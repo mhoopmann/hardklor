@@ -8,3 +8,5 @@ Hardklor uses 3rd party free software tools.
 = Details =
 
 Compilation requires zLib: http://zlib.net/
+
+Additionally, RAMP from the Trans Proteome Pipeline (http://tools.proteomecenter.org/wiki/index.php?title=Software:TPP) is used, but an older stable version is already included in this source repository.
