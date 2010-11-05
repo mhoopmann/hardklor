@@ -1,0 +1,10 @@
+#summary Installation Notes
+
+= Introduction =
+
+Hardklor uses 3rd party free software tools.
+
+
+= Details =
+
+Compilation requires zLib: http://zlib.net/
