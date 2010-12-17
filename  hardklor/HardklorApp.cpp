@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
 	CMercury8 *mercury;
 
 	if(argc==1){
-		cout << "Hardklor v1.34, August 18, 2010\n";
+		cout << "Hardklor v1.35, November 30, 2010\n";
 		cout << "Usage:\t\thardklor <MS1 file> <output file> [parameters]\n";
 		cout << "\t\thardklor -conf <config file>\n";
 		cout << "Parameters:\tSee documentation" << endl;

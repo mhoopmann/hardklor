@@ -99,7 +99,7 @@ void CHardklor::SetMercury(CMercury8 *m){
 }
 
 int CHardklor::GoHardklor(CHardklorSetting sett){
-  cout << "\n\nHardklor, v1.34, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2009\nUniversity of Washington\n" << endl;
+  cout << "\n\nHardklor, v1.35, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2009\nUniversity of Washington\n" << endl;
 	cs = sett;
   Analyze();
   return 0;
@@ -2215,17 +2215,41 @@ void CHardklor::WriteScanLine(Spectrum& s, fstream& fptr, int format){
 
   if(format==0) {
     fptr << "S\t" << s.getScanNumber() << "\t" << s.getRTime() << "\t" << cs.inFile;
-    if(s.sizeZ()>0){
-      for(int i=0;i<s.sizeZ();i++) fptr << "\t" << s.atZ(i).z << "," << s.atZ(i).mz;
-    }
+
+		//For Alex Panchaud, special ZS case
+		if(s.getFileType()==ZS || s.getFileType()==UZS){
+			if(s.sizeZ()>0){
+				for(int i=0;i<s.sizeZ();i++) fptr << "\t" << s.atZ(i).z << "," << s.atZ(i).mz;
+			}
+		} else {
+
+			//otherwise output precursor info if it exists
+			if(s.sizeZ()==1){
+				fptr << "\t" << s.atZ(0).mz-1.00727649 << "\t" << s.atZ(0).z << "\t" << s.getMZ();
+			} else if(s.sizeZ()>1){
+				fptr << "\t0.0\t0\t" << s.getMZ();
+			} else {
+				fptr << "\t0.0\t0\t0.0";
+			}
+		}
     fptr << endl;
   } else if(format==1){
     fptr << "<Spectrum Scan=\"" << s.getScanNumber() << "\" ";
 		fptr << "RetentionTime=\"" << s.getRTime() << "\" "; 
 		fptr << "Filename=\"" << cs.inFile << "\"";
-    if(s.sizeZ()>0){
-      for(int i=0;i<s.sizeZ();i++) fptr << " PeptideSignal" << i << "=\"" << s.atZ(i).z << "," << s.atZ(i).mz << "\"";
-    }
+		if(s.getFileType()==ZS || s.getFileType()==UZS){
+			if(s.sizeZ()>0){
+				for(int i=0;i<s.sizeZ();i++) fptr << " PeptideSignal" << i << "=\"" << s.atZ(i).z << "," << s.atZ(i).mz << "\"";
+			}
+		} else {
+			if(s.sizeZ()==1){
+				fptr << " AccMonoMass=\"" << s.atZ(0).mz-1.00727649 << "\" PrecursorCharge=\"" << s.atZ(0).z << "\" PrecursorMZ=\"" << s.getMZ() << "\"";
+			} else if(s.sizeZ()>1){
+				fptr << " AccMonoMass=\"0.0\" PrecursorCharge=\"0\" PrecursorMZ=\"" << s.getMZ() << "\"";
+			} else {
+				fptr << " AccMonoMass=\"0.0\" PrecursorCharge=\"0\" PrecursorMZ=\"0.0\"";
+			}
+		}
     fptr << ">" << endl;
   }
 }

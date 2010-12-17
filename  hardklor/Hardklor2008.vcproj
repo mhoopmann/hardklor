@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\hoopmann\My Documents\MSToolkit&quot;;&quot;C:\Documents and Settings\hoopmann\My Documents\MSToolkit\RAMP&quot;;&quot;C:\Documents and Settings\hoopmann\My Documents\MSToolkit\zLib&quot;"
+				AdditionalIncludeDirectories="..\MSToolkit\RAMP;..\zlib;..\MSToolkit"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,10 +61,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="MSToolkit.lib"
+				AdditionalDependencies="MSToolkitLite.lib zLib.lib"
 				OutputFile="$(OutDir)\Hardklor.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;C:\Documents and Settings\hoopmann\My Documents\MSToolkit\Release&quot;"
+				AdditionalLibraryDirectories="..\MSToolkit\Release;..\zlib\zlib\Release"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -141,7 +141,7 @@
 				AdditionalDependencies="MSToolkitLite.lib zLib.lib"
 				OutputFile="$(OutDir)\Hardklor.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\MSToolkit\Release;..\zLib\Release"
+				AdditionalLibraryDirectories="..\MSToolkit\Release;..\zLib\zLib\Release"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
