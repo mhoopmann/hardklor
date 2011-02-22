@@ -667,7 +667,7 @@ void CSpecAnalyze::MakePredictions(vector<CHardklorVariant>& var){
           if(fracAbun>0.50) p.AddVariant(pv);
           break;
         case 3:
-          p.AddVariant(pv);
+          if(matchCount>1) p.AddVariant(pv);
           break;
         default:
           if(matchCount>mismatchCount) p.AddVariant(pv);
