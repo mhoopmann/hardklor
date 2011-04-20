@@ -79,10 +79,11 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release"
+			OutputDirectory="..\Release"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
+			ManagedExtensions="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -104,8 +105,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\MSToolkit;..\..\MSToolkit\zLib;..\..\MSToolkit\RAMP"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_ATL_MIXED"
+				AdditionalIncludeDirectories="&quot;C:\Users\mhoopman\Documents\Software Development\MSToolkitCLR\&quot;;&quot;C:\Users\mhoopman\Documents\Software Development\MSToolkitCLR\expat-2.0.1\lib&quot;;&quot;C:\Users\mhoopman\Documents\Software Development\MSToolkitCLR\zlib-1.2.5&quot;;&quot;C:\Users\mhoopman\Documents\Software Development\MSToolkitCLR\mzParserB&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_NOSQLITE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"

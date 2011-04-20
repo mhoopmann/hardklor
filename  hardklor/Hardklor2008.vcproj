@@ -119,8 +119,8 @@
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_WARNINGS&quot;"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\MSToolkit;..\MSToolkit\RAMP;..\zLib"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_ATL_MIXED"
+				AdditionalIncludeDirectories="&quot;..\MSToolkit-Google\&quot;;&quot;..\MSToolkit-Google\mzParser&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_ATL_MIXED;_CRT_SECURE_NO_WARNINGS;_NOSQLITE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -138,10 +138,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="MSToolkitLite.lib zLib.lib"
+				AdditionalDependencies="MSToolkitLite.lib"
 				OutputFile="$(OutDir)\Hardklor.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\MSToolkit\Release;..\zLib\zLib\Release"
+				AdditionalLibraryDirectories="&quot;..\MSToolkit-Google\PublicBuild\MSToolkitLite\Release&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"

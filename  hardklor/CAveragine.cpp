@@ -13,7 +13,7 @@ CAveragine::CAveragine(char* fn, char* fn2){
 
 CAveragine::~CAveragine(){
   delete [] atoms;
-  for(int i=0;i<enrich->size();i++){
+  for(unsigned int i=0;i<enrich->size();i++){
     delete enrich->at(i).abundance;
     delete enrich->at(i).mass;
   }
