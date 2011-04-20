@@ -80,6 +80,7 @@ class CHardklor{
   ~CHardklor();
 
   //Methods:
+	void Echo(bool b);
   int GoHardklor(CHardklorSetting sett);
 	void SetAveragine(CAveragine *a);
 	void SetMercury(CMercury8 *m);
@@ -115,6 +116,7 @@ class CHardklor{
 	CHardklorSetting cs;
 	CAveragine *averagine;
 	CMercury8 *mercury;
+	bool bEcho;
 
   //Temporary Data Members:
   char bestCh[200];

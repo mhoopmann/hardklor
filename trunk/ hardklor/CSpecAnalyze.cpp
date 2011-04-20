@@ -96,7 +96,7 @@ void CSpecAnalyze::BuildMismatchArrays(){
   //Essentially, this creates dynamic bins for all mismatched points
 
   //Iterate through each predicted peptide
-  for(i=0;i<predPep->size();i++) {
+  for(i=0;i<(int)predPep->size();i++) {
 
     //get resolution
     deltaM = calcFWHM(predPep->at(i).GetMZ());
@@ -110,7 +110,7 @@ void CSpecAnalyze::BuildMismatchArrays(){
 
         //Check mz of every extra data point against the current list
         match=false;
-        for(m=0;m<mz.size();m++){
+        for(m=0;m<(int)mz.size();m++){
           if( fabs(mz.at(m) - extraMZ.mz) < deltaM ) {
             match=true;
             break;
@@ -124,8 +124,8 @@ void CSpecAnalyze::BuildMismatchArrays(){
 		
   //The list is built, sort it
   if(mz.size()>1) {
-    for(i=0;i<mz.size()-1;i++){
-      for(j=i+1;j<mz.size();j++){
+    for(i=0;i<(int)mz.size()-1;i++){
+      for(j=i+1;j<(int)mz.size();j++){
         if(mz.at(j)<mz.at(i)){
           tmp = mz.at(i);
           mz.at(i) = mz.at(j);
@@ -141,7 +141,7 @@ void CSpecAnalyze::BuildMismatchArrays(){
   //to fit the master bins.
 
   //Iterate through every predicted peptide
-  for(i=0;i<predPep->size();i++) {
+  for(i=0;i<(int)predPep->size();i++) {
 
     //get resolution
     deltaM = calcFWHM(predPep->at(i).GetMZ());
@@ -371,7 +371,7 @@ void CSpecAnalyze::FirstDerivativePeaks(Spectrum& s, int start, int stop, int wi
 				centroid.mz += (s.at(bestPeak).mz+s.at(nextBest).mz)/2;
 
 				//Calc centroid intensity
-				centroid.intensity=s.at(bestPeak).intensity/exp(-pow((s.at(bestPeak).mz-centroid.mz)/FWHM,2)*GAUSSCONST);
+				centroid.intensity=(float)(s.at(bestPeak).intensity/exp(-pow((s.at(bestPeak).mz-centroid.mz)/FWHM,2)*GAUSSCONST));
 
 				//some peaks are funny shaped and have bad gaussian fit.
 				//if error is more than 10%, keep existing intensity
@@ -545,8 +545,8 @@ void CSpecAnalyze::MakePredictions(vector<CHardklorVariant>& var){
   pv.SetMatchSize(i);
 
   //Sort peaks from high to low intensity;
-  for(i=0;i<predPeak->size()-1;i++){
-    for(j=i+1;j<predPeak->size();j++){
+  for(i=0;i<(int)predPeak->size()-1;i++){
+    for(j=i+1;j<(int)predPeak->size();j++){
       if(predPeak->at(j).GetIntensity() > predPeak->at(i).GetIntensity()) {
         pk = predPeak->at(j);
         predPeak->at(j) = predPeak->at(i);
@@ -556,7 +556,7 @@ void CSpecAnalyze::MakePredictions(vector<CHardklorVariant>& var){
   }
 
   //Go through every peak prediction
-  for(i=0;i<predPeak->size();i++) {
+  for(i=0;i<(int)predPeak->size();i++) {
 
     //Clear any prior peptide prediction data
     p.Clear();
@@ -572,7 +572,7 @@ void CSpecAnalyze::MakePredictions(vector<CHardklorVariant>& var){
     for(j=0;j<predPeak->at(i).Size();j++){
 
       //Iterate through every variant
-      for(q=0;q<var.size();q++){
+      for(q=0;q<(int)var.size();q++){
 
         //Clear prior data
         pv.Clear();
@@ -597,7 +597,7 @@ void CSpecAnalyze::MakePredictions(vector<CHardklorVariant>& var){
 
         //Align to max peak
         dif=0;
-        for(k=0; k<mercury->FixedData.size(); k++) {
+        for(k=0; k<(int)mercury->FixedData.size(); k++) {
           if(mercury->FixedData.at(k).data>dif){
             dif = mercury->FixedData.at(k).data;
             maxPeak=k;
@@ -610,7 +610,7 @@ void CSpecAnalyze::MakePredictions(vector<CHardklorVariant>& var){
         if(strcmp(userParams.formula,"")!=0){
           if( fabs(shft/mercury->FixedData[maxPeak].mass*1000000) > 10) continue;
         }
-        for(k=0; k<mercury->FixedData.size(); k++) {
+        for(k=0; k<(int)mercury->FixedData.size(); k++) {
           mercury->FixedData.at(k).mass += shft;
         }
 
@@ -620,7 +620,7 @@ void CSpecAnalyze::MakePredictions(vector<CHardklorVariant>& var){
         distArea=0;
 
         //Match predictions to the observed peaks and record them in the proper array.
-        for(k=0;k<mercury->FixedData.size();k++) {
+        for(k=0;k<(int)mercury->FixedData.size();k++) {
           if(mercury->FixedData.at(k).data<S2NCutoff) continue;
           if(mercury->FixedData.at(k).data<0.1) continue;
 
@@ -730,7 +730,7 @@ int CSpecAnalyze::PredictPeptides(){
 				if(peaks.at(i).intensity==0) continue;
 				p.SetMZ(peaks.at(i).mz);
 				p.SetIntensity(peaks.at(i).intensity);
-				for(j=0;j<charges->size();j++) p.AddCharge(charges->at(j));
+				for(j=0;j<(int)charges->size();j++) p.AddCharge(charges->at(j));
 				if(p.Size()>0) predPeak->push_back(p);
 			}
 			break;

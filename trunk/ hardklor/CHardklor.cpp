@@ -74,6 +74,7 @@ void SSObject::clear(){
 CHardklor::CHardklor(){
 	averagine=NULL;
 	mercury=NULL;
+	bEcho=true;
 }
 
 CHardklor::CHardklor(CAveragine *a, CMercury8 *m){
@@ -81,11 +82,16 @@ CHardklor::CHardklor(CAveragine *a, CMercury8 *m){
   mercury=m;
   sa.setAveragine(averagine);
   sa.setMercury(mercury);
+	bEcho=true;
 }
 
 CHardklor::~CHardklor(){
 	averagine=NULL;
 	mercury=NULL;
+}
+
+void CHardklor::Echo(bool b){
+	bEcho=b;
 }
 
 void CHardklor::SetAveragine(CAveragine *a){
@@ -99,7 +105,7 @@ void CHardklor::SetMercury(CMercury8 *m){
 }
 
 int CHardklor::GoHardklor(CHardklorSetting sett){
-  cout << "\n\nHardklor, v1.35, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2009\nUniversity of Washington\n" << endl;
+  if(bEcho) cout << "\n\nHardklor, v1.36, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2011\nUniversity of Washington\n" << endl;
 	cs = sett;
   Analyze();
   return 0;
@@ -130,7 +136,8 @@ void CHardklor::Analyze() {
   SSObject bsso;
 
   //iterators
-  unsigned int k,c,j;   //counters for loops
+  unsigned int k;   //counters for loops
+	int c;
 
   int TotalIterations=0;
   int TotalScans=0;
@@ -144,8 +151,8 @@ void CHardklor::Analyze() {
   splitTime=0;
 	
   //placeholders for data output to file
-  int pepID;
-  int varID;
+  //int pepID;
+  //int varID;
 
   //Variables for some basic information output.
   int iPercent;
@@ -175,8 +182,10 @@ void CHardklor::Analyze() {
   int winCount=0;
 
   //Ouput file info to user
-  cout << "Reading from file: " << cs.inFile << endl;
-  cout << "Writing to file: " << cs.outFile << endl;
+	if(bEcho){
+		cout << "Reading from file: " << cs.inFile << endl;
+		cout << "Writing to file: " << cs.outFile << endl;
+	}
 
   if(cs.fileFormat==dunno) {
     cout << "Unknown file format or bad extension." << endl;
@@ -244,7 +253,7 @@ void CHardklor::Analyze() {
 
   //Set and display on screen percentage counter
   iPercent=0;
-  cout << iPercent;
+  if(bEcho) cout << iPercent;
   
   //While there is still data to read in the file.
   while(true){
@@ -323,8 +332,8 @@ void CHardklor::Analyze() {
 	
 				//Smooth the file, if requested.
 				if(cs.smooth>0) SG_Smooth(curSpec,cs.smooth,4);
-      };//if(!bCutMe)
-    };//if(bFirst)
+      }//if(!bCutMe)
+    }//if(bFirst)
     
     //track loadtime
     getExactTime(stopTime);
@@ -439,14 +448,16 @@ void CHardklor::Analyze() {
     splitTime+=tmpTime1-tmpTime2;
 
     //Update the percentage indicator
-    if (r.getPercent() > iPercent){
-      if(iPercent<10) cout << "\b";
-      else cout << "\b\b";
-      cout.flush();
-      iPercent=r.getPercent();
-      cout << iPercent;
-      cout.flush();
-    }
+		if(bEcho){
+			if (r.getPercent() > iPercent){
+				if(iPercent<10) cout << "\b";
+				else cout << "\b\b";
+				cout.flush();
+				iPercent=r.getPercent();
+				cout << iPercent;
+				cout.flush();
+			}
+		}
     
     //do not analyze spectrum with 0 predicted peaks; Keep count of these occurrances.
     //if(sa.peptide.size()==0) {
@@ -469,7 +480,7 @@ void CHardklor::Analyze() {
 
     //Keep track of how many spectrum had more predicted peptides than the user
     //defined threshold, or no peptides after making predictions.
-    if(sa.predPep->size()>=cs.peptide) {
+    if((int)sa.predPep->size()>=cs.peptide) {
 			manyPep++;
 			//cout << winCount << ": " << sa.predPep->size() << endl;
 		}
@@ -540,7 +551,7 @@ void CHardklor::Analyze() {
 		default:
 			BasicMethod(match,mismatch,&bsso,1,cs.depth,sa.predPep->size()-1);
 			break;
-		};
+		}
 
 		delete [] match;
 		delete [] mismatch;
@@ -571,44 +582,46 @@ void CHardklor::Analyze() {
   fptr.close();
   fptr.clear();
 
-	cout << "\n" << endl;
+	if(bEcho) {
+		cout << "\n" << endl;
 
-	switch(cs.algorithm){
-	case SemiComplete:
-		cout << "SemiComplete analysis:" << endl;
-		break;
-	case SemiCompleteFast:
-		cout << "SemiCompleteFast analysis:" << endl;
-		break;
-	case Dynamic:
-		cout << "Dynamic analysis:" << endl;
-		break;
-	case DynamicSemiComplete:
-		cout << "DynamicSemiComplete analysis:" << endl;
-		break;
-	case SemiSubtractive:
-		cout << "SemiSubtractive analysis:" << endl;
-		break;
-	case FewestPeptides:
-		cout << "FewestPeptides analysis:" << endl;
-		break;
-	case FewestPeptidesChoice:
-		cout << "FewestPeptidesChoice analysis:" << endl;
-		break;
-	case FastFewestPeptides:
-		cout << "FastFewestPeptides analysis:" << endl;
-		break;
-	case FastFewestPeptidesChoice:
-		cout << "FastFewestPeptidesChoice analysis:" << endl;
-		break;
-	case Basic:
-	default:
-		cout << "Basic analysis:" << endl;
-		break;
-	};
+		switch(cs.algorithm){
+		case SemiComplete:
+			cout << "SemiComplete analysis:" << endl;
+			break;
+		case SemiCompleteFast:
+			cout << "SemiCompleteFast analysis:" << endl;
+			break;
+		case Dynamic:
+			cout << "Dynamic analysis:" << endl;
+			break;
+		case DynamicSemiComplete:
+			cout << "DynamicSemiComplete analysis:" << endl;
+			break;
+		case SemiSubtractive:
+			cout << "SemiSubtractive analysis:" << endl;
+			break;
+		case FewestPeptides:
+			cout << "FewestPeptides analysis:" << endl;
+			break;
+		case FewestPeptidesChoice:
+			cout << "FewestPeptidesChoice analysis:" << endl;
+			break;
+		case FastFewestPeptides:
+			cout << "FastFewestPeptides analysis:" << endl;
+			break;
+		case FastFewestPeptidesChoice:
+			cout << "FastFewestPeptidesChoice analysis:" << endl;
+			break;
+		case Basic:
+		default:
+			cout << "Basic analysis:" << endl;
+			break;
+		}
+	}
   
   //Output the simple statistics
-	cout << "  Total number of scans analyzed: " << TotalScans << endl;
+	if(bEcho) cout << "  Total number of scans analyzed: " << TotalScans << endl;
   //cout << "  Number of (sub)scans not analyzed:" << endl;
   //cout << "    No Peptides Predicted: " << zeroPep << endl;
   //cout << "    Intensity Below Limit: " << lowSigPep << endl;
@@ -616,42 +629,44 @@ void CHardklor::Analyze() {
 	//cout << "  Total Correlations Made: " << TotalIterations << endl;
 
 	//Output the time to analyze this file.
-  i=timeToSec(loadTime,timerFrequency);
-	minutes = (int)(i/60);
-  seconds = i - (60*minutes);
-  cout << "\nFile access time: " << minutes << " minutes, " << seconds << " seconds." << endl;
-  i=timeToSec(splitTime,timerFrequency);
-	minutes = (int)(i/60);
-  seconds = i - (60*minutes);
-	cout << "Split Time:       " << minutes << " minutes, " << seconds << " seconds." << endl;
-  i=timeToSec(analysisTime,timerFrequency);
-  minutes = (int)(i/60);
-  seconds = i - (60*minutes);
-  cout << "Analysis Time:    " << minutes << " minutes, " << seconds << " seconds." << endl;
+	if(bEcho){
+		i=(int)timeToSec(loadTime,timerFrequency);
+		minutes = (int)(i/60);
+		seconds = i - (60*minutes);
+		cout << "\nFile access time: " << minutes << " minutes, " << seconds << " seconds." << endl;
+		i=(int)timeToSec(splitTime,timerFrequency);
+		minutes = (int)(i/60);
+		seconds = i - (60*minutes);
+		cout << "Split Time:       " << minutes << " minutes, " << seconds << " seconds." << endl;
+		i=(int)timeToSec(analysisTime,timerFrequency);
+		minutes = (int)(i/60);
+		seconds = i - (60*minutes);
+		cout << "Analysis Time:    " << minutes << " minutes, " << seconds << " seconds." << endl;
 
-  if (minutes==0 && seconds==0){
-    cout << "IMPOSSIBLE!!!" << endl;
-  } else if(minutes <=2){
-    cout << "HOLY FRIJOLE!!" << endl;
-  } else if(minutes<=5) {
-    cout << "Like lightning!" << endl;
-  } else if(minutes<=10){
-    cout << "That's pretty damn fast!" << endl;
-  } else if(minutes<=20){
-    cout << "Monkeys calculate faster than that!" << endl;
-  } else if(minutes<=30){
-    cout << "You should have taken a lunch break." << endl;
-  } else if(minutes<=40){
-    cout << "Oi! Too freakin' slow!!" << endl;
-  } else {
-    cout << "Blame Klezmer!" << endl;
-  }
+		if (minutes==0 && seconds==0){
+			cout << "IMPOSSIBLE!!!" << endl;
+		} else if(minutes <=2){
+			cout << "HOLY FRIJOLE!!" << endl;
+		} else if(minutes<=5) {
+			cout << "Like lightning!" << endl;
+		} else if(minutes<=10){
+			cout << "That's pretty damn fast!" << endl;
+		} else if(minutes<=20){
+			cout << "Monkeys calculate faster than that!" << endl;
+		} else if(minutes<=30){
+			cout << "You should have taken a lunch break." << endl;
+		} else if(minutes<=40){
+			cout << "Oi! Too freakin' slow!!" << endl;
+		} else {
+			cout << "Blame Klezmer!" << endl;
+		}
+	}
 
 }
 
 double CHardklor::LinReg(float *match, float *mismatch){
 
-  int i;
+  int i,sz;
   double sxx=0,syy=0,sxy=0;
   vector<sFloat> v;
   sFloat tmp;
@@ -661,7 +676,7 @@ double CHardklor::LinReg(float *match, float *mismatch){
 		tmp.fLower = sa.peaks.at(i).intensity;
 		tmp.fUpper = match[i];
 		v.push_back(tmp);
-  };
+  }
 
 	//Correlate mismatches with 0
 	for(i=0;i<sa.mismatchSize;i++){
@@ -669,23 +684,24 @@ double CHardklor::LinReg(float *match, float *mismatch){
 			tmp.fLower = 0;
 			tmp.fUpper = mismatch[i];
 			v.push_back(tmp);
-		};
-  };
+		}
+  }
 
   //Cosine angle correlation
   sxy=0;
   sxx=0;
   syy=0;
-  for(i=0;i<v.size();i++){
+	sz=(int)v.size();
+  for(i=0;i<sz;i++){
     sxy += (v.at(i).fLower*v.at(i).fUpper);
     sxx += (v.at(i).fLower*v.at(i).fLower);
     syy += (v.at(i).fUpper*v.at(i).fUpper);
-  };
+  }
 
   if(sxx>0 && syy>0 && sxy>0) return sxy/sqrt(sxx*syy);
   else return 0;
     
-};
+}
 
 
 void CHardklor::BasicMethod(float *match, float *mismatch,SSObject *combo, 
@@ -815,8 +831,8 @@ void CHardklor::SemiCompleteMethod(float *match, float *mismatch,SSObject *combo
 			//Check if it is the best, if so, mark it
 			if(recCombo.corr>bestCombo.corr) bestCombo = recCombo;
 		
-    };
-  };
+    }
+  }
 
 	//If we reached threshold, stop here without recursion
 	if(bestCombo.corr>cs.corr) {
@@ -824,7 +840,7 @@ void CHardklor::SemiCompleteMethod(float *match, float *mismatch,SSObject *combo
 		delete [] sumMismatch;
 		*combo = bestCombo;
 		return;
-	};
+	}
 
 	if(depth<maxDepth){
 
@@ -838,12 +854,12 @@ void CHardklor::SemiCompleteMethod(float *match, float *mismatch,SSObject *combo
 				//Do matches first
 				for(a=0;a<sa.peaks.size();a++){
 					sumMatch[a]=sa.predPep->at(k).GetVariant(n).GetMatch(a).intensity + match[a];
-				};
+				}
 
 				//Now add mismatches
 				for(a=0;a<sa.mismatchSize;a++){
 					sumMismatch[a]=sa.predPep->at(k).GetVariant(n).GetMismatch(a).intensity + mismatch[a];
-				};
+				}
       
 				recCombo = *combo;
 				recCombo.addVar(k,n);
@@ -855,15 +871,15 @@ void CHardklor::SemiCompleteMethod(float *match, float *mismatch,SSObject *combo
 				//Check if it is the best, if so, mark it
 				if(recCombo.corr>bestCombo.corr) bestCombo = recCombo;
       
-			};
-    };
-  };
+			}
+    }
+  }
 
 	delete [] sumMatch;
 	delete [] sumMismatch;
 	*combo = bestCombo;
   
-};
+}
 
 void CHardklor::SemiCompleteFastMethod(float *match, float *mismatch,SSObject *combo, 
 			     int depth, int maxDepth, int start){
@@ -2117,36 +2133,38 @@ void CHardklor::FastFewestPeptidesChoiceMethod(SSObject *combo, int maxDepth){
 int CHardklor::calcDepth(int start, int max, int depth, int count) {
 	int i,j,n;
 	int total=0;
+	int sz=(int)sa.predPep->size();
 	
 	if(max==1) {
-		for(i=start;i<sa.predPep->size();i++) total+=sa.predPep->at(i).VariantListSize();
+		for(i=start;i<sz;i++) total+=sa.predPep->at(i).VariantListSize();
 		return total;
-	};
+	}
 
-	for(i=start;i<sa.predPep->size()-max+depth;i++) {
+	for(i=start;i<sz-max+depth;i++) {
 
 		if(depth==max) {
 			return sa.predPep->at(i).VariantListSize()*count;
 		} else {
-			for(j=i+1;j<sa.predPep->size();j++){
+			for(j=i+1;j<sz;j++){
 				n = calcDepth(j,max,depth+1,sa.predPep->at(i).VariantListSize()*count);
 				total+=n;
-			};
-		};
+			}
+		}
 		if(depth>1) return total;
-	};
+	}
 
 	return total;
 
-};
+}
 
 void CHardklor::WritePepLine(SSObject& obj, CPeriodicTable* PT, fstream& fptr, int format){
   int j,k;
   int pepID;
   int varID;
+	int sz=(int)obj.pepVar->size();
 
   //Each peptide in a window is designated with a P 
-  for(k=0;k<obj.pepVar->size();k++) {
+  for(k=0;k<sz;k++) {
 
     pepID=obj.pepVar->at(k).iLower;
     varID=obj.pepVar->at(k).iUpper;

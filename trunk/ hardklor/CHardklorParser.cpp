@@ -909,6 +909,7 @@ MSFileFormat CHardklorParser::getFileFormat(char* c){
 	if(strcmp(ext,"cms2")==0 || strcmp(ext,"CMS2")==0) return cms2;
 	if(strcmp(ext,"zs")==0 || strcmp(ext,"ZS")==0) return zs;
 	if(strcmp(ext,"uzs")==0 || strcmp(ext,"UZS")==0) return uzs;
+	if(strcmp(ext,"mzML")==0 || strcmp(ext,"MZML")==0) return mzML;
 	if(strcmp(ext,"mzXML")==0 || strcmp(ext,"MZXML")==0) return mzXML;
   if(strcmp(ext,"raw")==0 || strcmp(ext,"RAW")==0) return raw;
 	return dunno;
