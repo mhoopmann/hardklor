@@ -29,7 +29,7 @@ class CPeriodicTable {
    void loadTable(char*);
 
    //Data Members:
-   vector<element> *table;
+   vector<element> table;
 
 };
 

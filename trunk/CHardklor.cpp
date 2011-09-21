@@ -125,7 +125,6 @@ void CHardklor::Analyze() {
   //Objects
   MSReader r;
   CNoiseReduction nr(&r,cs);
-  //CHardklorFileReader fr(cs);
   CPeriodicTable *PT;
   PT = new CPeriodicTable(cs.HardklorFile);
 

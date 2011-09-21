@@ -16,9 +16,9 @@ void CHardklorParser::parse(char* cmd) {
   bool isGlobal=true;
   sMolecule m;
   char *tok;
-  char *tok2;
   char tmpstr[256];
-  int i;
+	char upStr[64];
+  unsigned int i;
   string tstr;
   vector<string> vs;
 
@@ -250,7 +250,7 @@ void CHardklorParser::parse(char* cmd) {
 					isotope="";
 
 					//Get the APE
-					for(j=0;j<strlen(tok);j++){
+					for(j=0;j<(int)strlen(tok);j++){
 						if(isdigit(tok[j]) || tok[j]=='.') {
 							if(percent.size()==15){
 								cout << "Malformed modification flag: too many digits." << endl;
@@ -265,7 +265,7 @@ void CHardklorParser::parse(char* cmd) {
 					if(badMod) break;
 
 					//Get the atom
-					for(j=j;j<strlen(tok);j++){
+					for(j=j;j<(int)strlen(tok);j++){
 						if(isalpha(tok[j])) {
 							if(atom.size()==2){
 								cout << "Malformed modification flag: invalid atom" << endl;
@@ -280,7 +280,7 @@ void CHardklorParser::parse(char* cmd) {
 					if(badMod) break;
 
 					//Get the isotope
-					for(j=j;j<strlen(tok);j++){
+					for(j=j;j<(int)strlen(tok);j++){
 						if(isotope.size()==2){
 							cout << "Malformed modification flag: bad isotope" << endl;
 							badMod=true;
@@ -317,7 +317,7 @@ void CHardklorParser::parse(char* cmd) {
 					bNew=true;
 
 					//Get the atom
-					for(j=0;j<strlen(tok);j++){
+					for(j=0;j<(int)strlen(tok);j++){
       
 						//Check for an atom symbol
 						if(isalpha(tok[j])) {
@@ -464,6 +464,15 @@ void CHardklorParser::parse(char* cmd) {
       } else if (strcmp(tok,"MIX")==0 || strcmp(tok,"mix")==0) {
 				if(isGlobal) global.sna=3;
 				else hs.sna=3;
+			} else if (strcmp(tok,"V2")==0 || strcmp(tok,"v2")==0) {
+				if(isGlobal) global.sna=4;
+				else hs.sna=4;
+			} else if (strcmp(tok,"V2ASN")==0 || strcmp(tok,"v2asn")==0) {
+				if(isGlobal) global.sna=5;
+				else hs.sna=5;
+			} else if (strcmp(tok,"V2MIX")==0 || strcmp(tok,"v2mix")==0) {
+				if(isGlobal) global.sna=6;
+				else hs.sna=6;
 			} else {
         cout << "Unkown signal to noise algorithm. Defaulting to STD method." << endl;
 				if(isGlobal) global.sna=0;
@@ -656,16 +665,18 @@ void CHardklorParser::parse(char* cmd) {
 				else hs.res400=atof(tok);
       }
 			tok = strtok(NULL," \n");
-			if(strcmp(tok,"FTICR")==0) {
+			for(j=0;j<(int)strlen(tok);j++) upStr[j]=toupper(tok[j]);
+			upStr[j]='\0';
+			if(strcmp(upStr,"FTICR")==0) {
 				if(isGlobal) global.msType=FTICR;
 				else hs.msType=FTICR;
-			} else if (strcmp(tok,"OrbiTrap")==0 || strcmp(tok,"Orbitrap")==0) {
+			} else if (strcmp(upStr,"ORBITRAP")==0) {
 				if(isGlobal) global.msType=OrbiTrap;
 				else hs.msType=OrbiTrap;
-			} else if (strcmp(tok,"TOF")==0) {
+			} else if (strcmp(upStr,"TOF")==0) {
 				if(isGlobal) global.msType=TOF;
 				else hs.msType=TOF;
-			} else if (strcmp(tok,"QIT")==0) {
+			} else if (strcmp(upStr,"QIT")==0) {
 				if(isGlobal) global.msType=QIT;
 				else hs.msType=QIT;
 			} else {

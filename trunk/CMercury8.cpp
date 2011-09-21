@@ -87,6 +87,7 @@ void CMercury8::Enrich(int c,int e,double d){
   int i=0;
   int j=0;
   double ab=0;
+	float f=(float)d;
 
   //c++;
   if(showOutput) cout << "Enrich: " << Element[c].Symbol << " " << c << "\t" << d << endl;
@@ -96,23 +97,23 @@ void CMercury8::Enrich(int c,int e,double d){
     if(Element[c].IsoProb[i]>ab){
       j=i;
       ab=Element[c].IsoProb[i];
-    };
-  };
+    }
+  }
 
   //Normalize all isotope abundances
   for(i=0;i<Element[c].NumIsotopes;i++){
     Element[c].IsoProb[i]/=Element[c].IsoProb[j];
-  };
+  }
 
   //Calculate enrichment
   for(i=0;i<Element[c].NumIsotopes;i++){
-    if(i==e) Element[c].IsoProb[i]=(1-d)*Element[c].IsoProb[i]+d;
-    else Element[c].IsoProb[i]=(1-d)*Element[c].IsoProb[i];
-  };
+    if(i==e) Element[c].IsoProb[i]=(1-f)*Element[c].IsoProb[i]+f;
+    else Element[c].IsoProb[i]=(1-f)*Element[c].IsoProb[i];
+  }
 
   EnrichAtoms.push_back(c);
 
-};
+}
   
 
 /*************************************************/
@@ -295,177 +296,79 @@ void CMercury8::AddElement(char Atom[3], int Ecount, int Acount) {
 //Return codes
 //	0: Success
 //	-1: Invalid character
-int CMercury8::ParseMF(char MF[], int *elementcount)
-{
-   int  i, COND, ERRFLAG;
-   int atomcount;
-   char Atom[3], ch, errorch;
+int CMercury8::ParseMF(char MF[], int *elementcount) {
+  int COND, ERRFLAG;
+  int atomcount;
+  char Atom[3], errorch;
 
-   atomcount=0; COND=0; ERRFLAG=0;
-   Atom[0] = Atom[1] = Atom[2] = '\0';
+  atomcount=0; COND=0; ERRFLAG=0;
+  Atom[0] = Atom[1] = Atom[2] = '\0';
 
-
-   int pos=0;
-   int peek=0;
-   int count=0;
-   char digit[2];
-   bool bFirst=true;
-   atomcount=0;
-   *elementcount=0;
-   while(pos<strlen(MF) && ERRFLAG==0){
-     if(isupper(MF[pos])){
-       //Add the last atom
-       if(!bFirst) {
-         AddElement(Atom,(*elementcount)++,atomcount);
-         atomcount=0;
-       } else {
-         bFirst=false;
-       }
+  unsigned int pos=0;
+  unsigned int peek=0;
+  unsigned int count=0;
+  char digit[2];
+  bool bFirst=true;
+  atomcount=0;
+  *elementcount=0;
+  while(pos<strlen(MF) && ERRFLAG==0){
+    if(isupper(MF[pos])){
+      //Add the last atom
+      if(!bFirst) {
+        AddElement(Atom,(*elementcount)++,atomcount);
+        atomcount=0;
+      } else {
+        bFirst=false;
+      }
+      
+      peek=pos+1;
+      if(peek==strlen(MF)){
+        //reached end of string, add this single atom
+        Atom[0]=MF[pos];
+        Atom[1]=Atom[2]='\0';
+        atomcount=1;
+        pos++;
+        continue;
+      }
        
-       peek=pos+1;
-       if(peek==strlen(MF)){
-         //reached end of string, add this single atom
-         Atom[0]=MF[pos];
-         Atom[1]=Atom[2]='\0';
-         atomcount=1;
-         pos++;
-         continue;
-       }
-        
-       if(isupper(MF[peek])){
-         //This is a single atom
-         Atom[0]=MF[pos];
-         Atom[1]=Atom[2]='\0';
-         atomcount=1;
-         pos++;
-       } else if(islower(MF[peek])){
-         //Set the atom name
-         Atom[0]=MF[pos];
-         Atom[1]=MF[peek];
-         Atom[2]='\0';
-         atomcount=0;
-         pos+=2;
-       } else if(isdigit(MF[peek])){
-         //Set the atom name
-         Atom[0]=MF[pos];
-         Atom[1]=Atom[2]='\0';
-         atomcount=0;
-         pos++;
-       } else {
-         errorch=MF[peek];
-         ERRFLAG=1;
-       }
-          
-     } else if(isdigit(MF[pos])){
-       digit[0]=MF[pos];
-       digit[1]='\0';
-       atomcount*=10;
-       atomcount+=atoi(digit);
-       pos++;
-
+      if(isupper(MF[peek])){
+        //This is a single atom
+        Atom[0]=MF[pos];
+        Atom[1]=Atom[2]='\0';
+        atomcount=1;
+        pos++;
+      } else if(islower(MF[peek])){
+        //Set the atom name
+        Atom[0]=MF[pos];
+        Atom[1]=MF[peek];
+        Atom[2]='\0';
+        atomcount=0;
+        pos+=2;
+      } else if(isdigit(MF[peek])){
+        //Set the atom name
+        Atom[0]=MF[pos];
+        Atom[1]=Atom[2]='\0';
+        atomcount=0;
+        pos++;
+      } else {
+        errorch=MF[peek];
+        ERRFLAG=1;
+      }
+         
+    } else if(isdigit(MF[pos])){
+      digit[0]=MF[pos];
+      digit[1]='\0';
+      atomcount*=10;
+      atomcount+=atoi(digit);
+      pos++;
      } else {
-       errorch=MF[pos];
-       ERRFLAG=1;
-     }
-   }
+      errorch=MF[pos];
+      ERRFLAG=1;
+    }
+  }
 
-   if(ERRFLAG==0) AddElement(Atom,(*elementcount)++,atomcount);
-   else printf("There was an error\n");
-
-
-/*
-   for (i=0; i<=strlen(MF); i++) {
-     
-     ch = MF[i];
-     if (isspace(ch)) ch = 0;
-     switch (COND) {
-       
-     case 0: 
-       if (isupper(ch)) {
-	 Atom[0] = ch;
-	 COND = 1;
-       } else {
-	 COND = -1;
-	 errorch = ch;
-       };
-       break;  // out of case 0 
-       
-     case 1: 
-       if (isupper(ch)) {
-	 AddElement(Atom,(*elementcount)++,1);
-	 Atom[0] = 0;
-	 COND = 0;
-	 i--;
-       } else {
-	 if (islower(ch)) {
-	   Atom[1] = ch;
-	   COND = 2;
-	 } else {
-	   if (isdigit(ch)) {
-	     atomcount = atoi(&ch);
-	     COND = 3;
-	   } else {
-	     if (ch == 0) { 
-	       AddElement(Atom,(*elementcount)++,1);
-	     } else {
-	       COND = -1;
-	       errorch = ch;
-	     };
-	   };
-	 };
-       };
-       break;  // out of case 1 
-       
-     case 2: 
-       if (isupper(ch)) {
-	 AddElement(Atom,(*elementcount)++,1);
-	 Atom[0] = ch; Atom[1] = 0;
-	 COND = 1;
-       } else {
-	 if (isdigit(ch)) {
-	   atomcount = atoi(&ch);
-	   COND = 3;
-	 } else {
-	   if (ch == 0) {
-	     AddElement(Atom,(*elementcount)++,1);
-	   } else {
-	     COND = -1;
-	     errorch = ch;
-	   };
-	 };
-       };
-       break;  // out of case 2 
-       
-     case 3: 
-       if (isupper(ch)) {
-	 AddElement(Atom,(*elementcount)++,atomcount);
-	 atomcount = 0;
-	 Atom[0] = Atom[1] = 0;
-	 COND = 0;
-	 i--;
-       } else {
-	 if (isdigit(ch)) {
-	   atomcount = atomcount*10+atoi(&ch);
-	 } else {
-	   if (ch == 0) {
-	     AddElement(Atom,(*elementcount)++,atomcount);
-	     COND = 0;
-	   } else {
-	     COND = -1;
-	     errorch = ch;
-	   };
-	 };
-       };
-       break;  // out of case 3 
-       
-     case -1: 
-       ERRFLAG = -1;
-       i = strlen(MF) + 1;  // skip out of loop 
-       break;  // out ot case -1 
-       
-     };  // end switch 
-   };  // end for i ... 
-*/
+  if(ERRFLAG==0) AddElement(Atom,(*elementcount)++,atomcount);
+  else printf("There was an error\n");
 
   if (ERRFLAG) {
     printf("\nError in format of input...  The character '%c' is invalid\n",errorch);
@@ -500,17 +403,17 @@ void CMercury8::CalcFreq(complex* FreqData, int Ecount, int NumPoints, int MassR
 				X = TWOPI * Element[Z].IntMass[k] * freq;
 				real += Element[Z].IsoProb[k] * cos(X);
 				imag += Element[Z].IsoProb[k] * sin(X);
-      };
+      }
       
       /* Convert to polar coordinates, r then theta */
       tempr = sqrt(real*real+imag*imag);
-      r *= pow(tempr,(double)Element[Z].NumAtoms);
+      r *= pow(tempr,Element[Z].NumAtoms);
       if (real > 0) theta += Element[Z].NumAtoms * atan(imag/real);
       else if (real < 0) theta += Element[Z].NumAtoms * (atan(imag/real) + PI);
       else if (imag > 0) theta += Element[Z].NumAtoms * HALFPI;
       else theta += Element[Z].NumAtoms * -HALFPI;
       
-    };  /* end for(j) */
+    }  /* end for(j) */
     
     /* Convert back to real:imag coordinates and store */
     a = r * cos(theta);
@@ -520,7 +423,7 @@ void CMercury8::CalcFreq(complex* FreqData, int Ecount, int NumPoints, int MassR
     FreqData[i].real = a*c - b*d;
     FreqData[i].imag = b*c + a*d;
     
-  };  /* end for(i) */
+  }  /* end for(i) */
   
   /* Calculate second half of Frequency Domain (-)masses */
   for (i=NumPoints/2; i<NumPoints; i++) {
@@ -535,17 +438,17 @@ void CMercury8::CalcFreq(complex* FreqData, int Ecount, int NumPoints, int MassR
 				X = TWOPI * Element[Z].IntMass[k] * freq;
 				real += Element[Z].IsoProb[k] * cos(X);
 				imag += Element[Z].IsoProb[k] * sin(X);
-      };
+      }
       
       /* Convert to polar coordinates, r then theta */
       tempr = sqrt(real*real+imag*imag);
-      r *= pow(tempr,(double)Element[Z].NumAtoms);
+      r *= pow(tempr,Element[Z].NumAtoms);
       if (real > 0) theta += Element[Z].NumAtoms * atan(imag/real);
       else if (real < 0) theta += Element[Z].NumAtoms * (atan(imag/real) + PI);
       else if (imag > 0) theta += Element[Z].NumAtoms * HALFPI;
       else theta += Element[Z].NumAtoms * -HALFPI;
       
-    };  /* end for(j) */
+    }  /* end for(j) */
     
     /* Convert back to real:imag coordinates and store */
     a = r * cos(theta);
@@ -555,9 +458,9 @@ void CMercury8::CalcFreq(complex* FreqData, int Ecount, int NumPoints, int MassR
     FreqData[i].real = a*c - b*d;
     FreqData[i].imag = b*c + a*d;
     
-  };  /* end of for(i) */
+  }  /* end of for(i) */
   
-};  /* End of CalcFreq() */
+}  /* End of CalcFreq() */
   
  
 /*************************************************/
@@ -569,7 +472,7 @@ void CMercury8::CalcFreq(complex* FreqData, int Ecount, int NumPoints, int MassR
 //	2: Cannot write to file
 int CMercury8::GoMercury(char* MolForm, int Charge, char* filename) {
   
-  int 	 i;
+  unsigned int i;
   int	 NumElements=0;			/* Number of elements in molecular formula */
   FILE	 *outfile;			/* output file pointer */
   
@@ -577,14 +480,14 @@ int CMercury8::GoMercury(char* MolForm, int Charge, char* filename) {
   if (strlen(MolForm) == 0) {
     //printf("\nNo molecular formula!\n");
     return 1;
-  };
+  }
   
   //Parse the formula, check for validity
   if (ParseMF(MolForm,&NumElements) == -1)     {
     MolForm[0] = '\0';
     NumElements = 0;
     return 1;
-  };
+  }
 
   //Run the user requested Mercury
   if(bAccMass) AccurateMass(NumElements,Charge);
@@ -598,20 +501,20 @@ int CMercury8::GoMercury(char* MolForm, int Charge, char* filename) {
     if ((outfile = fopen(filename,"w")) == NULL) {
       printf("\nError - Cannot create file %s\n",filename);
       return 2;
-    };
+    }
     for(i=0;i<FixedData.size();i++){
       fprintf(outfile,"%lf %lf\n",FixedData[i].mass,FixedData[i].data);
-    };
+    }
     fclose(outfile);
     
-  };
+  }
   
   //If the user wants the data on the screen, let it be so.
   if(showOutput){
-    for(int i=0;i<FixedData.size();i++){
+    for(i=0;i<FixedData.size();i++){
       printf("%.4f\t%.5f\n",FixedData[i].mass,FixedData[i].data);
-    };
-  };
+    }
+  }
   
   //Clear all non-user input so object can be reused:
   Reset();
@@ -621,19 +524,20 @@ int CMercury8::GoMercury(char* MolForm, int Charge, char* filename) {
   
   return 0;
   
-};
+}
 
 
 //This function resets all atomic states to those at initialization.
 //This is so the same object can be reused after performing a calculation
 //or after user intervention, such as Enrich().
 void CMercury8::Reset(){
-  int i,j;
+  unsigned int i;
+	int j;
   
   for (i=0;i<20;i++) AtomicNum[i]=0;
   for (i=0; i<=MAXAtomNo; i++)  Element[i].NumAtoms = 0;
   
-  for (i=0;i<EnrichAtoms.size();i++){
+  for (i=0;i<(int)EnrichAtoms.size();i++){
     for (j=0;j<Element[EnrichAtoms[i]].NumIsotopes;j++){
       Element[EnrichAtoms[i]].IsoProb[j] = Orig[EnrichAtoms[i]].IsoProb[j];
     }
@@ -651,7 +555,7 @@ void CMercury8::AccurateMass(int NumElements, int Charge){
   int   PtsPerAmu;
   int   NumPoints;			/* Working # of datapoints (real:imag) */
   complex *FreqData;              /* Array of real:imaginary frequency values for FFT */
-  float MW;
+  double MW;
   double MIMW, tempMW, MolVar, IntMolVar;
   int intMW, MIintMW;
   int dummyLong;
@@ -679,8 +583,8 @@ void CMercury8::AccurateMass(int NumElements, int Charge){
     } else {
       printf("Average Molecular Weight: %.3lf\n",MW);
       printf("Average Integer MW: %ld\n\n",intMW);
-    };
-  };
+    }
+  }
 
   //Set our parental molecular weight. This will be used as the lower bounds.
   //PMIintMW = (int)round(MIMW);
@@ -734,7 +638,7 @@ void CMercury8::AccurateMass(int NumElements, int Charge){
   MaxIntMW = (int)(vParent[vParent.size()-1].mass+0.5);
 
   //set parental masses to 0
-  for(i=0;i<vParent.size();i++) vParent[i].mass=0;
+  for(i=0;i<(int)vParent.size();i++) vParent[i].mass=0;
 
   //We have now completed the analysis on the actual protein.
   //Next we compute compositions for each element and each isotope
@@ -767,21 +671,21 @@ void CMercury8::AccurateMass(int NumElements, int Charge){
       for(k=0;k<NumPoints;k++) {
 				AltData2[k].imag=AltData[k].imag+Element[AtomicNum[i]].IntMass[j];
 				AltData2[k].real=AltData[k].real;
-      };
+      }
 
       GetPeaks(AltData2,NumPoints,vProduct,PMIintMW,MaxIntMW);
 
       //find ratio of abundances, multiply by abundance & number of atoms
-      for(k=0;k<vProduct.size();k++){
+      for(k=0;k<(int)vProduct.size();k++){
 				vProduct[k].data/=vParent[k].data;
 				vProduct[k].data*=Element[AtomicNum[i]].IsoProb[j];
 				vProduct[k].data*=(Element[AtomicNum[i]].NumAtoms+1);
 
 				//Add to the real mass for the parent
 				vParent[k].mass += vProduct[k].data * Element[AtomicNum[i]].IsoMass[j];
-			};
+			}
       
-    };
+    }
 
 		delete [] AltData;
 		delete [] AltData2;
@@ -789,25 +693,23 @@ void CMercury8::AccurateMass(int NumElements, int Charge){
     //Add back the atom
     Element[AtomicNum[i]].NumAtoms++;
     
-  };
+  }
 
   //output accurate masses:
   FixedData.clear();
-  for(i=0;i<vParent.size();i++){
+  for(i=0;i<(int)vParent.size();i++){
     if(vParent[i].data < 0.000001) continue;
     vParent[i].mass=(vParent[i].mass+ProtonMass*Charge)/Charge;
     FixedData.push_back(vParent[i]);
-  };
+  }
 
 	delete [] FreqData;
 
-};
-
-
+}
 
 
 void CMercury8::ConvertMass(complex* Data, int NumPoints, int PtsPerAmu,
-		float MW, float tempMW, int intMW, int MIintMW, int charge,
+		double MW, double tempMW, int intMW, int MIintMW, int charge,
 		double MolVar, double IntMolVar) {
 
   int i;
@@ -893,7 +795,7 @@ void CMercury8::GetPeaks(complex* Data, int NumPoints, vector<Result>& v,
 
 void CMercury8::RelativeAbundance(vector<Result>& v){
 
-  int i;
+  unsigned int i;
   double max=0;
 	double sum=0;
 
@@ -905,16 +807,15 @@ void CMercury8::RelativeAbundance(vector<Result>& v){
 		//also, store fractional abundances anyway (useful for Hardklor, which uses both);
 		FracAbunData.push_back(v[i]);
 		sum+=v[i].data;
-	};
+	}
   for (i=0; i<v.size(); i++) {
 		v[i].data = 100 * v[i].data/max;
 		FracAbunData[i].data/=sum;
-	};
+	}
 
-};
+}
 
-
-void CMercury8::CalcWeights(float& MW, double& MIMW, double& tempMW, int& intMW, 
+void CMercury8::CalcWeights(double& MW, double& MIMW, double& tempMW, int& intMW, 
 			    int& MIintMW, int& MaxIntMW, int& IsoShift, int NumElements){
 
   int j, k, Z;
@@ -928,24 +829,24 @@ void CMercury8::CalcWeights(float& MW, double& MIMW, double& tempMW, int& intMW,
       MW += Element[Z].NumAtoms * Element[Z].IsoMass[k] * Element[Z].IsoProb[k];
       tempMW += Element[Z].NumAtoms * Element[Z].IntMass[k] * Element[Z].IsoProb[k];
       if (k==0) {
-	MIMW += Element[Z].NumAtoms * Element[Z].IsoMass[k];
-	MIintMW += Element[Z].NumAtoms * Element[Z].IntMass[k];
-      };
+				MIMW += Element[Z].NumAtoms * Element[Z].IsoMass[k];
+				MIintMW += Element[Z].NumAtoms * Element[Z].IntMass[k];
+      }
       if(k==Element[Z].NumIsotopes-1){
 
-	//IsoShift is only used for accurate masses as an indication of how
-	//much each product distribution will differ in mass range from the
-	//parent distribution.
-	if((Element[Z].IntMass[k]-Element[Z].IntMass[0]) > IsoShift){
-	  IsoShift = Element[Z].IntMass[k]-Element[Z].IntMass[0];
-	};
+				//IsoShift is only used for accurate masses as an indication of how
+				//much each product distribution will differ in mass range from the
+				//parent distribution.
+				if((Element[Z].IntMass[k]-Element[Z].IntMass[0]) > IsoShift){
+					IsoShift = Element[Z].IntMass[k]-Element[Z].IntMass[0];
+				}
 
-	MaxIntMW += Element[Z].NumAtoms * Element[Z].IntMass[k];
-      };
-    };
-  };
+				MaxIntMW += Element[Z].NumAtoms * Element[Z].IntMass[k];
+      }
+    }
+  }
   
-  MW -= (float)ElectronMass;
+  MW -= ElectronMass;
   tempMW -= ElectronMass;
   MIMW -= ElectronMass;
   intMW = (int)(tempMW+0.5);
@@ -960,7 +861,7 @@ void CMercury8::Mercury(int NumElements, int Charge) {
   int     PtsPerAmu;
   int    NumPoints;		       // Working # of datapoints (real:imag) 
   complex *FreqData;              // Array of real:imaginary frequency values for FFT 
-  float   MW;
+  double   MW;
   double  MIMW, tempMW, MolVar, IntMolVar;
   int    intMW, MIintMW, MaxIntMW;
   clock_t start, end;
@@ -979,8 +880,8 @@ void CMercury8::Mercury(int NumElements, int Charge) {
     } else {
       printf("Average Molecular Weight: %.3lf\n",MW);
       printf("Average Integer MW: %ld\n\n",intMW);
-    };
-  };
+    }
+  }
  
   //Calculate mass range to use based on molecular variance 
   CalcVariances(&MolVar,&IntMolVar,NumElements);
@@ -1004,13 +905,12 @@ void CMercury8::Mercury(int NumElements, int Charge) {
 
   //Output the results if the user requested an Echo.
   if(showOutput){
-    timex = (end - start) / CLOCKS_PER_SEC;
+    timex = (float)(end - start) / CLOCKS_PER_SEC;
     minutes = (int)(timex/60);
     seconds = timex - (60*minutes);
     printf("Calculation performed in %d min %.3f sec\n",minutes,seconds);
-  };
+  }
 	
-  
   //Not sure why we do this...
   if (Charge == 0) Charge = 1;
 

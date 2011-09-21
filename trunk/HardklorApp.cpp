@@ -2,22 +2,27 @@
 #include <string>
 
 #include "CHardklor.h"
+#include "CHardklor2.h"
+#include "CModelLibrary.h"
 #include "CHardklorParser.h"
 #include "CHardklorSetting.h"
+#include "CHardklorVariant.h"
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
   int i;
+	unsigned int j;
   bool bConf;
   char tstr[512]="\0";
   fstream fptr;
 
 	CAveragine *averagine;
 	CMercury8 *mercury;
+	CModelLibrary *models;
 
 	if(argc==1){
-		cout << "Hardklor v1.36, April 20, 2011\n";
+		cout << "Hardklor v2.00, August 4, 2011\n";
 		cout << "Usage:\t\thardklor <MS1 file> <output file> [parameters]\n";
 		cout << "\t\thardklor -conf <config file>\n";
 		cout << "Parameters:\tSee documentation" << endl;
@@ -29,8 +34,8 @@ int main(int argc, char* argv[]) {
     if(strcmp(argv[i],"-conf")==0) {
       bConf = true;
       break;
-    };
-  };
+    }
+  }
   
   
   CHardklorParser hp;
@@ -40,9 +45,9 @@ int main(int argc, char* argv[]) {
     for(i=1;i<argc;i++){
       strcat(tstr," ");
       strcat(tstr,argv[i]);
-    };
+    }
     hp.parse(tstr);
-  };
+  }
   
 
   //Create all the output files that will be used
@@ -50,20 +55,35 @@ int main(int argc, char* argv[]) {
     fptr.clear();
     fptr.open(&hp.queue(i).outFile[0],ios::out);
     fptr.close();
-  };
+  }
 
 	averagine = new CAveragine(hp.queue(0).MercuryFile,hp.queue(0).HardklorFile);
 	mercury = new CMercury8(hp.queue(0).MercuryFile);
+	models = new CModelLibrary(averagine,mercury);
 
   CHardklor h(averagine,mercury);
+	CHardklor2 h2(averagine,mercury,models);
+	vector<CHardklorVariant> pepVariants;
+	CHardklorVariant hkv;
 
   for(i=0;i<hp.size();i++) {
-    h.GoHardklor(hp.queue(i));
-  };
+		if(hp.queue(i).sna>3){
+			pepVariants.clear();
+			if(!hp.queue(i).noBase) pepVariants.push_back(hkv);
+			for(j=0;j<hp.queue(i).variant->size();j++)  pepVariants.push_back(hp.queue(i).variant->at(j));
 
+			models->eraseLibrary();
+			models->buildLibrary(hp.queue(i).minCharge,hp.queue(i).maxCharge,pepVariants);
+			h2.GoHardklor(hp.queue(i));
+		} else {
+			h.GoHardklor(hp.queue(i));
+		}
+  }
+
+	delete models;
 	delete averagine;
 	delete mercury;
   
   return 0;
   
-};
+}

@@ -188,6 +188,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CHardklor2.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CHardklorParser.cpp"
 				>
 			</File>
@@ -201,6 +205,10 @@
 			</File>
 			<File
 				RelativePath=".\CMercury8.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CModelLibrary.cpp"
 				>
 			</File>
 			<File
@@ -258,6 +266,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CHardklor2.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CHardklorParser.h"
 				>
 			</File>
@@ -271,6 +283,10 @@
 			</File>
 			<File
 				RelativePath=".\CMercury8.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CModelLibrary.h"
 				>
 			</File>
 			<File
