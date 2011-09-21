@@ -27,22 +27,6 @@ using namespace std;
 
 #define PminusE 1.00672791
 
-typedef struct {
-  char id[5];
-  double mz;
-  double monoMass;
-  double shft;
-  double abun;
-  int charge;
-  char seq[31];
-  int C;
-  int H;
-  int O;
-  int N;
-  int S;
-  vector<sID> *enrich;
-} peps;
-
 class SSObject {
 public:
 	//Data members
@@ -61,14 +45,6 @@ public:
 	void addVar(int a, int b);
 	void clear();
   
-};
-
-//Do this better
-enum ScanType{
-  Zoom,
-  UltraZoom,
-  IonSpec2,
-  Other
 };
 
 class CHardklor{

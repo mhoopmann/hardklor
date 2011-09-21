@@ -160,7 +160,8 @@ void SenkoCharge(vector<int> *charges, Spectrum& s, unsigned int start, unsigned
 	double *array2;
 	float ch;
 	float maxPeak = 0;
-	int i,j,c;
+	int i,c;
+	unsigned int j;
 	int size = (highCharge - lowCharge + 1) * 3;
 	bool bFound;
 
@@ -176,7 +177,7 @@ void SenkoCharge(vector<int> *charges, Spectrum& s, unsigned int start, unsigned
 	while(true){
 		p.mz += interval;
 		if(p.mz > s.at(stop).mz) break;
-		p.intensity=GetIntensity(s,start,stop,p.mz);
+		p.intensity=(float)GetIntensity(s,start,stop,p.mz);
 		if(p.intensity<0) p.intensity=0;
 		spl.add(p);
 	}
@@ -205,7 +206,7 @@ void SenkoCharge(vector<int> *charges, Spectrum& s, unsigned int start, unsigned
 	for(i=0;i<size-2;i++){
 		if( (array1[i+1] > array1[i]) && (array1[i+1] > array1[i+2]) && 
 			  (array1[i+1] > 0.5) ) {
-			ch = (double)(i+3)/3 + (double)(lowCharge - 1);
+			ch = (float)(i+3)/3 + (float)(lowCharge - 1);
 			c = (int)(ch+0.5);
 
 			//check if charge already exists in list. If not, add it to the list.

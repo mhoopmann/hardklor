@@ -44,9 +44,9 @@ void CSplitSpectrum::NoSplitAnalysis(){
 		if(userParams.chargeMode=='F' || 
 			 userParams.chargeMode=='P' ||
 			 userParams.chargeMode=='S'){
-			goodPeaks.peaks = signalToNoise(*wholeSpec,0,wholeSpec->size()-1,userParams.sn,&goodPeaks.S2NCutoff,true,true);
+			goodPeaks.peaks = signalToNoise(*wholeSpec,0,wholeSpec->size()-1,(float)userParams.sn,&goodPeaks.S2NCutoff,true,true);
 		} else {
-			goodPeaks.peaks = signalToNoise(*wholeSpec,0,wholeSpec->size()-1,userParams.sn,&goodPeaks.S2NCutoff);
+			goodPeaks.peaks = signalToNoise(*wholeSpec,0,wholeSpec->size()-1,(float)userParams.sn,&goodPeaks.S2NCutoff);
 		}
 		for(i=0;i<goodPeaks.peaks.size();i++)	s2n->push_back(goodPeaks.S2NCutoff);
 	} else {
@@ -120,7 +120,7 @@ void CSplitSpectrum::OverlappingAnalysis(double gapSize){
 				//Clear the CSpecAnalyze object and find the peaks
 				sa.clear();
 				if(userParams.sn>0){
-					sa.S2NCutoff = findSNCutoff(*wholeSpec,startA,endA,userParams.sn);
+					sa.S2NCutoff = findSNCutoff(*wholeSpec,startA,endA,(float)userParams.sn);
 				} else {
 					sa.S2NCutoff=0;
 				}
@@ -146,7 +146,7 @@ void CSplitSpectrum::OverlappingAnalysis(double gapSize){
 		    sa.clear();
 
 				if(userParams.sn>0){
-					sa.S2NCutoff = findSNCutoff(*wholeSpec,startB,endB,userParams.sn);
+					sa.S2NCutoff = findSNCutoff(*wholeSpec,startB,endB,(float)userParams.sn);
 				} else {
 					sa.S2NCutoff=0;
 				}
@@ -214,9 +214,9 @@ void CSplitSpectrum::SinglePassAnalysis(double gapSize){
 				if(userParams.chargeMode=='F' || 
 					 userParams.chargeMode=='P' ||
 					 userParams.chargeMode=='S'){
-					sa.peaks = signalToNoise(*wholeSpec,startA,endA,userParams.sn,&sa.S2NCutoff,true,true);
+					sa.peaks = signalToNoise(*wholeSpec,startA,endA,(float)userParams.sn,&sa.S2NCutoff,true,true);
 				} else {
-					sa.peaks = signalToNoise(*wholeSpec,startA,endA,userParams.sn,&sa.S2NCutoff);
+					sa.peaks = signalToNoise(*wholeSpec,startA,endA,(float)userParams.sn,&sa.S2NCutoff);
 				};
 				sa.FindPeaks();
 
@@ -244,9 +244,9 @@ void CSplitSpectrum::SinglePassAnalysis(double gapSize){
 		if(userParams.chargeMode=='F' || 
 			 userParams.chargeMode=='P' ||
 			 userParams.chargeMode=='S'){
-			sa.peaks = signalToNoise(*wholeSpec,startA,endA,userParams.sn,&sa.S2NCutoff,true,true);
+			sa.peaks = signalToNoise(*wholeSpec,startA,endA,(float)userParams.sn,&sa.S2NCutoff,true,true);
 		} else {
-			sa.peaks = signalToNoise(*wholeSpec,startA,endA,userParams.sn,&sa.S2NCutoff);
+			sa.peaks = signalToNoise(*wholeSpec,startA,endA,(float)userParams.sn,&sa.S2NCutoff);
 		};
 		sa.FindPeaks();
 
@@ -285,7 +285,7 @@ void CSplitSpectrum::UnionAnalysis(){
 
 			//Check A set for next peak
 			if(aCount<setA->size()){
-				if(setA->at(aCount).peaks.size()==0 || apCount>=setA->at(aCount).peaks.size()) {
+				if(setA->at(aCount).peaks.size()==0 || apCount>=(unsigned int)setA->at(aCount).peaks.size()) {
 					aCount++;
 					apCount=0;
 					continue;
@@ -293,7 +293,7 @@ void CSplitSpectrum::UnionAnalysis(){
 			};
 			//Check B set for next peak
 			if(bCount<setB->size()){
-				if(setB->at(bCount).peaks.size()==0 || bpCount>=setB->at(bCount).peaks.size()) {
+				if(setB->at(bCount).peaks.size()==0 || bpCount>=(unsigned int)setB->at(bCount).peaks.size()) {
 					bCount++;
 					bpCount=0;
 					continue;
@@ -439,7 +439,7 @@ void CSplitSpectrum::UnionAnalysis(){
 	 when found in both sets. The lowest signal to noise cutoff is kept.
 */
 void CSplitSpectrum::IntersectionAnalysis(){
-	int aCount,apCount,bCount,bpCount;
+	unsigned int aCount,apCount,bCount,bpCount;
 
 	aCount=0;
 	bCount=0;
@@ -458,22 +458,22 @@ void CSplitSpectrum::IntersectionAnalysis(){
 		while(true){
 			//Check set A
 			if(aCount<setA->size()){
-				if(setA->at(aCount).peaks.size()==0 || apCount>=setA->at(aCount).peaks.size()) {
+				if(setA->at(aCount).peaks.size()==0 || apCount>=(unsigned int)setA->at(aCount).peaks.size()) {
 					aCount++;
 					apCount=0;
 					continue;
-				};
-			};
+				}
+			}
 			//Check set B
 			if(bCount<setB->size()){
-				if(setB->at(bCount).peaks.size()==0 || bpCount>=setB->at(bCount).peaks.size()) {
+				if(setB->at(bCount).peaks.size()==0 || bpCount>=(unsigned int)setB->at(bCount).peaks.size()) {
 					bCount++;
 					bpCount=0;
 					continue;
-				};
-			};
+				}
+			}
 			break;
-		};
+		}
 
 		//Keep peaks found in both sets only.
 		if(aCount<setA->size() && bCount<setB->size()){
@@ -484,8 +484,8 @@ void CSplitSpectrum::IntersectionAnalysis(){
 				if(userParams.window.dLower>0 || userParams.window.dUpper > 0){
 					if(setA->at(aCount).peaks.at(apCount).mz < userParams.window.dLower || setA->at(aCount).peaks.at(apCount).mz > userParams.window.dUpper) {
 						bSkip=true;
-					};
-				};
+					}
+				}
 
 				if(!bSkip){
 					goodPeaks.peaks.add(setA->at(aCount).peaks.at(apCount));
@@ -493,14 +493,14 @@ void CSplitSpectrum::IntersectionAnalysis(){
 						s2n->push_back(setA->at(aCount).S2NCutoff);
 					} else {
 						s2n->push_back(setB->at(bCount).S2NCutoff);
-					};
+					}
 					if(userParams.chargeMode=='F' || 
 						 userParams.chargeMode=='P' ||
 						 userParams.chargeMode=='S'){
 						aIndex->push_back(aCount);
 						bIndex->push_back(bCount);
-					};
-				};
+					}
+				}
 
 				apCount++;
 				bpCount++;
@@ -508,12 +508,11 @@ void CSplitSpectrum::IntersectionAnalysis(){
 				apCount++;
 			} else {
 				bpCount++;
-			};
-		};
+			}
+		}
+	}
 
-	};
-
-};
+}
 
 /* 
 	 This funciton scans through all the good peaks and divides them into sets with a maximum
@@ -538,7 +537,7 @@ void CSplitSpectrum::MakeAnalysis(double winSize){
   //For optimum window splitting
   vector<sSplit> split;
   sSplit tmpSplit;
-  double tmpDouble;
+  //double tmpDouble;
   float lowIntensity;
 
 	//For testing purposes:
@@ -587,8 +586,8 @@ void CSplitSpectrum::MakeAnalysis(double winSize){
       while(maxDif<0.53) { 
 
         //remove the least intensity peak;
-        lowIntensity=99999999.0;
-        for(i=1;i<split.size();i++){
+        lowIntensity=99999999.0f;
+        for(i=1;i<(int)split.size();i++){
           if(split[i].intensity<lowIntensity){
             lowIntensity=split[i].intensity;
             j=i;
@@ -609,7 +608,7 @@ void CSplitSpectrum::MakeAnalysis(double winSize){
 
         //compute the new max difference between peaks
         maxDif=0.0;
-        for(i=1;i<split.size();i++){
+        for(i=1;i<(int)split.size();i++){
           if( (split[i].mz-split[i-1].mz) > maxDif){
 				    maxDif = split[i].mz-split[i-1].mz;
             cutPoint = split[i-1].index;
@@ -660,9 +659,9 @@ void CSplitSpectrum::MakeAnalysis(double winSize){
 					//only add charges from setA if it contributed to the peak
 					if(aIndex->at(i) != -1) {
 
-						for(k=0;k<setA->at(aIndex->at(i)).charges->size();k++){
+						for(k=0;k<(int)setA->at(aIndex->at(i)).charges->size();k++){
 							bFound=false;
-							for(j=0;j<sa.charges->size();j++){
+							for(j=0;j<(int)sa.charges->size();j++){
 								if(sa.charges->at(j) == setA->at(aIndex->at(i)).charges->at(k)){
 									bFound=true;
 									break;
@@ -676,9 +675,9 @@ void CSplitSpectrum::MakeAnalysis(double winSize){
 
 					//only add charges from SetB if it contributed to the peak
 					if(bIndex->at(i) != -1) {
-						for(k=0;k<setB->at(bIndex->at(i)).charges->size();k++){
+						for(k=0;k<(int)setB->at(bIndex->at(i)).charges->size();k++){
 							bFound=false;
-							for(j=0;j<sa.charges->size();j++){
+							for(j=0;j<(int)sa.charges->size();j++){
 								if(sa.charges->at(j) == setB->at(bIndex->at(i)).charges->at(k)){
 									bFound=true;
 									break;
@@ -770,7 +769,7 @@ void CSplitSpectrum::NewSNPass(double gapSize){
 
 			if(endA-startA>1){
 
-				S2NCutoff = findSNCutoff2(*wholeSpec,startA,endA,userParams.sn,max);
+				S2NCutoff = findSNCutoff2(*wholeSpec,startA,endA,(float)userParams.sn,max);
 				
 				if( (S2NCutoff/100*max) < lowPoint ) lowPoint = S2NCutoff/100*max;
 				if( max > maxIntensity ) maxIntensity = max;
@@ -789,7 +788,7 @@ void CSplitSpectrum::NewSNPass(double gapSize){
   }
 
 	sa.clear();
-	sa.S2NCutoff = lowPoint/maxIntensity*100;
+	sa.S2NCutoff = (float)(lowPoint/maxIntensity*100);
 	sa.FindPeaks(*wholeSpec,0,wholeSpec->size()-1);
 
 	if(userParams.sn>0)	sa.removePeaksBelowSN();
@@ -797,7 +796,7 @@ void CSplitSpectrum::NewSNPass(double gapSize){
 	goodPeaks.clear();
 	delete s2n;
 	s2n = new vector<float>;
-	for(i=0;i<sa.peaks.size();i++){
+	for(i=0;i<(unsigned int)sa.peaks.size();i++){
 		if(userParams.window.dLower>0 || userParams.window.dUpper > 0){
 			if(sa.peaks.at(i).mz < userParams.window.dLower || sa.peaks.at(i).mz > userParams.window.dUpper) continue;
 		}
