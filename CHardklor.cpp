@@ -105,7 +105,7 @@ void CHardklor::SetMercury(CMercury8 *m){
 }
 
 int CHardklor::GoHardklor(CHardklorSetting sett){
-  if(bEcho) cout << "\n\nHardklor, v1.36, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2011\nUniversity of Washington\n" << endl;
+  if(bEcho) cout << "\n\nHardklor, v2.01, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2011\nUniversity of Washington\n" << endl;
 	cs = sett;
   Analyze();
   return 0;
@@ -657,7 +657,7 @@ void CHardklor::Analyze() {
 		} else if(minutes<=40){
 			cout << "Oi! Too freakin' slow!!" << endl;
 		} else {
-			cout << "Blame Klezmer!" << endl;
+			cout << "You might be able to eek out some better performance by adjusting your parameters." << endl;
 		}
 	}
 
