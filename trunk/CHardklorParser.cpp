@@ -35,6 +35,10 @@ void CHardklorParser::parse(char* cmd) {
 
   CHardklorSetting hs;
 
+	//Replace first # with a terminator
+	tok=strstr(cmd,"#");
+	if(tok!=NULL) strncpy(tok,"\0",1);
+
   //Replace the space+hyphen with a delimiter
   while(true){
     tok = strstr(cmd," -");
@@ -53,14 +57,14 @@ void CHardklorParser::parse(char* cmd) {
   for(i=0;i<vs.size();i++){
 
     //Grab first subtoken, which should be the parameter to change
-    tok = strtok(&vs.at(i)[0]," \n");
+    tok = strtok(&vs.at(i)[0]," \t\n");
     if(tok==NULL) continue;
 
     //-nb : No Base Molecule
     //followed by true/false. If not followed by anything, assumed true.
     //invalid characters assumed false
     if(strcmp(tok,"-nb")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) {
         if(isGlobal) global.noBase=true;
 			  else hs.noBase=true;
@@ -79,7 +83,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-ns : Do not split the spectrum
     } else if(strcmp(tok,"-ns")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) {
         if(isGlobal) global.noSplit=true;
 			  else hs.noSplit=true;
@@ -98,7 +102,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-i : Intersection analysis
     } else if(strcmp(tok,"-i")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) {
         if(isGlobal) global.iAnalysis=true;
 			  else hs.iAnalysis=true;
@@ -117,7 +121,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-da : Output distribution area instead of base peak intensity
     } else if(strcmp(tok,"-da")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) {
         if(isGlobal) global.distArea=true;
 			  else hs.distArea=true;
@@ -136,7 +140,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-da : Output distribution area instead of base peak intensity
     } else if(strcmp(tok,"-xml")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) {
         if(isGlobal) global.xml=true;
 			  else hs.xml=true;
@@ -155,7 +159,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-zero : Zero intensity analysis - allow zero intensity values
     } else if(strcmp(tok,"-zero")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) {
         if(isGlobal) global.skipZero=false;
 			  else hs.skipZero=false;
@@ -174,7 +178,7 @@ void CHardklorParser::parse(char* cmd) {
     
     //-d : Depth of recursion
     } else if(strcmp(tok,"-d")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
       if(atoi(tok)>0) {
 				if(isGlobal) global.depth=atoi(tok);
@@ -183,7 +187,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-corr : Correlation Threshold
     } else if(strcmp(tok,"-corr")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
       if(atof(tok)>0) {
 				if(isGlobal) global.corr=atof(tok);
@@ -192,7 +196,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-c : Assume Centroid Data
     } else if(strcmp(tok,"-c")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) {
         if(isGlobal) global.centroid=true;
 				else hs.centroid=true;
@@ -239,7 +243,7 @@ void CHardklorParser::parse(char* cmd) {
 			PT = new CPeriodicTable(global.HardklorFile);
 
 			while(true){
-				tok = strtok(NULL," \n");
+				tok = strtok(NULL," \t\n");
 				if(tok==NULL) break;
 
 				badMod=false;
@@ -399,7 +403,7 @@ void CHardklorParser::parse(char* cmd) {
       
     //-s : Savitsky-Golay Smoothing
     } else if(strcmp(tok,"-s")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
       if(atoi(tok)>0) {
 				if(isGlobal) global.smooth=atoi(tok);
@@ -408,13 +412,13 @@ void CHardklorParser::parse(char* cmd) {
 	  
     //-sc : Read specific scan number(s)
 		} else if(strcmp(tok,"-sc")==0) {
-			tok = strtok(NULL," \n");
+			tok = strtok(NULL," \t\n");
 			if(tok==NULL) continue;
 			if(atoi(tok)>0) {
 				if(isGlobal) global.scan.iLower=atoi(tok);
 				else hs.scan.iLower=atoi(tok);
 			}
-			tok = strtok(NULL," \n");
+			tok = strtok(NULL," \t\n");
 			if(tok==NULL) continue;
 			if(atoi(tok)>0) {
 				if(isGlobal) global.scan.iUpper=atoi(tok);
@@ -423,13 +427,13 @@ void CHardklorParser::parse(char* cmd) {
 	 
     //-w : Spectrum window boundaries
     } else if(strcmp(tok,"-w")==0) {
-			tok = strtok(NULL," \n");
+			tok = strtok(NULL," \t\n");
 			if(tok==NULL) continue;
 			if(atof(tok)>=1.0) {
 				if(isGlobal) global.window.dLower=atof(tok);
 				else hs.window.dLower=atof(tok);
 			}
-			tok = strtok(NULL," \n");
+			tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
       if(atof(tok)>=1.0) {
 				if(isGlobal) global.window.dUpper=atof(tok);
@@ -438,7 +442,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-sl : sensitivity level
     } else if(strcmp(tok,"-sl")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
       if(atof(tok)>=0) {
 				if(isGlobal) global.sl=atoi(tok);
@@ -447,7 +451,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-sna : Signal to Noise Algorithm
     } else if(strcmp(tok,"-sna")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) {
         cout << "Unspecified signal to noise algorithm. Defaulting to STD method." << endl;
         continue;
@@ -474,14 +478,14 @@ void CHardklorParser::parse(char* cmd) {
 				if(isGlobal) global.sna=6;
 				else hs.sna=6;
 			} else {
-        cout << "Unkown signal to noise algorithm. Defaulting to STD method." << endl;
+				cout << "Unkown signal to noise algorithm: " << tok << ". Defaulting to STD method." << endl;
 				if(isGlobal) global.sna=0;
 				else hs.sna=0;
 			}
 
     //-ppMatch : Match threshold for preprocessing
     } else if(strcmp(tok,"-ppMatch")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) {
         cout << "Unspecified ppMatch parameter. Using default value: 1" << endl;
         continue;
@@ -495,7 +499,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-ppm : PPM threshold for preprocessing
     } else if(strcmp(tok,"-ppm")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) {
         cout << "Unspecified -ppm parameter. Using default value: 10.0" << endl;
         continue;
@@ -509,7 +513,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-ppWin : Window size for preprocessing
     } else if(strcmp(tok,"-ppWin")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) {
         cout << "Unspecified pWin parameter. Using default value: 1" << endl;
         continue;
@@ -533,7 +537,7 @@ void CHardklorParser::parse(char* cmd) {
     //-avg : Average RAW scan data
       /*
     } else if(strcmp(tok,"-avg")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) {
         cout << "WARNING: Unknown value for -avg. Setting to default value: false" << endl;
         if(isGlobal) global.rawAvg=false;
@@ -555,7 +559,7 @@ void CHardklorParser::parse(char* cmd) {
     //-avgWin : Window size for RAW scan averaging (+/-)
       /*
     } else if(strcmp(tok,"-avgWin")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) {
         cout << "WARNING: Unknown value for -avgWin. Using default value: 1" << endl;
         if(isGlobal) global.rawAvgWidth=1;
@@ -575,7 +579,7 @@ void CHardklorParser::parse(char* cmd) {
     //-avgCut : Intensity cutoff for RAW scan averaging
       /*
     } else if(strcmp(tok,"-avgCut")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) {
         cout << "WARNING: Unknown value for -avgCut. Using default value: 1000" << endl;
         if(isGlobal) global.rawAvgCutoff=1000;
@@ -594,7 +598,7 @@ void CHardklorParser::parse(char* cmd) {
       
     //-sn : Signal to Noise Ratio
     } else if(strcmp(tok,"-sn")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
       if(atof(tok)>=0) {
 				if(isGlobal) global.sn=atof(tok);
@@ -603,26 +607,26 @@ void CHardklorParser::parse(char* cmd) {
 
     //-snWin : Signal to Noise Window Size
     } else if(strcmp(tok,"-snWin")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
       if(atof(tok)>0) {
 				if(isGlobal) global.snWindow=atof(tok);
 				else hs.snWindow=atof(tok);
       }
-			tok = strtok(NULL," \n");
+			tok = strtok(NULL," \t\n");
 			if(tok==NULL) {
 				if(isGlobal) global.staticSN=false;
 				else hs.staticSN=false;
 				continue;
 			}
-      if(atoi(tok)>0) {
+      if(strcmp(tok,"true")==0 || atoi(tok)>0) {
 				if(isGlobal) global.staticSN=true;
 				else hs.staticSN=true;
       }
 
     //-win : Window size when dividing spectrum
     } else if(strcmp(tok,"-win")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
       if(atof(tok)>0) {
 				if(isGlobal) global.winSize=atof(tok);
@@ -631,7 +635,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-chMax : Maximum charge
     } else if(strcmp(tok,"-chMax")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
       if(atoi(tok)>0) {
 				if(isGlobal) global.maxCharge=atoi(tok);
@@ -640,7 +644,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-chMin : Minimum charge
     } else if(strcmp(tok,"-chMin")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
       if(atoi(tok)>0) {
 				if(isGlobal) global.minCharge=atoi(tok);
@@ -649,7 +653,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-p : Maximum number of peptide models
     } else if(strcmp(tok,"-p")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
       if(atoi(tok)>0) {
 				if(isGlobal) global.peptide=atoi(tok);
@@ -658,13 +662,13 @@ void CHardklorParser::parse(char* cmd) {
 
     //-res : Resolution
     } else if(strcmp(tok,"-res")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
       if(atoi(tok)>0) {
 				if(isGlobal) global.res400=atof(tok);
 				else hs.res400=atof(tok);
       }
-			tok = strtok(NULL," \n");
+			tok = strtok(NULL," \t\n");
 			for(j=0;j<(int)strlen(tok);j++) upStr[j]=toupper(tok[j]);
 			upStr[j]='\0';
 			if(strcmp(upStr,"FTICR")==0) {
@@ -686,7 +690,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-mF : mzXML Filter
     } else if(strcmp(tok,"-mF")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
       if(strcmp(tok,"MS1")==0) {
 				if(isGlobal) global.mzXMLFilter=MS1;
@@ -707,7 +711,7 @@ void CHardklorParser::parse(char* cmd) {
 
 		//-a : Algorithm
     } else if(strcmp(tok,"-a")==0) {
-			tok = strtok(NULL," \n");
+			tok = strtok(NULL," \t\n");
 			if(strcmp(tok,"Basic")==0) {
 				if(isGlobal) global.algorithm=Basic;
 				else hs.algorithm=Basic;
@@ -745,7 +749,7 @@ void CHardklorParser::parse(char* cmd) {
 
     //-cdm : Charge Determination Mode
     } else if(strcmp(tok,"-cdm")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
 			switch(tok[0]){
 				case 'C':
@@ -774,7 +778,7 @@ void CHardklorParser::parse(char* cmd) {
     /*
     //-o : Output File (deprecated)
     } else if(strcmp(tok,"-o")==0) {
-      tok = strtok(NULL," \n");
+      tok = strtok(NULL," \t\n");
       if(tok==NULL) continue;
       if(isGlobal) strcpy(global.outFile,tok);
       else strcpy(hs.outFile,tok);
@@ -802,7 +806,7 @@ void CHardklorParser::parse(char* cmd) {
 
             //continue reading tokens until another quote is found
             while(true){
-              tok=strtok(NULL," \n");
+              tok=strtok(NULL," \t\n");
               if(tok==NULL) {
                 cout << "Invalid input file." << endl;
                 exit(-1);
@@ -821,7 +825,7 @@ void CHardklorParser::parse(char* cmd) {
 					strcpy(hs.inFile,tok);
         }
 
-				tok = strtok(NULL," \n");
+				tok = strtok(NULL," \t\n");
 				if(tok==NULL) {
 					cout << "Invalid output file." << endl;
 					exit(-1);
@@ -837,7 +841,7 @@ void CHardklorParser::parse(char* cmd) {
 
             //continue reading tokens until another quote is found
             while(true){
-              tok=strtok(NULL," \n");
+              tok=strtok(NULL," \t\n");
               if(tok==NULL) {
                 cout << "Invalid output file." << endl;
                 exit(-1);
