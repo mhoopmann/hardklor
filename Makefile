@@ -8,12 +8,12 @@ FLAGS = -O3 -static -D_NOSQLITE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DGCC
 LIBPATH = ../MSToolkit
 LIBS = -lmstoolkitlite
 
-INCLUDE = -I$(LIBPATH) -I$(LIBPATH)/mzParser
+INCLUDE = -I$(LIBPATH)/include -I$(LIBPATH)/mzParser
 
 
 #Do not touch these variables
 SUPPORT = S2N.o Smooth.o FFT.o
-HARDKLOR = CHardklor.o CAveragine.o CPeriodicTable.o CHardklorVariant.o CHardklorSetting.o CHardklorParser.o CNoiseReduction.o CSplitSpectrum.o CMercury8.o CSpecAnalyze.o CHardklorProtein.o SpecAnalyzeSupport.o FFT-HK.o
+HARDKLOR = CHardklor.o CAveragine.o CPeriodicTable.o CHardklorVariant.o CHardklorSetting.o CHardklorParser.o CNoiseReduction.o CSplitSpectrum.o CMercury8.o CSpecAnalyze.o CHardklorProtein.o SpecAnalyzeSupport.o FFT-HK.o CModelLibrary.o CHardklor2.o
 
 
 #Make statements
@@ -73,3 +73,8 @@ SpecAnalyzeSupport.o : SpecAnalyzeSupport.cpp
 CNoiseReduction.o : CNoiseReduction.cpp
 	$(CC) $(FLAGS) $(INCLUDE) CNoiseReduction.cpp -c
 
+CModelLibrary.o : CModelLibrary.cpp
+	$(CC) $(FLAGS) $(INCLUDE) CModelLibrary.cpp -c
+	
+CHardklor2.o : CHardklor2.cpp
+	$(CC) $(FLAGS) $(INCLUDE) CHardklor2.cpp -c
