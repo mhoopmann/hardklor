@@ -47,7 +47,7 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 	CNoiseReduction nr(&r,cs);
 
 	//Signature
-	if(bEcho) cout << "\n\nHardklor, v2.0, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2011\nUniversity of Washington\n" << endl;
+	if(bEcho) cout << "\n\nHardklor, v2.02, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2012\nUniversity of Washington\n" << endl;
 
 	//Set the periodic table
 	if(PT==NULL) PT = new CPeriodicTable(cs.HardklorFile);
