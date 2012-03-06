@@ -105,7 +105,7 @@ void CHardklor::SetMercury(CMercury8 *m){
 }
 
 int CHardklor::GoHardklor(CHardklorSetting sett){
-  if(bEcho) cout << "\n\nHardklor, v2.01, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2011\nUniversity of Washington\n" << endl;
+  if(bEcho) cout << "\n\nHardklor, v2.02, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2012\nUniversity of Washington\n" << endl;
 	cs = sett;
   Analyze();
   return 0;
