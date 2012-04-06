@@ -40,6 +40,7 @@ CHardklorSetting::CHardklorSetting(){
 	centroid=false;
 	staticSN=true;
   xml=false;
+	reducedOutput=false;
 
   ppMatch=1;
   ppWin=1;
@@ -98,6 +99,7 @@ CHardklorSetting::CHardklorSetting(const CHardklorSetting& c){
 	centroid = c.centroid;
 	staticSN = c.staticSN;
   xml = c.xml;
+	reducedOutput = c.reducedOutput;
 
   ppMatch=c.ppMatch;
   ppWin=c.ppWin;
@@ -159,6 +161,7 @@ CHardklorSetting& CHardklorSetting::operator=(const CHardklorSetting& c){
 		centroid = c.centroid;
 		staticSN = c.staticSN;
     xml = c.xml;
+		reducedOutput = c.reducedOutput;
 
     ppMatch=c.ppMatch;
     ppWin=c.ppWin;

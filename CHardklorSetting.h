@@ -28,15 +28,16 @@ class CHardklorSetting {
   void out(char *s);
 
   //Data Mebers:
-  bool centroid;    //spectrum data is centroided
-  bool distArea;    //report distribution area instead of base peak intensity
-  bool iAnalysis;   //intersect analysis(true) or union analysis(false)
-  bool noBase;      //No base molecule - perform analysis with only averagine variant models
-  bool noSplit;     //analyze entire spectrum at once
+  bool centroid;			//spectrum data is centroided
+  bool distArea;			//report distribution area instead of base peak intensity
+  bool iAnalysis;			//intersect analysis(true) or union analysis(false)
+  bool noBase;				//No base molecule - perform analysis with only averagine variant models
+  bool noSplit;				//analyze entire spectrum at once
   //bool rawAvg;      //use averaged raw scans
-  bool skipZero;    //ignore zero intensity data points
-  bool staticSN;    //for sna=THRASH; assume one noise level for entire spectrum
-  bool xml;         //output is in xml
+	bool reducedOutput;	//output m/z, intensity, and charge only (de-isotoped peaks)
+  bool skipZero;			//ignore zero intensity data points
+  bool staticSN;			//for sna=THRASH; assume one noise level for entire spectrum
+  bool xml;						//output is in xml
   
   
   int depth;        //maximum number of overlapping peptides

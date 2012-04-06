@@ -47,7 +47,7 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 	CNoiseReduction nr(&r,cs);
 
 	//Signature
-	if(bEcho) cout << "\n\nHardklor, v2.02, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2012\nUniversity of Washington\n" << endl;
+	if(bEcho) cout << "\n\nHardklor, v2.03, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2012\nUniversity of Washington\n" << endl;
 
 	//Set the periodic table
 	if(PT==NULL) PT = new CPeriodicTable(cs.HardklorFile);
@@ -101,7 +101,8 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
   }
 
 	//Write scan information to output file.
-	if(cs.xml) WriteScanLine(curSpec,fout,1);
+	if(cs.reducedOutput) WriteScanLine(curSpec,fout,2);
+	else if(cs.xml) WriteScanLine(curSpec,fout,1);
   else WriteScanLine(curSpec,fout,0);
 
 	//Output progress indicator
@@ -130,7 +131,8 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 
 		//export results
 		for(i=0;i<(int)vPeps.size();i++){
-			if(cs.xml) WritePepLine(vPeps[i],c,fout,1);
+			if(cs.reducedOutput) WritePepLine(vPeps[i],c,fout,2);
+			else if(cs.xml) WritePepLine(vPeps[i],c,fout,1);
 			else WritePepLine(vPeps[i],c,fout,0);
 		}
 
@@ -174,7 +176,9 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 
 		if(curSpec.getScanNumber()!=0){
 			//Write scan information to output file.
-			if(cs.xml) {
+			if(cs.reducedOutput){
+				WriteScanLine(curSpec,fout,2);
+			} else if(cs.xml) {
 				fprintf(fout,"</Spectrum>\n");
 				WriteScanLine(curSpec,fout,1);
 			} else {
@@ -259,7 +263,7 @@ double CHardklor2::CalcFWHM(double mz,double res,int iType){
 		deltaM = mz / res;
 		break;
 	case 2: //QIT
-		deltaM = res;
+		deltaM = res / 5000.0;
 		break;
 	case 3: //FTICR
 	default:
@@ -330,7 +334,7 @@ void CHardklor2::Centroid(Spectrum& s, Spectrum& out){
             centroid.intensity < 0 ) {
 					centroid.intensity=s[bestPeak].intensity;
 				}
-
+				
 				//Hack until I put in mass ranges
 				if(centroid.mz<0 || centroid.mz>2000) {
 					//do nothing if invalid mz
@@ -1284,7 +1288,14 @@ void CHardklor2::WritePepLine(pepHit& ph, Spectrum& s, FILE* fptr, int format){
 
 			fptr << "Score=\"" << obj.corr << "\"/>" << endl;
 			*/
-  }
+
+		//reduced output
+  } else if(format==2){
+		fprintf(fptr,"%.4lf",(ph.monoMass+ph.charge*1.007276466)/ph.charge);
+		if(cs.distArea) fprintf(fptr,"\t%.0f",ph.area*ph.intensity);
+		else fprintf(fptr,"\t%.0f",ph.intensity);
+		fprintf(fptr,"\t%d\n",ph.charge);
+	}
 }
 
 void CHardklor2::WriteScanLine(Spectrum& s, FILE* fptr, int format){
@@ -1329,5 +1340,9 @@ void CHardklor2::WriteScanLine(Spectrum& s, FILE* fptr, int format){
 			}
 		}
     fprintf(fptr,">\n");
-  }
+
+		//For reduced output
+	} else if(format==2) {
+		fprintf(fptr, "Scan = %d\n", s.getScanNumber());
+	}
 }

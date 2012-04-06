@@ -195,7 +195,7 @@ double CSpecAnalyze::calcFWHM(double mz){
 		deltaM = mz / userParams.res400;
 		break;
 	case QIT:
-		deltaM = userParams.res400;
+		deltaM = userParams.res400 / 5000.0;
 		break;
 	case FTICR:
 	default:
