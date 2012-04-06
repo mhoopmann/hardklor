@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
 	CModelLibrary *models;
 
 	if(argc==1){
-		cout << "Hardklor v2.02, March 2, 2012\n";
+		cout << "Hardklor v2.03, April 6, 2012\n";
 		cout << "Usage:\t\thardklor -conf <config file>\n";
 		cout << "See documentation for instructions to modify and use config files." << endl;
 		exit(1);

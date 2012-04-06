@@ -138,7 +138,7 @@ void CHardklorParser::parse(char* cmd) {
 			  else hs.distArea=true;
       }
 
-    //-da : Output distribution area instead of base peak intensity
+    //-mxl: Output as xml
     } else if(strcmp(tok,"-xml")==0) {
       tok = strtok(NULL," \t\n");
       if(tok==NULL) {
@@ -155,6 +155,25 @@ void CHardklorParser::parse(char* cmd) {
 			} else {
 				if(isGlobal) global.xml=true;
 			  else hs.xml=true;
+      }
+
+		//-ro : reduced output
+    } else if(strcmp(tok,"-ro")==0) {
+      tok = strtok(NULL," \t\n");
+      if(tok==NULL) {
+				if(isGlobal) global.reducedOutput=true;
+			  else hs.reducedOutput=true;
+        continue;
+      }
+			if(strcmp(tok,"true")==0){
+				if(isGlobal) global.reducedOutput=true;
+			  else hs.reducedOutput=true;
+			} else if(strcmp(tok,"false")==0 || atoi(tok)==0) {
+				if(isGlobal) global.reducedOutput=false;
+			  else hs.reducedOutput=false;
+			} else {
+				if(isGlobal) global.reducedOutput=true;
+			  else hs.reducedOutput=true;
       }
 
     //-zero : Zero intensity analysis - allow zero intensity values

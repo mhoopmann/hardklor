@@ -29,7 +29,7 @@ double CNoiseReduction::calcFWHM(double mz){
 		deltaM = mz / cs.res400;
 		break;
 	case QIT:
-		deltaM = cs.res400;
+		deltaM = cs.res400 / 5000.0;
 		break;
 	case FTICR:
 	default:

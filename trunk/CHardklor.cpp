@@ -105,7 +105,7 @@ void CHardklor::SetMercury(CMercury8 *m){
 }
 
 int CHardklor::GoHardklor(CHardklorSetting sett){
-  if(bEcho) cout << "\n\nHardklor, v2.02, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2012\nUniversity of Washington\n" << endl;
+  if(bEcho) cout << "\n\nHardklor, v2.03, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2012\nUniversity of Washington\n" << endl;
 	cs = sett;
   Analyze();
   return 0;
@@ -268,6 +268,7 @@ void CHardklor::Analyze() {
       bFirst=false;
 
 			//Write scan information to output file.
+			if(cs.reducedOutput) WriteScanLine(curSpec,fptr,2);
       if(cs.xml) WriteScanLine(curSpec,fptr,1);
       else WriteScanLine(curSpec,fptr,0);
 
@@ -319,9 +320,14 @@ void CHardklor::Analyze() {
             //fclose(fpeak);
 
 						//Write scan information to output file.
-            if(cs.xml) fptr << "</Spectrum>" << endl;
-						if(cs.xml) WriteScanLine(curSpec,fptr,1);
-            else WriteScanLine(curSpec,fptr,0);
+						if(cs.reducedOutput) {
+							WriteScanLine(curSpec,fptr,2);
+						} else if(cs.xml) {
+							fptr << "</Spectrum>" << endl;
+							WriteScanLine(curSpec,fptr,1);
+						} else {
+							WriteScanLine(curSpec,fptr,0);
+						}
 					}
 
 				}
@@ -565,7 +571,8 @@ void CHardklor::Analyze() {
 		
 		//if we exceeded our threshold, output the data to file
     if(bsso.corr > cs.corr) {
-      if(cs.xml) WritePepLine(bsso,PT,fptr,1);
+			if(cs.reducedOutput) if(cs.xml) WritePepLine(bsso,PT,fptr,2);
+      else if(cs.xml) WritePepLine(bsso,PT,fptr,1);
       else WritePepLine(bsso,PT,fptr,0);
     }
     
@@ -2223,7 +2230,13 @@ void CHardklor::WritePepLine(SSObject& obj, CPeriodicTable* PT, fstream& fptr, i
       fptr << "\" ";
 
 			fptr << "Score=\"" << obj.corr << "\"/>" << endl;
-    }
+    } else if(format==2){
+			fptr << (sa.predPep->at(pepID).GetVariant(varID).GetMonoMass()+sa.predPep->at(pepID).GetVariant(varID).GetCharge()*1.007276466)/sa.predPep->at(pepID).GetVariant(varID).GetCharge();
+			if(cs.distArea) fptr << "\t" << sa.predPep->at(pepID).GetIntensity()*sa.predPep->at(pepID).GetVariant(varID).GetArea();
+			else fptr << "\t" << sa.predPep->at(pepID).GetIntensity();
+			fptr << "\t" << sa.predPep->at(pepID).GetVariant(varID).GetCharge();
+			fptr << endl;
+		}
   }
 }
 
@@ -2268,7 +2281,10 @@ void CHardklor::WriteScanLine(Spectrum& s, fstream& fptr, int format){
 			}
 		}
     fptr << ">" << endl;
-  }
+  } else if(format==2) {
+		fptr << "Scan = " << s.getScanNumber();
+		fptr << endl;
+	}
 }
 
 void CHardklor::WriteParams(fstream& fptr, int format){
