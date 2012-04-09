@@ -571,7 +571,7 @@ void CHardklor::Analyze() {
 		
 		//if we exceeded our threshold, output the data to file
     if(bsso.corr > cs.corr) {
-			if(cs.reducedOutput) if(cs.xml) WritePepLine(bsso,PT,fptr,2);
+			if(cs.reducedOutput) WritePepLine(bsso,PT,fptr,2);
       else if(cs.xml) WritePepLine(bsso,PT,fptr,1);
       else WritePepLine(bsso,PT,fptr,0);
     }
