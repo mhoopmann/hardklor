@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kronik2", "Kronik2.vcproj", "{8C8715DD-E6BD-404B-9D55-83723BBCA147}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kronik2Lib", "..\Kronik2Lib\Kronik2Lib.vcproj", "{0B23C0DC-FC26-4826-9794-4801E043DFE1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8C8715DD-E6BD-404B-9D55-83723BBCA147}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8C8715DD-E6BD-404B-9D55-83723BBCA147}.Debug|Win32.Build.0 = Debug|Win32
+		{8C8715DD-E6BD-404B-9D55-83723BBCA147}.Release|Win32.ActiveCfg = Release|Win32
+		{8C8715DD-E6BD-404B-9D55-83723BBCA147}.Release|Win32.Build.0 = Release|Win32
+		{0B23C0DC-FC26-4826-9794-4801E043DFE1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0B23C0DC-FC26-4826-9794-4801E043DFE1}.Debug|Win32.Build.0 = Debug|Win32
+		{0B23C0DC-FC26-4826-9794-4801E043DFE1}.Release|Win32.ActiveCfg = Release|Win32
+		{0B23C0DC-FC26-4826-9794-4801E043DFE1}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
