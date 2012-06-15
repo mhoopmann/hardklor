@@ -4,6 +4,7 @@
 //   Constructors and Destructors
 //-------------------------------------
 CKronik2::CKronik2(){
+	bGaussFit	= false;
   dPPMTol   = 10.0; 
   iGapTol   = 1;   
   iMatchTol = 3;    
@@ -12,6 +13,7 @@ CKronik2::~CKronik2(){
 }
 
 CKronik2::CKronik2(const CKronik2& c){
+	bGaussFit=c.bGaussFit;
   dPPMTol=c.dPPMTol;
   iGapTol=c.iGapTol;
   iMatchTol=c.iMatchTol;
@@ -28,6 +30,7 @@ CKronik2::CKronik2(const CKronik2& c){
 //-------------------------------------
 CKronik2& CKronik2::operator=(const CKronik2& c){
   if(this!=&c){
+		bGaussFit=c.bGaussFit;
     dPPMTol=c.dPPMTol;
     iGapTol=c.iGapTol;
     iMatchTol=c.iMatchTol;
@@ -243,20 +246,6 @@ bool CKronik2::processHK(char*  in, char* out) {
       bMatch=false;
       t.scan=i;
 			t.pep=binarySearch(allScans,i,mass,charge);
-      /*
-			t.pep=-1;
-      for(j=0;j<allScans[i].vPep->size();j++){
-        //if(allScans[i].vPep->at(j).intensity<0.0) continue;
-        ppm=(allScans[i].vPep->at(j).monoMass-mass)/mass*1000000;
-        if(fabs(ppm)<dPPMTol && allScans[i].vPep->at(j).charge==charge){
-          t.pep=j;
-          gap=0;
-          bMatch=true;
-          matchCount++;
-          break;
-        }
-      }
-			*/
 			if(t.pep>-1){
 				matchCount++;
 				gap=0;
@@ -275,20 +264,6 @@ bool CKronik2::processHK(char*  in, char* out) {
       bMatch=false;
       t.scan=i;
 			t.pep=binarySearch(allScans,i,mass,charge);
-      /*
-			t.pep=-1;
-      for(j=0;j<allScans[i].vPep->size();j++){
-        //if(allScans[i].vPep->at(j).intensity<0.0) continue;
-        ppm=(allScans[i].vPep->at(j).monoMass-mass)/mass*1000000;
-        if(fabs(ppm)<dPPMTol && allScans[i].vPep->at(j).charge==charge){
-          t.pep=j;
-          gap=0;
-          bMatch=true;
-          matchCount++;
-          break;
-        }
-      }
-			*/
 			if(t.pep>-1){
 				matchCount++;
 				gap=0;
@@ -456,16 +431,26 @@ bool CKronik2::processHK(char*  in, char* out) {
   }
   cout << endl;
 
+	if(bGaussFit){
+		cout << "Computing Gaussian chromatograms...";
+		for(i=0;i<vPeps.size();i++){
+			vPeps[i].gaussR2 = polynomialBestFit(vPeps[i].profile,vPeps[i].datapoints,vPeps[i].intensity,vPeps[i].gaussian);
+		}
+		cout << "Done." << endl;
+	}
+
   if(out[0]!='\0'){
     FILE* f;
     f=fopen(out,"wt");
 
     //Heading line
 	  fprintf(f,"First Scan\tLast Scan\tNum of Scans\tCharge\tMonoisotopic Mass\tBase Isotope Peak\t");
-	  fprintf(f,"Best Intensity\tSummed Intensity\tFirst RTime\tLast RTime\tBest RTime\tBest Correlation\tModifications\n");
+	  fprintf(f,"Best Intensity\tSummed Intensity\tFirst RTime\tLast RTime\tBest RTime\tBest Correlation\tModifications");
+		if(bGaussFit)	fprintf(f,"\tFWHM\t4sigma\tr2");
+		fprintf(f,"\n");
 
     for(i=0;i<vPeps.size();i++){
-		  fprintf(f,"%d\t%d\t%d\t%d\t%lf\t%lf\t%f\t%f\t%f\t%f\t%f\t%lf\t%s\n",
+		  fprintf(f,"%d\t%d\t%d\t%d\t%lf\t%lf\t%f\t%f\t%f\t%f\t%f\t%lf\t%s",
 																																		   vPeps[i].lowScan,
 																																		   vPeps[i].highScan,
                                                                        vPeps[i].datapoints,
@@ -479,6 +464,13 @@ bool CKronik2::processHK(char*  in, char* out) {
 																																		   vPeps[i].rTime,
 																																		   vPeps[i].xCorr,
 																																		   vPeps[i].mods);
+
+			if(bGaussFit){
+				fprintf(f,"\t%lf\t%lf\t%.6lf",FWHMCONST*vPeps[i].gaussian[2],
+																			4*vPeps[i].gaussian[2],
+																			vPeps[i].gaussR2);
+			}
+			fprintf(f,"\n");
 	  }
     
 	  fclose(f);
@@ -496,7 +488,6 @@ int CKronik2::binarySearch(vector<sScan>& v, int index, double mass, int charge)
 	double highMass=mass+(mass/1000000*dPPMTol);
 
 	if(sz<1) return -1;
-	//cout << "Searching for " << mass << " +" << charge << " : " << lowMass << "-" << highMass << " in scan " << v[index].scanNum << endl;
 
 	//Find a mass within ppm tolerance. Use binary search to for speed.
 	//Stop searching when first mass is found (although a second may exist).
@@ -522,24 +513,16 @@ int CKronik2::binarySearch(vector<sScan>& v, int index, double mass, int charge)
 	//Check that mass is correct
 	if(v[index].vPep->at(mid).monoMass<lowMass || v[index].vPep->at(mid).monoMass>highMass) return -1;
 
-	//cout << "Stage 2" << endl;
-
 	//Now that we have the right mass, check charge state. If incorrect, check neighbors
 	//until we exceed mass tolerance.
 	i=mid;
-	if(v[index].vPep->at(i).charge==charge && v[index].vPep->at(i).intensity>0.0) {
-		//cout << "MATCH: " << v[index].vPep->at(i).monoMass << "\t" << v[index].vPep->at(i).charge << endl;
-		return i;
-	}
+	if(v[index].vPep->at(i).charge==charge && v[index].vPep->at(i).intensity>0.0) return i;
 
 	//check left - note the inherent bias of always looking left first before right
 	while(i>0){
 		i--;
 		if(v[index].vPep->at(i).monoMass<lowMass) break;
-		if(v[index].vPep->at(i).charge==charge && v[index].vPep->at(i).intensity>0.0) {
-			//cout << "MATCH: " << v[index].vPep->at(i).monoMass << "\t" << v[index].vPep->at(i).charge << endl;
-			return i;
-		}
+		if(v[index].vPep->at(i).charge==charge && v[index].vPep->at(i).intensity>0.0)	return i;
 	}
 
 	//check right
@@ -547,14 +530,10 @@ int CKronik2::binarySearch(vector<sScan>& v, int index, double mass, int charge)
 	while(i<(sz-1)){
 		i++;
 		if(v[index].vPep->at(i).monoMass>highMass) break;
-		if(v[index].vPep->at(i).charge==charge && v[index].vPep->at(i).intensity>0.0) {
-			//cout << "MATCH: " << v[index].vPep->at(i).monoMass << "\t" << v[index].vPep->at(i).charge << endl;
-			return i;
-		}
+		if(v[index].vPep->at(i).charge==charge && v[index].vPep->at(i).intensity>0.0) return i;
 	}
 
 	//if nothing has matched, return -1
-	//cout << "NO MATCH!" << endl;
 	return -1;
 
 }
@@ -649,6 +628,10 @@ void CKronik2::setMatchTol(int i){
 
 void CKronik2::setGapTol(int i){
   iGapTol=i;
+}
+
+void CKronik2::setGaussFit(bool b){
+  bGaussFit=b;
 }
 
 unsigned int CKronik2::size(){
@@ -794,6 +777,156 @@ bool CKronik2::pearson(int i1, int i2, bool byScan, bool interpolate, double& rv
 
   return true;
 
+}
+
+double CKronik2::polynomialBestFit(sProfileData* profile, int sz, float max, double* coeff, int degree){
+	if(degree>3){
+		cout << "High order polynomials not supported with this function. Max=3" << endl;
+		exit(1);
+	}
+
+	if(degree<2){
+		cout << "Polynomials need at least two degrees. Min=2" << endl;
+		exit(1);
+	}
+
+	int i,j,a;
+	int n;
+	float threshold=max*0.25f;
+	vector<double> x;
+	vector<double> y;
+	degree++;
+
+	for(i=0;i<sz;i++) {
+		if(profile[i].intensity>threshold){
+			x.push_back(profile[i].rTime);
+			y.push_back(log((double)profile[i].intensity));
+		}
+	}
+	if(x.size()<3) {
+		coeff[0]=coeff[1]=coeff[2]=coeff[3]=0.0;
+		return 0.0;
+	}
+
+	//This is an offset to be reapplied later; It improves coefficient accuracy using this polynomial method.
+	n=x.size();
+	double sFactor=x[n/2];
+
+	//set X matrix
+	double** X = new double* [n];
+	for(i=0;i<n;i++){
+		X[i] = new double [degree];
+		X[i][0] = 1.0;
+		for(j=1;j<degree;j++) X[i][j]=X[i][j-1]*(x[i]-sFactor);
+	}
+
+	//make transpose of X
+	double** Xt = new double* [degree];
+	for(j=0;j<degree;j++) Xt[j] = new double [n];
+	for(i=0;i<n;i++){
+		for(j=0;j<degree;j++){
+			Xt[j][i] = X[i][j];
+		}
+	}
+
+	//matrix multiplication
+	double** XtX = new double* [degree];
+	for(i=0;i<degree;i++){
+		XtX[i] = new double [degree];
+		for(j=0;j<degree;j++){
+			XtX[i][j]=0;
+			for(a=0;a<n;a++) XtX[i][j]+=(Xt[i][a]*X[a][j]);
+		}
+	}
+
+	//inverse using Gauss-Jordan Elimination
+	double** XtXi = new double* [degree];
+	for(i=0;i<degree;i++){
+		XtXi[i] = new double [degree*2];
+		for(j=0;j<degree*2;j++){
+			if(j<degree) XtXi[i][j]=XtX[i][j];
+			else if(j-degree==i) XtXi[i][j]=1;
+			else XtXi[i][j]=0;
+		}
+	}
+	double d;
+	for(j=0;j<degree;j++){
+		for(i=0;i<degree;i++){
+			if(i==j) continue;
+			if(XtXi[i][j]==0) continue;
+			d=-XtXi[i][j]/XtXi[j][j];
+			for(a=0;a<degree*2;a++) XtXi[i][a]+=(d*XtXi[j][a]);
+		}
+	}
+	for(i=0;i<degree;i++){
+		d=1/XtXi[i][i];
+		for(j=0;j<degree*2;j++) XtXi[i][j]*=d;
+	}
+
+	//matrix multiplication
+	double* Xty = new double [degree];
+	for(i=0;i<degree;i++){
+		Xty[i]=0;
+		for(j=0;j<n;j++) Xty[i]+=Xt[i][j]*y[j];	
+	}
+
+	//matrix multiplication
+	double* c = new double [degree];
+	for(i=0;i<degree;i++){
+		c[i]=0;
+		for(j=0;j<degree;j++) c[i]+=XtXi[i][j+degree]*Xty[j];	
+	}
+
+	for(i=0;i<degree;i++) coeff[i]=c[i];
+	coeff[i]=sFactor;
+
+	//cout << "\n" << c[0] << "\t" << c[1] << "\t" << c[2] << "\t" << sFactor << endl;
+	//cout << coeff[0] << "\t" << coeff[1] << "\t" << coeff[2] << "\t" << sFactor << "\n" << endl;
+
+	vector<double> z;
+	for(i=0;i<n;i++) z.push_back((x[i]-sFactor)*(x[i]-sFactor)*c[2]+(x[i]-sFactor)*c[1]+c[0]);
+	//for(i=0;i<n;i++) cout << x[i] << "\t" << z[i] << endl;
+
+	/*
+	cout << "\nCentroid: " << -coeff[1]/(2*coeff[2])+coeff[3] << endl;
+	double sigma=1/(SQRTTWO*sqrt(-coeff[2]));
+	cout << "FWHM: " << FWHMCONST*sigma << endl;
+	cout << "4sigma: " << 4*sigma << endl;
+	exit(5);
+	*/
+
+	//clean up memory
+	delete [] c;
+	delete [] Xty;
+	for(i=0;i<degree;i++){
+		delete [] XtXi[i];
+		delete [] XtX[i];
+		delete [] Xt[i];
+	}
+	for(i=0;i<n;i++) delete [] X[i];
+	delete [] X;
+	delete [] Xt;
+	delete [] XtX;
+	delete [] XtXi;
+
+	double sxy=0;
+  double sxx=0;
+  double syy=0;
+	double xavg=0;
+	double yavg=0;
+  for(i=0;i<n;i++){
+		xavg+=z[i];
+		yavg+=y[i];
+	}
+	xavg/=n;
+	yavg/=n;
+  for(i=0;i<n;i++){
+		sxy += ((z[i]-xavg)*(y[i]-yavg));
+    sxx += ((z[i]-xavg)*(z[i]-xavg));
+		syy += ((y[i]-yavg)*(y[i]-yavg));
+  }
+	double r2 = (sxy*sxy)/(sxx*syy);
+	return r2;
 }
 
 double CKronik2::betai(double a, double b, double x){

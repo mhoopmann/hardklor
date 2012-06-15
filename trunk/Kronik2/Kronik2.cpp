@@ -4,7 +4,7 @@ void usage();
 
 int main(int argc, char* argv[]){
 
-	cout << "\nKrönik version 2.10, Feb 29 2012\nApp: kronik\nAuthor: Michael Hoopmann\nCopyright 2007-2011\n" << endl;
+	cout << "\nKrönik version 2.11, Jun 14 2012\nApp: kronik\nAuthor: Michael Hoopmann\nCopyright 2007-2012\n" << endl;
 	cout << "\nDescription: Finds peptide isotope distributions (PIDs) that" << endl;
 	cout << "             persist in at least 3 of 4 consecutive scans from" << endl;
 	cout << "             Hardklör results.\n" << endl;
@@ -22,6 +22,7 @@ int main(int argc, char* argv[]){
 	float contam=5.0;
 	int gapTol=1;
 	int matchTol=3;
+	bool gaussFit=false;
 
 	if(argc>3){
 		for(i=1;i<argc-2;i+=2){
@@ -34,6 +35,7 @@ int main(int argc, char* argv[]){
 			case 'p':	ppmTol=atof(argv[i+1]);	break;
 			case 'c': contam=(float)atof(argv[i+1]);	break;
 			case 'd': matchTol=atoi(argv[i+1]); break;
+			case 'f': gaussFit=true; i--; break;
 			case 'g': gapTol=atoi(argv[i+1]);	break;
 			case 'm': mass2=atof(argv[i+1]); break;
 			case 'n': mass1=atof(argv[i+1]); break;
@@ -59,6 +61,7 @@ int main(int argc, char* argv[]){
   k.setGapTol(gapTol);
   k.setMatchTol(matchTol);
   k.setPPMTol(ppmTol);
+	k.setGaussFit(gaussFit);
 
   k.processHK(argv[argc-2]);
 	cout << "Total Persistent Peptide Isotope Distributions (PID): " << k.size() << endl;
@@ -72,10 +75,12 @@ int main(int argc, char* argv[]){
 
   //Heading line
 	fprintf(f,"First Scan\tLast Scan\tNum of Scans\tCharge\tMonoisotopic Mass\tBase Isotope Peak\t");
-	fprintf(f,"Best Intensity\tSummed Intensity\tFirst RTime\tLast RTime\tBest RTime\tBest Correlation\tModifications\n");
+	fprintf(f,"Best Intensity\tSummed Intensity\tFirst RTime\tLast RTime\tBest RTime\tBest Correlation\tModifications");
+	if(gaussFit) fprintf(f,"\tFWHM\t4sigma\tr2");
+	fprintf(f,"\n");
 
   for(i=0;i<k.size();i++){
-		fprintf(f,"%d\t%d\t%d\t%d\t%lf\t%lf\t%f\t%f\t%f\t%f\t%f\t%lf\t%s\n",
+		fprintf(f,"%d\t%d\t%d\t%d\t%lf\t%lf\t%f\t%f\t%f\t%f\t%f\t%lf\t%s",
 																																		   k[i].lowScan,
 																																		   k[i].highScan,
                                                                        k[i].datapoints,
@@ -89,6 +94,17 @@ int main(int argc, char* argv[]){
 																																		   k[i].rTime,
 																																		   k[i].xCorr,
 																																		   k[i].mods);
+		if(gaussFit){
+			if(k[i].gaussR2<0.00000001){
+				fprintf(f,"\t0\t0\t0");
+			} else {
+				double sigma=1/(SQRTTWO*sqrt(-k[i].gaussian[2]));
+				fprintf(f,"\t%lf\t%lf\t%.6lf",FWHMCONST*sigma,
+																			4*sigma,
+																			k[i].gaussR2);
+			}
+		}
+		fprintf(f,"\n");
 	}
   fclose(f);
 
@@ -108,6 +124,9 @@ void usage(){
 	cout << "  -d\tSets the match tolerance. This number specifies the minimum\n"
 		   << "    \tconsecutive scans (allowing for gaps) that a peptide is\n"
 			 << "    \tobserved across to be considered persistent. Default: 3\n" << endl;
+	cout << "  -f\tPerforms a Gaussian fit to the peptide chromatographic profiles.\n"
+			 << "    \tFWHM, 4*sigma, and r^2 are reported in the output.\n"
+			 << "    \tDefault: off\n" << endl;
 	cout << "  -g\tSets the gap tolerance. Sets the number of scans a peptide\n"
 		   << "    \tcan skip and still be considered if seen again in the folloing\n"
 			 << "    \tscan. Default: 1\n" << endl;
