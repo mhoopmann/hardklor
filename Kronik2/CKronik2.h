@@ -6,6 +6,9 @@
 
 using namespace std;
 
+#define FWHMCONST 2.3548200450309493820231386529194
+#define SQRTTWO 1.4142135623730950488016887242097
+
 typedef struct sPep{
   int charge;
   float intensity;
@@ -119,6 +122,8 @@ typedef struct sPepProfile {
   double monoMass;
   double basePeak;
   double xCorr;
+	double gaussian[4];
+	double gaussR2;
 
   char mods[32];
   char gene[32];
@@ -145,6 +150,8 @@ typedef struct sPepProfile {
     monoMass=0.0;
     basePeak=0.0;
     xCorr=0.0;
+		gaussian[0]=gaussian[1]=gaussian[2]=gaussian[3]=0.0;
+		gaussR2=0.0;
     strcpy(mods,"");
     strcpy(sequence,"");
     strcpy(gene,"");
@@ -168,6 +175,8 @@ typedef struct sPepProfile {
     monoMass=0.0;
     basePeak=0.0;
     xCorr=0.0;
+		gaussian[0]=gaussian[1]=gaussian[2]=gaussian[3]=0.0;
+		gaussR2=0.0;
     strcpy(mods,"");
     strcpy(sequence,"");
     strcpy(gene,"");
@@ -190,6 +199,11 @@ typedef struct sPepProfile {
     monoMass = p.monoMass;
     basePeak = p.basePeak;
     xCorr = p.xCorr;
+		gaussian[0]=p.gaussian[0];
+		gaussian[1]=p.gaussian[1];
+		gaussian[2]=p.gaussian[2];
+		gaussian[3]=p.gaussian[3];
+		gaussR2=p.gaussR2;
     strcpy(mods,p.mods);
     strcpy(sequence,p.sequence);
     strcpy(gene,p.gene);
@@ -221,6 +235,11 @@ typedef struct sPepProfile {
       monoMass = p.monoMass;
       basePeak = p.basePeak;
       xCorr = p.xCorr;
+			gaussian[0]=p.gaussian[0];
+			gaussian[1]=p.gaussian[1];
+			gaussian[2]=p.gaussian[2];
+			gaussian[3]=p.gaussian[3];
+			gaussR2=p.gaussR2;
       strcpy(mods,p.mods);
       strcpy(sequence,p.sequence);
       strcpy(gene,p.gene);
@@ -300,10 +319,12 @@ public:
   CKronik2& operator=(const CKronik2& c);
   sPepProfile& operator[ ](const unsigned int& i);
 
-  //Statistics functions  
-  bool pearson(int i1, int i2, bool byScan, bool interpolate, double& rval, double& pval, double& slope, double& intercept, float& sum1, float& sum2);
+  //Statistics and math functions  
+  bool		pearson(int i1, int i2, bool byScan, bool interpolate, double& rval, double& pval, double& slope, double& intercept, float& sum1, float& sum2);
+	double	polynomialBestFit(sProfileData* profile, int sz, float max, double* coeff, int degree=2);
   
   //Parameter accessors and modifiers
+	void setGaussFit(bool b);
   void setPPMTol(double d);
   void setMatchTol(int i);
   void setGapTol(int i);
@@ -351,10 +372,11 @@ private:
   vector<sScan> hkData;
 
   //Data Members: parameters
-  double dPPMTol;   //default 10.0
-  int iGapTol;      //default 1
-  int iMatchTol;    //Default 3
-  int iPercent;
+	bool		bGaussFit;	//default false
+  double	dPPMTol;		//default 10.0
+  int			iGapTol;    //default 1
+  int			iMatchTol;  //Default 3
+  int			iPercent;
 
   //Sorting Functions
   void sortPeptide();
