@@ -75,6 +75,7 @@ CHardklor::CHardklor(){
 	averagine=NULL;
 	mercury=NULL;
 	bEcho=true;
+  bMem=false;
 }
 
 CHardklor::CHardklor(CAveragine *a, CMercury8 *m){
@@ -83,6 +84,7 @@ CHardklor::CHardklor(CAveragine *a, CMercury8 *m){
   sa.setAveragine(averagine);
   sa.setMercury(mercury);
 	bEcho=true;
+  bMem=false;
 }
 
 CHardklor::~CHardklor(){
@@ -104,10 +106,9 @@ void CHardklor::SetMercury(CMercury8 *m){
 	sa.setMercury(mercury);
 }
 
-int CHardklor::GoHardklor(CHardklorSetting sett){
-  if(bEcho) cout << "\n\nHardklor, v2.03, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2012\nUniversity of Washington\n" << endl;
+int CHardklor::GoHardklor(CHardklorSetting sett, Spectrum* s){
 	cs = sett;
-  Analyze();
+  Analyze(s);
   return 0;
 }
 
@@ -120,30 +121,21 @@ int CHardklor::compareData(const void *p1, const void *p2){
   else return 0;
 }
 
-void CHardklor::Analyze() {
+void CHardklor::Analyze(Spectrum* s) {
 
   //Objects
   MSReader r;
   CNoiseReduction nr(&r,cs);
-  CPeriodicTable *PT;
-  PT = new CPeriodicTable(cs.HardklorFile);
-
-  //Arrays for combinatorial analysis
-  float *match;
-  float *mismatch;
-
-  SSObject bsso;
+	PT = new CPeriodicTable(cs.HardklorFile);
 
   //iterators
   unsigned int k;   //counters for loops
-	int c;
 
   int TotalIterations=0;
   int TotalScans=0;
   int i;
 
   //Variables for file and clock management
-  fstream fptr;
   int minutes, seconds;
   loadTime=0;
   analysisTime=0;
@@ -161,8 +153,8 @@ void CHardklor::Analyze() {
   int lowSigPep=0; //Stores the number of spectra whose max intensity was below the user defined threshold.
 
   
-  //Vector for holding peptide list of distribution
-  vector<CHardklorVariant> pepVariants;
+  //Build variants (modifications) used in the analysis
+	pepVariants.clear();
   if(!cs.noBase) {
     CHardklorVariant hkv;
     pepVariants.push_back(hkv);
@@ -180,10 +172,12 @@ void CHardklor::Analyze() {
   CSplitSpectrum* cSS;
   int winCount=0;
 
+  vResults.clear();
+
   //Ouput file info to user
 	if(bEcho){
-		cout << "Reading from file: " << cs.inFile << endl;
-		cout << "Writing to file: " << cs.outFile << endl;
+		if(s==NULL) cout << "Reading from file: " << cs.inFile << endl;
+		if(!bMem) cout << "Writing to file: " << cs.outFile << endl;
 	}
 
   if(cs.fileFormat==dunno) {
@@ -198,26 +192,24 @@ void CHardklor::Analyze() {
   //Read in the initial spectrum
   r.setFilter(cs.mzXMLFilter);
   r.setRawFilter(cs.rawFilter);
-  switch(cs.sna){
-  case 0:
-    if((cs.scan.iLower>0) && (cs.scan.iLower==cs.scan.iUpper)) r.readFile(&cs.inFile[0],curSpec,cs.scan.iLower);
-    else if(cs.scan.iLower>0) r.readFile(&cs.inFile[0],curSpec,cs.scan.iLower);
-	  else r.readFile(&cs.inFile[0],curSpec);
-    break;
-  case 1:
-    if(!nr.DeNoise(curSpec)) curSpec.setScanNumber(0);
-    break;
-  case 2:
-    //scan averaging
-    if(!nr.DeNoiseD(curSpec)) curSpec.setScanNumber(0);
-    break;
-  case 3:
-    if(!nr.DeNoiseC(curSpec)) curSpec.setScanNumber(0);
-    break;
-  default:
-    cout << "Unknown preprocessing algorithm." << endl;
-    curSpec.setScanNumber(0);
-    break;
+  if(s!=NULL){
+    curSpec=*s;
+  } else {
+	  if(cs.boxcar==0){
+      if((cs.scan.iLower>0) && (cs.scan.iLower==cs.scan.iUpper)) r.readFile(&cs.inFile[0],curSpec,cs.scan.iLower);
+      else if(cs.scan.iLower>0) r.readFile(&cs.inFile[0],curSpec,cs.scan.iLower);
+	    else r.readFile(&cs.inFile[0],curSpec);
+
+		  //this is the command to filter by persistence without boxcar averaging
+		  //    if(!nr.DeNoise(curSpec)) curSpec.setScanNumber(0);
+
+	  } else {
+		  if(cs.boxcarFilter>0){
+			  if(!nr.DeNoiseC(curSpec)) curSpec.setScanNumber(0);
+		  } else {
+			  if(!nr.DeNoiseD(curSpec)) curSpec.setScanNumber(0);
+		  }
+    }
   }
 
   TotalScans++;
@@ -229,17 +221,24 @@ void CHardklor::Analyze() {
 
   //Check that file was read
   if(curSpec.getScanNumber()==0) {
+    if(s!=NULL) {
+      cout << "Spectrum is invalid." << endl;
+      return;
+    }
     if(cs.scan.iLower>0) cout << cs.inFile << " is invalid, or requested scan number is of incorrect format." << endl;
     else cout << cs.inFile << " is invalid, or contains no spectrum." << endl;
     return;
   }
+  currentScanNumber = curSpec.getScanNumber();
 
   //Open a file for output. Results will be written on the fly as they come out of the algorithm.
-  fptr.open(&cs.outFile[0],ios::out|ios::app);
-  if(!fptr.good()) cout << "Output file error" << endl;
-  fptr << setiosflags(ios::fixed) << setprecision(4);
+  if(!bMem){
+    fptr.open(&cs.outFile[0],ios::out|ios::app);
+    if(!fptr.good()) cout << "Output file error" << endl;
+    fptr << setiosflags(ios::fixed) << setprecision(4);
+  }
 
-  if(cs.xml){
+  if(!bMem && cs.xml){
     fptr << "<Hardklor>" << endl;
     fptr << "<File InputFilename=\"" << cs.inFile << "\" OutputFilename=\"" << cs.outFile << "\">" << endl;
     WriteParams(fptr,1);
@@ -256,201 +255,133 @@ void CHardklor::Analyze() {
   
   //While there is still data to read in the file.
   while(true){
-    
-    //If this is the first spectrum, it was read above and the section starting
-    //at else is skipped.
 
-		//track load time
+		//Load next spectrum to analyze
+		if(!bFirst){
+			
+			//close out xml tag for previous spectrum
+			if(!bMem && cs.xml) fptr << "</Spectrum>" << endl;
+
+      if(s!=NULL) break;
+
+		  //track load time
+		  getExactTime(startTime);
+		  if(cs.boxcar==0){
+			  r.readFile(NULL,curSpec);
+			  //case 1: nr.DeNoise(curSpec); break;
+		  } else {
+			  if(cs.boxcarFilter>0) nr.DeNoiseC(curSpec);
+			  else nr.DeNoiseD(curSpec);
+      }
+		  getExactTime(stopTime);
+		  tmpTime1=toMicroSec(stopTime);
+		  tmpTime2=toMicroSec(startTime);
+		  loadTime+=tmpTime1-tmpTime2;	
+
+		} else {
+
+			bFirst=false; //mark that the first scan has been processed
+
+		}
+
+		//Write scan information to output file.
+		if(curSpec.getScanNumber()!=0){	
+      if(!bMem){
+			  if(cs.scan.iUpper>0 && curSpec.getScanNumber()>cs.scan.iUpper) break;
+			  if(cs.reducedOutput) WriteScanLine(curSpec,fptr,2);
+			  else if(cs.xml) WriteScanLine(curSpec,fptr,1);
+			  else WriteScanLine(curSpec,fptr,0);
+      } else {
+        currentScanNumber = curSpec.getScanNumber();
+      }
+		} else {
+			break; //exit if there is no spectrum left to analyze
+		}
+		TotalScans++;
+
+		//Preprocess spectrum
+		//If we have an empty spectrum, go on to the next one
+    if(curSpec.size()==0) continue;
+
 		getExactTime(startTime);
-    if(bFirst){
-
-      if(cs.smooth>0) SG_Smooth(curSpec,cs.smooth,4);
-      bFirst=false;
-
-			//Write scan information to output file.
-			if(cs.reducedOutput) WriteScanLine(curSpec,fptr,2);
-      if(cs.xml) WriteScanLine(curSpec,fptr,1);
-      else WriteScanLine(curSpec,fptr,0);
-
-    } else {
-      
-      //if spectrum does not need splitting do the following.
-      if(!bCutMe){
-
-				//If we finished reading specified scans, stop here.
-				if(ReadScan) break;
-	
-				//Check if any user limits were made and met
-				if( (cs.scan.iUpper == cs.scan.iLower) && 
-						(cs.scan.iLower != 0) ){
-					ReadScan=true;
-					getExactTime(stopTime);
-					tmpTime1=toMicroSec(stopTime);
-					tmpTime2=toMicroSec(startTime);
-					loadTime+=tmpTime1-tmpTime2;
-					continue;
-				} else if( (cs.scan.iLower < cs.scan.iUpper) &&
-									 (curSpec.getScanNumber() >= cs.scan.iUpper) ){
-					ReadScan=true;
-					getExactTime(stopTime);
-					tmpTime1=toMicroSec(stopTime);
-					tmpTime2=toMicroSec(startTime);
-					loadTime+=tmpTime1-tmpTime2;
-					continue;
-				} else {
-					//Read next spectrum from file.
-          switch(cs.sna){
-            case 0: r.readFile(NULL,cs.fileFormat,curSpec); break;
-            case 1: nr.DeNoise(curSpec); break;
-            case 2: nr.DeNoiseD(curSpec); break;
-            case 3: nr.DeNoiseC(curSpec); break;
-            default: break;
-          }
-          //fr.getProcessedSpectrum(curSpec);
-
-					TotalScans++;
-
-					if(curSpec.getScanNumber()!=0){
-
-            //Spectrum tmpspec=curSpec;
-            //nr.FirstDerivativePeaks(tmpspec,1);
-
-            //FILE* fpeak=fopen("peakCount.txt","at");
-            //fprintf(fpeak,"%d\t%d\n",curSpec.getScanNumber(),curSpec.size());
-            //fclose(fpeak);
-
-						//Write scan information to output file.
-						if(cs.reducedOutput) {
-							WriteScanLine(curSpec,fptr,2);
-						} else if(cs.xml) {
-							fptr << "</Spectrum>" << endl;
-							WriteScanLine(curSpec,fptr,1);
-						} else {
-							WriteScanLine(curSpec,fptr,0);
-						}
-					}
-
-				}
-	
-				//If at the end of the file, exit our while loop.
-				if(curSpec.getScanNumber()==0) break;
-	
-				//Smooth the file, if requested.
-				if(cs.smooth>0) SG_Smooth(curSpec,cs.smooth,4);
-      }//if(!bCutMe)
-    }//if(bFirst)
-    
-    //track loadtime
-    getExactTime(stopTime);
-    tmpTime1=toMicroSec(stopTime);
-    tmpTime2=toMicroSec(startTime);
-    loadTime+=tmpTime1-tmpTime2;
+    if(cs.smooth>0) SG_Smooth(curSpec,cs.smooth,4);
+		//if(curSpec.getScanNumber()==1999){
+		//	for(int xx=0;xx<curSpec.size();xx++) cout << curSpec[xx].mz << "\t" << curSpec[xx].intensity << endl;
+		//}
 
     //Check our spectrum for file type. Zoom and UltraZoom scans do not
     //need splitting.
-		getExactTime(startTime);
-
     if(cs.fileFormat==zs || cs.fileFormat==uzs){
-      //Analyze without splitting
-      
-      //If we have an empty spectrum, go on to the next one
-      if(curSpec.size()==0) continue;
 
-      //Clear the CSpecAnalyze object and reset variables.
       sa.clear();
 			sa.setParams(cs);
       sa.setSpectrum(curSpec);
 			sa.FindPeaks();
-
 			sa.PredictPeptides();
-			//sa.FindPeptides();
+
+			//do not analyze spectrum with 0 predicted peaks; Keep count of these occurrances.
+			if(sa.predPeak->size()==0){
+				zeroPep++;
+				continue;
+			}
+
+			AnalyzePeaks(sa);
 
     } else {
-      
-      //Add code for handling cut spectrum
-      //If spectrum was not previously cut, set up a cutter.
-      if(!bCutMe){
+      	
+			//Reinitialize our split spectrum
+			cSS=new CSplitSpectrum(&curSpec,cs);
+			cSS->SetAveragine(averagine);
+			cSS->SetMercury(mercury);
 
-				bCutMe=true;
-		
-				//Reinitialize our split spectrum
-				cSS=new CSplitSpectrum(&curSpec,cs);
-				cSS->SetAveragine(averagine);
-				cSS->SetMercury(mercury);
-				
-        if(cs.sna==1 || cs.sna==3){
+			//Check if data already centroided
+			if(cs.centroid) {
+				if(cs.chargeMode=='F' || cs.chargeMode=='P' || cs.chargeMode=='S'){
+					cout << "-cdm settings of F, P, and S (FFT, Patterson, Senko) only work on profile data." << endl;
+					cout << "Please choose settings of Q or C (QuickCharge, Complete)" << endl;
+					exit(5);
+				}
+				//This function directly copies the already centroided spectra to the CSS object
+				cSS->Centroid(curSpec);
+
+			//if not, process the data here (ultimately includes centroiding)
+			} else {
+				if(cs.boxcarFilter>0){ //TODO: Figure out how filtering interferes here
           cs.sn=0;
-          cSS->Centroid(curSpec);
-        } else {
-   				if(cs.noSplit) {
-	  				cSS->NoSplitAnalysis();
-		  		} else if(cs.centroid) {
-			  		cSS->Centroid(curSpec);
-				  } else if(cs.staticSN) {
-  					if(cs.sn==0) cSS->NoSplitAnalysis();
-	  				else cSS->NewSNPass(cs.snWindow);
-		  		} else {
-			  		cSS->OverlappingAnalysis(cs.snWindow);
-				  	if(cs.iAnalysis) cSS->IntersectionAnalysis();
-					  else cSS->UnionAnalysis();
-				  }
-        }
-				
-				cSS->MakeAnalysis(cs.winSize);
-
-				//Get the first window, if there is one
-				if(cSS->getNumWindows()>0){
-					sa = cSS->getWindow(0);
-					sa.setParams(cs);
-					sa.PredictPeptides();
-					winCount++;
-				} else {
-
-					//if we got here, it was because cutting the spectrum did not produce any
-					//peaks to analyze. So just analyze the whole thing without cutting
-					cutSpec.clear();
-					for(c=0;c<curSpec.size();c++){
-						if(curSpec.at(c).mz>=cs.window.dLower && curSpec.at(c).mz<=cs.window.dUpper){
-							cutSpec.add(curSpec.at(c));
-						}
-					}
-					sa.clear();
-					sa.setSpectrum(cutSpec);
-					sa.setParams(cs);
-					//sa.FindPeptides();
-
-					delete cSS;
-					bCutMe = false;
-					//continue;
+					cSS->Centroid(curSpec);
+				} else if(cs.staticSN) {
+					if(cs.sn==0) cSS->NoSplitAnalysis();
+					else cSS->NewSNPass(cs.snWindow);
+		  	} else {
+			  	cSS->OverlappingAnalysis(cs.snWindow);
+				 	if(cs.iAnalysis) cSS->IntersectionAnalysis();
+				  else cSS->UnionAnalysis();
 				}
+			}
+		
+			//Split the spectrum
+		  cSS->MakeAnalysis(cs.winSize);
 
-      } else {
-	
-				//If bCutMe is true, then there is still more spectrum to cut out
-				if(winCount < cSS->getNumWindows()){
-					sa = cSS->getWindow(winCount);
-					sa.setParams(cs);
-					sa.PredictPeptides();
-					winCount++;
-				} else {
-					winCount=0;
-					bCutMe = false;
-					delete cSS;
-					//Track split times
-					getExactTime(stopTime);
-					tmpTime1=toMicroSec(stopTime);
-					tmpTime2=toMicroSec(startTime);
-					splitTime+=tmpTime1-tmpTime2;
-					continue;
-				}
-      }
-    }
-    
-    //Track split times
-    getExactTime(stopTime);
-    tmpTime1=toMicroSec(stopTime);
-    tmpTime2=toMicroSec(startTime);
-    splitTime+=tmpTime1-tmpTime2;
+		  //Analyze each window
+		  for(winCount=0;winCount<cSS->getNumWindows();winCount++){
+			  sa = cSS->getWindow(winCount);
+			  sa.setParams(cs);
+			  sa.PredictPeptides();	
+
+			  //do not analyze spectrum with 0 predicted peaks; Keep count of these occurrances.
+			  if(sa.predPeak->size()==0){
+				  zeroPep++;
+				  continue;
+			  }
+
+			  AnalyzePeaks(sa);
+
+		  }
+
+			//clean up cSS object
+			delete cSS;
+
+		}
 
     //Update the percentage indicator
 		if(bEcho){
@@ -463,130 +394,20 @@ void CHardklor::Analyze() {
 				cout.flush();
 			}
 		}
-    
-    //do not analyze spectrum with 0 predicted peaks; Keep count of these occurrances.
-    //if(sa.peptide.size()==0) {
-    //cout << "Scan: " << curSpec.getScanNumber() << "  Window: " << endl;
-		//cout << "predPeak: " << sa.predPeak->size() << endl;
-		if(sa.predPeak->size()==0){
-      zeroPep++;
-      continue;
-    }
-    //else {
-      //for(int bb=0;bb<sa.predPeak->size();bb++) cout << sa.predPeak->at(bb).GetMZ() << " " << sa.predPeak->at(bb).GetCharge(0) << endl;
-    //}
 
-		//Track analysis times
-		getExactTime(startTime);
-
-    //Make an averagine distribution for every variant specified in the conf file.
-    //for(c=0;c<pepVariants.size();c++)	sa.MakePredictions(pepVariants.at(c));
-		sa.MakePredictions(pepVariants);
-
-    //Keep track of how many spectrum had more predicted peptides than the user
-    //defined threshold, or no peptides after making predictions.
-    if((int)sa.predPep->size()>=cs.peptide) {
-			manyPep++;
-			//cout << winCount << ": " << sa.predPep->size() << endl;
+		if(!bMem && cs.xml) {
+			fptr << "</Spectrum>" << endl;
+			fptr << "</File>" << endl;
+			fptr << "</Hardklor>" << endl;
 		}
 
-		if(sa.predPep->size()==0) {
-			zeroPep++;
-			getExactTime(stopTime);
-			tmpTime1=toMicroSec(stopTime);
-			tmpTime2=toMicroSec(startTime);
-			analysisTime+=tmpTime1-tmpTime2;
-			continue;
-		}
-
-		//Restructure mismatch arrays for faster correlation analysis
-		sa.BuildMismatchArrays();
- 
-    //Send the distributions, and the observed data points from the spectrum to a recursive
-    //algorithm that will sum up every combination of every peptide in each of its chlorinated
-    //forms to find the combination that best fits the data.
-
-		//Counter to see how many correlations are made; fewer generally equals faster, but is
-		//less thorough.
-		SSIterations=0;
-
-		//Dimension our arrays
-		match = new float[sa.peaks.size()];
-		for(c=0;c<sa.peaks.size();c++) match[c]=0;
-
-		if(sa.mismatchSize>0){
-			mismatch = new float[sa.mismatchSize];
-			for(c=0;c<sa.mismatchSize;c++) mismatch[c]=0;
-		} else {
-			mismatch = new float[1];
-			mismatch[0] = 0;
-		}
-
-		//clear prior data
-		bsso.clear();
-		switch(cs.algorithm){
-		case SemiComplete:
-			SemiCompleteMethod(match,mismatch,&bsso,1,cs.depth,0);
-			break;
-		case SemiCompleteFast:
-			SemiCompleteFastMethod(match,mismatch,&bsso,1,cs.depth,0);
-			break;
-		case Dynamic:
-			DynamicMethod(match,mismatch,&bsso,1,cs.depth,0,0);
-			break;
-		case DynamicSemiComplete:
-			DynamicSemiCompleteMethod(match,mismatch,&bsso,1,cs.depth,0,0);
-			break;
-		case SemiSubtractive:
-			SemiSubtractiveMethod(&bsso,cs.depth);
-			break;
-		case FewestPeptides:
-			FewestPeptidesMethod(&bsso,cs.depth);
-			break;
-		case FewestPeptidesChoice:
-			FewestPeptidesChoiceMethod(&bsso,cs.depth);
-			break;
-		case FastFewestPeptides:
-			FastFewestPeptidesMethod(&bsso,cs.depth);
-			break;
-		case FastFewestPeptidesChoice:
-			FastFewestPeptidesChoiceMethod(&bsso,cs.depth);
-			break;
-		case Basic:
-		default:
-			BasicMethod(match,mismatch,&bsso,1,cs.depth,sa.predPep->size()-1);
-			break;
-		}
-
-		delete [] match;
-		delete [] mismatch;
-
-		TotalIterations+=SSIterations;
-
-		//Track analysis times
-		getExactTime(stopTime);
-    		tmpTime1=toMicroSec(stopTime);
-    		tmpTime2=toMicroSec(startTime);
-		analysisTime+=tmpTime1-tmpTime2;
-		
-		//if we exceeded our threshold, output the data to file
-    if(bsso.corr > cs.corr) {
-			if(cs.reducedOutput) WritePepLine(bsso,PT,fptr,2);
-      else if(cs.xml) WritePepLine(bsso,PT,fptr,1);
-      else WritePepLine(bsso,PT,fptr,0);
-    }
-    
-  }
-
-  if(cs.xml) {
-    fptr << "</Spectrum>" << endl;
-    fptr << "</File>" << endl;
-    fptr << "</Hardklor>" << endl;
-  }
+	} //loop to next spectrum (while)
   
   //Close the output file and clear it so it can be reused.
-  fptr.close();
-  fptr.clear();
+  if(!bMem){
+    fptr.close();
+    fptr.clear();
+  }
 
 	if(bEcho) {
 		cout << "\n" << endl;
@@ -668,6 +489,111 @@ void CHardklor::Analyze() {
 		}
 	}
 
+	delete PT;
+
+}
+
+bool CHardklor::AnalyzePeaks(CSpecAnalyze& sa){
+	
+	int i;
+	SSObject bsso;
+
+	//Arrays for combinatorial analysis
+  float *match;
+  float *mismatch;
+
+	//Track analysis times
+	getExactTime(startTime);
+
+  //Make an averagine distribution for every variant specified in the conf file.
+	sa.MakePredictions(pepVariants);
+
+	//if there are no possible peptides, stop the analysis here.
+	if(sa.predPep->size()==0) {
+		getExactTime(stopTime);
+		tmpTime1=toMicroSec(stopTime);
+		tmpTime2=toMicroSec(startTime);
+		analysisTime+=tmpTime1-tmpTime2;
+		return false;
+	}
+
+	//Restructure mismatch arrays for faster correlation analysis
+	sa.BuildMismatchArrays();
+ 
+  //Send the distributions, and the observed data points from the spectrum to a recursive
+  //algorithm that will sum up every combination of every peptide in each of its chlorinated
+  //forms to find the combination that best fits the data.
+
+	//Dimension our arrays
+	match = new float[sa.peaks.size()];
+	for(i=0;i<sa.peaks.size();i++) match[i]=0;
+
+	if(sa.mismatchSize>0){
+		mismatch = new float[sa.mismatchSize];
+		for(i=0;i<sa.mismatchSize;i++) mismatch[i]=0;
+	} else {
+		mismatch = new float[1];
+		mismatch[0] = 0;
+	}
+
+	//clear prior data and select analysis algorithm
+	bsso.clear();
+	switch(cs.algorithm){
+	case SemiComplete:
+		SemiCompleteMethod(match,mismatch,&bsso,1,cs.depth,0);
+		break;
+	case SemiCompleteFast:
+		SemiCompleteFastMethod(match,mismatch,&bsso,1,cs.depth,0);
+		break;
+	case Dynamic:
+		DynamicMethod(match,mismatch,&bsso,1,cs.depth,0,0);
+		break;
+	case DynamicSemiComplete:
+		DynamicSemiCompleteMethod(match,mismatch,&bsso,1,cs.depth,0,0);
+		break;
+	case SemiSubtractive:
+		SemiSubtractiveMethod(&bsso,cs.depth);
+		break;
+	case FewestPeptides:
+		FewestPeptidesMethod(&bsso,cs.depth);
+		break;
+	case FewestPeptidesChoice:
+		FewestPeptidesChoiceMethod(&bsso,cs.depth);
+		break;
+	case FastFewestPeptides:
+		FastFewestPeptidesMethod(&bsso,cs.depth);
+		break;
+	case FastFewestPeptidesChoice:
+		FastFewestPeptidesChoiceMethod(&bsso,cs.depth);
+		break;
+	case Basic:
+	default:
+		BasicMethod(match,mismatch,&bsso,1,cs.depth,sa.predPep->size()-1);
+		break;
+	}
+
+	//Clean up memory
+	delete [] match;
+	delete [] mismatch;
+
+	//Track analysis times
+	getExactTime(stopTime);
+  tmpTime1=toMicroSec(stopTime);
+  tmpTime2=toMicroSec(startTime);
+	analysisTime+=tmpTime1-tmpTime2;
+		
+	//if we exceeded our threshold, output the data to file or store it in memoryt
+  if(bsso.corr > cs.corr) {
+    if(!bMem){
+		  if(cs.reducedOutput) WritePepLine(bsso,PT,fptr,2);
+      else if(cs.xml) WritePepLine(bsso,PT,fptr,1);
+      else WritePepLine(bsso,PT,fptr,0);
+    } else {
+      ResultToMem(bsso,PT);
+    }
+  }
+    
+	return true;
 }
 
 double CHardklor::LinReg(float *match, float *mismatch){
@@ -759,7 +685,7 @@ void CHardklor::BasicMethod(float *match, float *mismatch,SSObject *combo,
 			};
       
       //Correlate this combined distribution with the mass spec data.
-			SSIterations++;
+			//SSIterations++;
       RCorr = LinReg(sumMatch,sumMismatch);
 
 			//cout << RCorr << endl;
@@ -826,7 +752,7 @@ void CHardklor::SemiCompleteMethod(float *match, float *mismatch,SSObject *combo
 			};
       
       //Correlate this combined distribution with the mass spec data.
-			SSIterations++;
+			//SSIterations++;
       RCorr = LinReg(sumMatch,sumMismatch);
       
 			recCombo = *combo;
@@ -935,7 +861,7 @@ void CHardklor::SemiCompleteFastMethod(float *match, float *mismatch,SSObject *c
 			};
       
       //Correlate this combined distribution with the mass spec data.
-			SSIterations++;
+			//SSIterations++;
       RCorr = LinReg(sumMatch[b],sumMismatch[b]);
       
 			recCombo = *combo;
@@ -1036,7 +962,7 @@ void CHardklor::DynamicMethod(float *match, float *mismatch,SSObject *combo,
 			};
       
       //Correlate this combined distribution with the mass spec data.
-			SSIterations++;
+			//SSIterations++;
       RCorr = LinReg(sumMatch,sumMismatch);
 
 			//cout << "RCorr = " << RCorr << endl;
@@ -1105,7 +1031,7 @@ void CHardklor::DynamicSemiCompleteMethod(float *match, float *mismatch,SSObject
 			};
       
       //Correlate this combined distribution with the mass spec data.
-			SSIterations++;
+			//SSIterations++;
       RCorr = LinReg(sumMatch,sumMismatch);
       
 			recCombo = *combo;
@@ -1245,7 +1171,7 @@ void CHardklor::SemiSubtractiveMethod(SSObject *combo, int maxDepth){
 				};
       
 				//Correlate this combined distribution with the mass spec data.
-				SSIterations++;
+				//SSIterations++;
 		    RCorr = LinReg(sumMatch,sumMismatch);
 				cout << RCorr << endl;
       
@@ -1400,7 +1326,7 @@ void CHardklor::FewestPeptidesMethod(SSObject *combo, int maxDepth){
 					};
 
 					//Correlate this combined distribution with the mass spec data.
-					SSIterations++;
+					//SSIterations++;
 					RCorr = LinReg(sumMatch,sumMismatch);
 					//cout << RCorr << endl;
       
@@ -1544,7 +1470,7 @@ void CHardklor::FewestPeptidesChoiceMethod(SSObject *combo, int maxDepth){
 					};
 
 					//Correlate this combined distribution with the mass spec data.
-					SSIterations++;
+					//SSIterations++;
 					RCorr = LinReg(sumMatch,sumMismatch);
 					//cout << RCorr << endl;
       
@@ -1795,7 +1721,7 @@ void CHardklor::FastFewestPeptidesMethod(SSObject *combo, int maxDepth){
 						}
 
 						//Correlate this combined distribution with the mass spec data.
-						SSIterations++;
+						//SSIterations++;
 						if(depth == maxDepth-1){
 							RCorr = LinReg(sumMatchC,sumMismatchC);
 						} else {
@@ -2056,7 +1982,7 @@ void CHardklor::FastFewestPeptidesChoiceMethod(SSObject *combo, int maxDepth){
 						};
 
 						//Correlate this combined distribution with the mass spec data.
-						SSIterations++;
+						//SSIterations++;
 						if(storeA) RCorr = LinReg(sumMatchA[count],sumMismatchA[count]);
 						else RCorr = LinReg(sumMatchB[count],sumMismatchB[count]);
       
@@ -2160,6 +2086,50 @@ int CHardklor::calcDepth(int start, int max, int depth, int count) {
 	}
 
 	return total;
+
+}
+
+void CHardklor::ResultToMem(SSObject& obj, CPeriodicTable* PT){
+  int j,k;
+  int pepID;
+  int varID;
+	int sz=(int)obj.pepVar->size();
+  char mods[32];
+  char tmp[16];
+
+  //Each peptide in a window is designated with a P 
+  for(k=0;k<sz;k++) {
+
+    pepID=obj.pepVar->at(k).iLower;
+    varID=obj.pepVar->at(k).iUpper;
+
+    hkm.monoMass = sa.predPep->at(pepID).GetVariant(varID).GetMonoMass();
+    hkm.charge = sa.predPep->at(pepID).GetVariant(varID).GetCharge();
+    if(cs.distArea) hkm.intensity = sa.predPep->at(pepID).GetIntensity()*sa.predPep->at(pepID).GetVariant(varID).GetArea();
+    else hkm.intensity = sa.predPep->at(pepID).GetIntensity();
+    hkm.scan = currentScanNumber;
+    hkm.mz = sa.predPep->at(pepID).GetMZ();
+    hkm.corr = obj.corr;
+
+		//Add mods
+		strcpy(mods,"");
+		for(j=0;j<sa.predPep->at(pepID).GetVariant(varID).GetHKVariant().sizeAtom();j++){
+			strcat(mods,PT->at(sa.predPep->at(pepID).GetVariant(varID).GetHKVariant().atAtom(j).iLower).symbol);
+      sprintf(tmp,"%d",sa.predPep->at(pepID).GetVariant(varID).GetHKVariant().atAtom(j).iUpper);
+			strcat(mods,tmp);
+		}
+		strcat(mods,"_");
+		for(j=0;j<sa.predPep->at(pepID).GetVariant(varID).GetHKVariant().sizeEnrich();j++){
+      sprintf(tmp,"%.2lf",sa.predPep->at(pepID).GetVariant(varID).GetHKVariant().atEnrich(j).ape);
+      strcat(mods,tmp);
+      strcat(mods,PT->at(sa.predPep->at(pepID).GetVariant(varID).GetHKVariant().atEnrich(j).atomNum).symbol);
+			sprintf(tmp,"%d",sa.predPep->at(pepID).GetVariant(varID).GetHKVariant().atEnrich(j).isotope);
+			strcat(mods,tmp);
+    }
+    strcpy(hkm.mods,mods);
+    vResults.push_back(hkm);
+
+  } 
 
 }
 
@@ -2289,5 +2259,17 @@ void CHardklor::WriteScanLine(Spectrum& s, fstream& fptr, int format){
 
 void CHardklor::WriteParams(fstream& fptr, int format){
 
+}
+
+int CHardklor::Size(){
+  return vResults.size();
+}
+
+void CHardklor::SetResultsToMemory(bool b){
+  bMem=b;
+}
+
+hkMem& CHardklor::operator[](const int& index){
+  return vResults[index];
 }
 

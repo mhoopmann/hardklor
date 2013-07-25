@@ -1,3 +1,6 @@
+#ifndef _CNOISEREDUCTION_H
+#define _CNOISEREDUCTION_H
+
 #include "MSReader.h"
 #include "Spectrum.h"
 #include "CHardklorSetting.h"
@@ -50,5 +53,21 @@ private:
   deque<Spectrum> s;
   deque<Spectrum> bs;
 
+	/*
+	  __int64 startTime;
+    __int64 stopTime;
+    __int64 loadTime;
+    __int64 analysisTime;
+    __int64 timerFrequency;
+    __int64 tmpTime1;
+    __int64 tmpTime2;
+    #define getExactTime(a) QueryPerformanceCounter((LARGE_INTEGER*)&a)
+    #define getTimerFrequency(a) QueryPerformanceFrequency((LARGE_INTEGER*)&a)
+    #define toMicroSec(a) (a)
+    #define timeToSec(a,b) (a/b)
+		*/
+
 };
+
+#endif
 

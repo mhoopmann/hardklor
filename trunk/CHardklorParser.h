@@ -28,9 +28,13 @@ class CHardklorParser {
  protected:
 
  private:
-  //Data Members
-  CHardklorSetting global;
-  vector<CHardklorSetting> *vQueue;
+	 //Methods
+   bool makeVariant(char* c);
+	 void warn(char*, int);
+	 
+	 //Data Members
+	 CHardklorSetting global;
+	 vector<CHardklorSetting> *vQueue;
 };
 
 

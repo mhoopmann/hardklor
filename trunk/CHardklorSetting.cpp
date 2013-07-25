@@ -42,12 +42,14 @@ CHardklorSetting::CHardklorSetting(){
   xml=false;
 	reducedOutput=false;
 
-  ppMatch=1;
-  ppWin=1;
+  //ppMatch=1;
+  //ppWin=1;
   //noiseMatch=1;
   //noiseWindow=3;
   ppm=10.0;
-  sna=0;
+  //sna=0;
+	boxcar=0;
+	boxcarFilter=0;
 
   //rawAvg=false;
   //rawAvgWidth=1;
@@ -101,12 +103,14 @@ CHardklorSetting::CHardklorSetting(const CHardklorSetting& c){
   xml = c.xml;
 	reducedOutput = c.reducedOutput;
 
-  ppMatch=c.ppMatch;
-  ppWin=c.ppWin;
+  //ppMatch=c.ppMatch;
+  //ppWin=c.ppWin;
   //noiseMatch=c.noiseMatch;
   //noiseWindow=c.noiseWindow;
   ppm=c.ppm;
-  sna=c.sna;
+  //sna=c.sna;
+	boxcar=c.boxcar;
+	boxcarFilter=c.boxcarFilter;
 
   //rawAvg=c.rawAvg;
   //rawAvgWidth=c.rawAvgWidth;
@@ -163,12 +167,14 @@ CHardklorSetting& CHardklorSetting::operator=(const CHardklorSetting& c){
     xml = c.xml;
 		reducedOutput = c.reducedOutput;
 
-    ppMatch=c.ppMatch;
-    ppWin=c.ppWin;
+    //ppMatch=c.ppMatch;
+    //ppWin=c.ppWin;
     //noiseMatch=c.noiseMatch;
     //noiseWindow=c.noiseWindow;
     ppm=c.ppm;
-    sna=c.sna;
+    //sna=c.sna;
+		boxcar=c.boxcar;
+		boxcarFilter=c.boxcarFilter;
 
     //rawAvg=c.rawAvg;
     //rawAvgWidth=c.rawAvgWidth;

@@ -39,20 +39,21 @@ class CHardklorSetting {
   bool staticSN;			//for sna=THRASH; assume one noise level for entire spectrum
   bool xml;						//output is in xml
   
-  
+	int boxcar;				//number of scans to average together
+  int	boxcarFilter;	//value to meet or exceed to keep peak in boxcar averaged data
   int depth;        //maximum number of overlapping peptides
   int maxCharge;    //max charge state to search for
   int minCharge;    //min charge state to search for
   int peptide;			//maximum peptide models to analyze at a single time
-  int ppMatch;      //pre-processing matches. m/z must be observed this amount across ppWin
-  int ppWin;        //pre-processing window size (1 = +/-1 scan)
+  //int ppMatch;      //pre-processing matches. m/z must be observed this amount across ppWin
+  //int ppWin;        //pre-processing window size (1 = +/-1 scan)
   //int noiseMatch;   //for sna=PP; number of matches required for real peaks
   //int noiseWindow;  //for sna=PP; Size of window over which scans are analyzed
   //int rawAvgCutoff; //Noise cutoff intensity for averaged raw scans
   //int rawAvgWidth;  //Number of scans on either side of target to average (1 = +/-1 scan)
   int sl;           //sensitivity level
   int smooth;       //Savitsky-Golay smoothing window size
-  int sna;          //Signal-to-noise algorithm; 0=THRASH, 1=Persistent peaks (PP)
+  //int sna;          //Signal-to-noise algorithm; 0=THRASH, 1=Persistent peaks (PP)
 
   double corr;      //correlation threshold
   double ppm;       //ppm tolerance of m/z values to match across scans

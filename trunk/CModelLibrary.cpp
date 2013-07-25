@@ -39,7 +39,7 @@ bool CModelLibrary::buildLibrary(int lowCharge, int highCharge, vector<CHardklor
 	chargeMin=lowCharge;
 	chargeCount=highCharge+1;
 	varCount=pepVariants.size();
-	merCount=400;
+	merCount=1000;
 
 	libModel = new mercuryModel**[chargeCount];
 	for(i=chargeMin;i<chargeCount;i++){
@@ -58,6 +58,10 @@ bool CModelLibrary::buildLibrary(int lowCharge, int highCharge, vector<CHardklor
 				averagine->clear();
 				averagine->calcAveragine(mass,pepVariants[j]);
 				averagine->getAveragine(&av[0]);
+        //cout << mass << "\t" << pepVariants[j].sizeAtom() << "\t" << pepVariants[j].sizeEnrich() << "\t" << av << endl;
+        for(n=0;n<(unsigned int)pepVariants[j].sizeEnrich();n++){
+          mercury->Enrich(pepVariants[j].atEnrich(n).atomNum,pepVariants[j].atEnrich(n).isotope,pepVariants[j].atEnrich(n).ape);
+        }
 				mercury->GoMercury(&av[0],i);
 
 				vMR.clear();
