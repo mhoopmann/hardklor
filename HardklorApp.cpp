@@ -21,9 +21,10 @@ int main(int argc, char* argv[]) {
 	CMercury8 *mercury;
 	CModelLibrary *models;
 
+	cout << "Hardklor v2.15, July 25 2013" << endl;
+	cout << "Mike Hoopmann, Mike MacCoss\nCopyright 2007-2013\nUniversity of Washington" << endl;
 	if(argc==1){
-		cout << "Hardklor v2.03, April 6, 2012\n";
-		cout << "Usage:\t\thardklor -conf <config file>\n";
+		cout << "Usage:\t\thardklor <config file>\n";
 		cout << "See documentation for instructions to modify and use config files." << endl;
 		exit(1);
 	}
@@ -66,7 +67,7 @@ int main(int argc, char* argv[]) {
 	CHardklorVariant hkv;
 
   for(i=0;i<hp.size();i++) {
-		if(hp.queue(i).sna>3){
+		if(hp.queue(i).algorithm==Version2){
 			pepVariants.clear();
 			if(!hp.queue(i).noBase) pepVariants.push_back(hkv);
 			for(j=0;j<hp.queue(i).variant->size();j++)  pepVariants.push_back(hp.queue(i).variant->at(j));

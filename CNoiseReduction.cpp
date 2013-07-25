@@ -84,7 +84,7 @@ bool CNoiseReduction::DeNoise(Spectrum& sp){
       s.push_front(tmpSpec);
       if(strcmp(cFilter1,cFilter2)==0){
         j++;
-        if(j==cs.ppWin) break;
+				if(j==(int)(cs.boxcar/2)) break;
       }
       i++;
     }
@@ -122,7 +122,7 @@ bool CNoiseReduction::DeNoise(Spectrum& sp){
       //cout << tmpSpec.getScanNumber() << " " << cFilter1 << " xx " << cFilter2 << endl;
       if(strcmp(cFilter1,cFilter2)==0){  
         j++;
-        if(j==cs.ppWin) break;
+				if(j==(int)(cs.boxcar/2)) break;
       }
       i++;
     }
@@ -144,7 +144,7 @@ bool CNoiseReduction::DeNoise(Spectrum& sp){
     s[i].getRawFilter(cFilter2,256);
     if(strcmp(cFilter1,cFilter2)==0) {
       v.push_back(i);
-      if(v.size()==cs.ppWin) break;
+			if(v.size()==(int)(cs.boxcar/2)) break;
     }
   }
 
@@ -163,12 +163,12 @@ bool CNoiseReduction::DeNoise(Spectrum& sp){
     if(strcmp(cFilter1,cFilter2)==0) {
       v.push_back(i);
       j++;
-      if(j==cs.ppWin) break;
+      if(j==(int)(cs.boxcar/2)) break;
     }
   }
 
   //extend right side if needed
-  while(j<cs.ppWin){
+  while(j<(int)(cs.boxcar/2)){
     r->readFile(NULL,tmpSpec);
     if(tmpSpec.getScanNumber()==0) break;    
     tmpSpec.getRawFilter(cFilter2,256);
@@ -199,7 +199,7 @@ bool CNoiseReduction::DeNoise(Spectrum& sp){
       ppm=fabs( (s[v[j]].at(index).mz-s[pos].at(i).mz)/s[pos].at(i).mz * 1000000);
       if(ppm<cs.ppm) matchCount++;
     }
-    if(matchCount>=cs.ppMatch || matchCount==v.size()) sp.add(s[pos].at(i));
+		if(matchCount>=cs.boxcarFilter || matchCount==v.size()) sp.add(s[pos].at(i));
   }
   sp.setScanNumber(s[pos].getScanNumber());
   sp.setScanNumber(s[pos].getScanNumber(true),true);
@@ -1284,7 +1284,7 @@ bool CNoiseReduction::ScanAveragePlusDeNoise(Spectrum& sp, char* file, int width
     }
 
     //if data point was not visible across enough scans, set it to 0
-    if(match<cs.ppMatch && match<(int)v.size()) ps.at(i).intensity=0.0;
+		if(match<cs.boxcarFilter && match<(int)v.size()) ps.at(i).intensity=0.0;
 
   }
 
@@ -1324,13 +1324,13 @@ bool CNoiseReduction::DeNoiseB(Spectrum& sp){
 
   if(pos==0){
     if((cs.scan.iLower>0)) {
-      if(!ScanAveragePlusDeNoise(sp,&cs.inFile[0],cs.ppWin,0.1f,cs.scan.iLower)) return false;
+      if(!ScanAveragePlusDeNoise(sp,&cs.inFile[0],(int)(cs.boxcar/2),0.1f,cs.scan.iLower)) return false;
     } else {
-      ScanAveragePlusDeNoise(sp,&cs.inFile[0],cs.ppWin,0.1f);
+      ScanAveragePlusDeNoise(sp,&cs.inFile[0],(int)(cs.boxcar/2),0.1f);
     }
     pos=1;
   } else {
-    ScanAveragePlusDeNoise(sp,NULL,cs.ppWin,0.1f);
+    ScanAveragePlusDeNoise(sp,NULL,(int)(cs.boxcar/2),0.1f);
   }
 
   if(sp.getScanNumber()==0) return false;
@@ -1348,13 +1348,13 @@ bool CNoiseReduction::DeNoiseC(Spectrum& sp){
 
   if(pos==0){
     if(cs.scan.iLower>0) {
-      if(!NewScanAveragePlusDeNoise(sp,cs.inFile,cs.ppWin,0.1f,cs.scan.iLower)) return false;
+      if(!NewScanAveragePlusDeNoise(sp,cs.inFile,(int)(cs.boxcar/2),0.1f,cs.scan.iLower)) return false;
     } else {
-      NewScanAveragePlusDeNoise(sp,cs.inFile,cs.ppWin,0.1f);
+      NewScanAveragePlusDeNoise(sp,cs.inFile,(int)(cs.boxcar/2),0.1f);
     }
     pos=1;
   } else {
-    NewScanAveragePlusDeNoise(sp,NULL,cs.ppWin,0.1f);
+    NewScanAveragePlusDeNoise(sp,NULL,(int)(cs.boxcar/2),0.1f);
   }
 
   if(sp.getScanNumber()==0) return false;
@@ -1372,13 +1372,13 @@ bool CNoiseReduction::DeNoiseD(Spectrum& sp){
 
   if(pos==0){
     if(cs.scan.iLower>0) {
-      if(!NewScanAverage(sp,cs.inFile,cs.ppWin,0.1f,cs.scan.iLower)) return false;
+      if(!NewScanAverage(sp,cs.inFile,(int)(cs.boxcar/2),0.1f,cs.scan.iLower)) return false;
     } else {
-      NewScanAverage(sp,cs.inFile,cs.ppWin,0.1f);
+      NewScanAverage(sp,cs.inFile,(int)(cs.boxcar/2),0.1f);
     }
     pos=1;
   } else {
-    NewScanAverage(sp,NULL,cs.ppWin,0.1f);
+    NewScanAverage(sp,NULL,(int)(cs.boxcar/2),0.1f);
   }
 
   if(sp.getScanNumber()==0) return false;
@@ -1463,8 +1463,6 @@ bool CNoiseReduction::NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int wi
     specs[0]=bs[posA];
     c=CParam(specs[0],3);
   }
-
-  //cout << "C: " << c << endl;
 
   //set our pivot spectrum
   specs[0].getRawFilter(cFilter1,256);
@@ -1590,7 +1588,7 @@ bool CNoiseReduction::NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int wi
       }//for k
 
       //if data point was not visible across enough scans, set it to 0
-      if(match<cs.ppMatch && match<numScans) {
+			if(match<cs.boxcarFilter && match<numScans) {
         //ignore point
         //cout << "BAH! " << specs[m].at(i).mz << " has " << match << " matches." << endl;
       } else {

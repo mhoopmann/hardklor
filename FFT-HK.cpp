@@ -89,7 +89,7 @@ void Patterson(double *f, Spectrum& s, unsigned int start, unsigned int stop,
 		ch = (double)(i+2)/3 + shift;
 		ch = 1/ch;
 		ch /= 2;
-		for(j=0;j<s.size();j++){
+		for(j=start;j<=stop;j++){
 				mz1 = s.at(j).mz - ch;
 				mz2 = s.at(j).mz + ch;
 				f[i]+= (GetIntensity(s,start,stop,mz1) * GetIntensity(s,start,stop,mz2));
@@ -107,6 +107,7 @@ void Patterson(double *f, Spectrum& s, unsigned int start, unsigned int stop,
 			//cout << (double)(i+2)/3 + shift << "\t" << f[i] << endl;
 		}
 	}
+	//exit(1);
 
 }
 

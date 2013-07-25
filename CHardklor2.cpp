@@ -47,7 +47,7 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 	CNoiseReduction nr(&r,cs);
 
 	//Signature
-	if(bEcho) cout << "\n\nHardklor, v2.03, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2012\nUniversity of Washington\n" << endl;
+	//if(bEcho) cout << "\n\nHardklor, v2.06, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2012\nUniversity of Washington\n" << endl;
 
 	//Set the periodic table
 	if(PT==NULL) PT = new CPeriodicTable(cs.HardklorFile);
@@ -70,22 +70,18 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 	  //Read in the initial spectrum
   r.setFilter(cs.mzXMLFilter);
   r.setRawFilter(cs.rawFilter);
-  switch(cs.sna){
-  case 4:
+	if(cs.boxcar==0){
     if((cs.scan.iLower>0) && (cs.scan.iLower==cs.scan.iUpper)) r.readFile(&cs.inFile[0],curSpec,cs.scan.iLower);
     else if(cs.scan.iLower>0) r.readFile(&cs.inFile[0],curSpec,cs.scan.iLower);
 	  else r.readFile(&cs.inFile[0],curSpec);
-    break;
-	case 5:
-    if(!nr.DeNoise(curSpec)) curSpec.setScanNumber(0);
-    break;
-  case 6:
-    if(!nr.DeNoiseC(curSpec)) curSpec.setScanNumber(0);
-    break;
-  default:
-    cout << "Unknown preprocessing algorithm." << endl;
-    curSpec.setScanNumber(0);
-    break;
+	} else {
+		if(cs.boxcarFilter==0){
+			//if(!nr.DeNoise(curSpec)) curSpec.setScanNumber(0);
+			//do something about this...
+
+		} else {
+      if(!nr.DeNoiseC(curSpec)) curSpec.setScanNumber(0);
+		}
   }
 
 	getExactTime(stopTime);
@@ -119,7 +115,7 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 
 		//Centroid if needed; notice that this copy wastes a bit of time.
 		//TODO: make this more efficient
-		if(cs.sna==4 && !cs.centroid) Centroid(curSpec,c);
+		if(cs.boxcar==0 && !cs.centroid) Centroid(curSpec,c);
 		else c=curSpec;
 
 		//There is a bug when using noise reduction that results in out of order m/z values
@@ -162,11 +158,15 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 
 		//Read next spectrum from file.
 		getExactTime(startTime);
-    switch(cs.sna){
-			case 4: r.readFile(NULL,curSpec); break;
-			case 5: nr.DeNoise(curSpec); break;
-      case 6: nr.DeNoiseC(curSpec); break;
-			default: break;
+		if(cs.boxcar==0) {
+			r.readFile(NULL,curSpec);
+		} else {
+			if(cs.boxcarFilter==0){
+				//possible to not filter?
+			} else {
+			//case 5: nr.DeNoise(curSpec); break; //this is for filtering without boxcar
+				nr.DeNoiseC(curSpec);
+			}
 		}
 
 		getExactTime(stopTime);
@@ -627,9 +627,17 @@ double CHardklor2::PeakMatcher(vector<Result>& vMR, Spectrum& s, double lower, d
 		}
 	
 		if(!match) {
-			if(bMax) break;
+      //if expected peak is significant (above 50 rel abun) and has no match, match it to 0.
+      if(vMR[k].data>50.0) {
+        //cout << "xM: " << vMR[k].mass << "\t0" << endl;
+        mer.push_back((float)vMR[k].data);
+        obs.push_back(0.0f);
+        if(bMax) break;
+      }
+      
 		} else {
 			mer.push_back((float)vMR[k].data);
+      //cout << "xM: " << vMR[k].mass << "\t" << s[matchIndex].mz << endl;
 			if(mask[matchIndex].intensity>1.0 && vMR[k].data>50) {
 				if(indexOverlap<0) indexOverlap=matchIndex;
 			}
@@ -647,12 +655,19 @@ double CHardklor2::PeakMatcher(vector<Result>& vMR, Spectrum& s, double lower, d
 	if(matchCount<2) corr=0.0;
 	else corr=LinReg(mer,obs);
 
+	//for(j=0;j<mer.size();j++){
+  //  cout << "M:" << mer[j] << "\t" << "O:" << obs[j] << endl;
+	//}
+	//cout << "Corr: " << corr << "(" << matchCount << ")" << endl;
+
+  //remove last matched peaks (possibly overlap with other peaks) but only if they are of low abundance.
 	int tmpCount=matchCount;
-	while(corr<0.90 && matchCount>2){
+  while(corr<0.90 && matchCount>2 && mer[mer.size()-1]<50.0){
 		mer.pop_back();
 		obs.pop_back();
 		matchCount--;
 		double corr2=LinReg(mer,obs);
+		//cout << "Old corr: " << corr << "(" << matchCount+1 << ")" << " New corr: " << corr2 << endl;
 		if(corr2>corr) {
 			corr=corr2;
 			tmpCount=matchCount;
@@ -772,6 +787,18 @@ void CHardklor2::QuickCharge(Spectrum& s, int index, vector<int>& v){
 		if(ch<cs.minCharge || ch>cs.maxCharge) continue;
 		charge[ch]=1;
 	}
+  //if no forward charge, exit now.
+  bool bMatch=false;
+  for(i=cs.minCharge;i<=cs.maxCharge;i++){
+    if(charge[i]>0) {
+      bMatch=true;
+      break;
+    }
+  }
+  if(!bMatch) {
+    v.clear();
+    return;
+  }
 
 	//check backward
 	for(j=index-1;j>=0;j--){
@@ -832,6 +859,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 	vector<float> vMatchPeak2;
 	int matchCount,matchCount2;
 	int indexOverlap;
+  double top3[3];
 
 	//refinement variables
 	bool keepPH;
@@ -873,6 +901,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 
 	//find lowest intensity;
 	for(i=0;i<s.size();i++){
+    //printf("%.6lf\t%.1f\n",s[i].mz, s[i].intensity);
 		if(s[i].intensity<lowPoint) lowPoint=s[i].intensity;
 	}
 
@@ -914,21 +943,42 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 		bestMatchCount=0;
 		for(i=0;i<(int)charges.size();i++){
 
+			//cout << s[maxIndex].mz << "\t" << charges[i] << endl;
+
 			//check all variants
 			for(v=0;v<varCount;v++){
 
-				//use model library
+        //cout << "Variant: " << v << endl;
+
+				//use model library, align to top 3 peaks
 				dif=0;
+        top3[0]=top3[1]=top3[2]=0;
+        maxMercuryIndex[0]=maxMercuryIndex[1]=maxMercuryIndex[2]=-1;
 				model=models->getModel(charges[i],v,s[maxIndex].mz);
 				for(k=0; k<model->size; k++) {
-					if(model->peaks[k].intensity>dif){
-						dif = model->peaks[k].intensity;
+          //cout << "i\t" << model->peaks[k].mz << "\t" << model->peaks[k].intensity << endl;
+					//if(model->peaks[k].intensity>dif){
+          if(model->peaks[k].intensity>top3[0]){
+						//dif = model->peaks[k].intensity;
+            top3[2]=top3[1];
+            top3[1]=top3[0];
+            top3[0]=model->peaks[k].intensity;
+            maxMercuryIndex[2]=maxMercuryIndex[1];
+            maxMercuryIndex[1]=maxMercuryIndex[0];
 						maxMercuryIndex[0]=k;
-					}
+          } else if(model->peaks[k].intensity>top3[1]) {
+            top3[2]=top3[1];
+            top3[1]=model->peaks[k].intensity;
+            maxMercuryIndex[2]=maxMercuryIndex[1];
+            maxMercuryIndex[1]=k;
+          } else if(model->peaks[k].intensity>top3[2]) {
+            top3[2]=model->peaks[k].intensity;
+						maxMercuryIndex[2]=k;
+          }
 				}
-				if(k==0) maxMercuryIndex[1]=-1;
-				else maxMercuryIndex[1]=maxMercuryIndex[0]-1;		//allow right shift
-				maxMercuryIndex[2]=maxMercuryIndex[0]+1;				//allow left shift
+				//if(k==0) maxMercuryIndex[1]=-1;
+				//else maxMercuryIndex[1]=maxMercuryIndex[0]-1;		//allow right shift
+				//maxMercuryIndex[2]=maxMercuryIndex[0]+1;				//allow left shift
 
 				//Test all three positions for the model. Note that if the first peak is the base peak, then
 				//no left shift is tested.
@@ -940,6 +990,8 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 						n++;
 						continue;
 					}
+
+          //cout << "ii\tShift #" << n << endl;
 
 					//Align the mercury distribution (MD) to the observed peak. The MD can shift in
 					//either direction for one peak to adjust for system noise. The width of the MD
@@ -980,13 +1032,15 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 
 					//Match predictions to the observed peaks and record them in the proper array.
 					corr=PeakMatcher(vMR,s,lower,upper,deltaM/2,maxIndex,matchCount,indexOverlap,vMatchIndex,vMatchPeak);
-					//cout << s[maxIndex].mz << " " << s[maxIndex].intensity << "\t" << charges[i] << "\t" << matchCount << "\t" << corr << "\t" << indexOverlap << "\t" << maxIndex << "\tn" << n << endl;
+					//cout << "ii.i\t" << s[maxIndex].mz << " " << s[maxIndex].intensity << "\t" << charges[i] << "\t" << matchCount << "\t" << corr << "\t" << indexOverlap << "\t" << maxIndex << "\tn" << n << endl;
 
 					//check any overlap with observed peptides. Overlap indicates deconvolution may be necessary.
 					//Deconvolution is at best a rough estimate and is not used if it does not improve the correlation
 					//scores.
 					keepPH=false;
-					if(indexOverlap>-1){
+					if(indexOverlap>-1 /*&& indexOverlap>maxIndex*/){
+
+            //cout << "iii\tChecking overlap: " << indexOverlap << "\t" << maxIndex << endl;
 
 						//Find overlapping peptide
 						for(m=0;m<(int)vPeps.size();m++){
@@ -1017,7 +1071,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 
 						//Re-Solve subspectrum and see if it has better correlation
 						corr2=MatchSubSpectrum(tmpSpec,subIndex,ph2);
-						//cout << "\tCorr2: " << corr2 << "\t" << ph2.corr << "\t" << origSpec[vPeps[m].basePeakIndex].mz << "\t" << vPeps[m].charge << endl;
+						//cout << "iii.i\tCorr2: " << corr2 << "\t" << ph2.corr << "\t" << origSpec[vPeps[m].basePeakIndex].mz << "\t" << vPeps[m].charge << endl;
 
 						//If correlation is better (or close), go back and try the
 						//newly adjusted peaks.
@@ -1035,7 +1089,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 
 							//solve merged models
 							corr3=PeakMatcher(vMR,refSpec,lower,upper,deltaM/2,maxIndex,matchCount2,indexOverlap,vMatchIndex2,vMatchPeak2);
-							//cout << "\tCorr3: " << s[maxIndex].mz << " " << s[maxIndex].intensity << "\t" << charges[i] << "\t" << matchCount2 << "\t" << corr3 << "\t" << indexOverlap << endl;
+							//cout << "iii.ii\tCorr3: " << s[maxIndex].mz << " " << s[maxIndex].intensity << "\t" << charges[i] << "\t" << matchCount2 << "\t" << corr3 << "\t" << indexOverlap << endl;
 
 							//keep the new model if it is better than the old one.
 							if(corr3>corr) {
@@ -1058,8 +1112,11 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 						}
 
 					}//if indexOverlap>-1
-					
-					if(corr>bestCorr || (corr>cs.corr && corr+0.025*(matchCount-bestMatchCount)>bestCorr) ){
+          double tCorr;
+          if(bestMatchCount==0) tCorr=0;
+          else tCorr=0.025*(matchCount-bestMatchCount)/bestMatchCount;
+					//cout << "Old best corr: " << bestCorr << "(" << bestMatchCount << ") This corr: " << corr << "," << corr+tCorr << "(" << matchCount << ")" << endl;
+					if(/*corr>bestCorr ||*/ (corr>cs.corr && corr+tCorr>bestCorr) ){
 						bestMatchIndex=vMatchIndex;
 						bestMatchPeak=vMatchPeak;
 						bestMatchCount=matchCount;
@@ -1115,6 +1172,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 				} else {
 					s[bestMatchIndex[k]].intensity-=bestMatchPeak[k]*max;
 				}
+        //cout << "iv\t" << s[bestMatchIndex[k]].mz << " is now " << s[bestMatchIndex[k]].intensity << endl;
 			}
 		}
 
@@ -1343,6 +1401,6 @@ void CHardklor2::WriteScanLine(Spectrum& s, FILE* fptr, int format){
 
 		//For reduced output
 	} else if(format==2) {
-		fprintf(fptr, "Scan = %d\n", s.getScanNumber());
+		fprintf(fptr, "Scan=%d	RT=%.4f\n", s.getScanNumber(),s.getRTime());
 	}
 }
