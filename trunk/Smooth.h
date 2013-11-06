@@ -4,6 +4,7 @@
 #include "Spectrum.h"
 
 using namespace std;
+using namespace MSToolkit;
 
 double SG_GenFact(int, int);
 double SG_GramPoly(int, int, int, int);

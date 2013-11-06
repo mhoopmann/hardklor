@@ -13,7 +13,6 @@ using namespace std;
 int main(int argc, char* argv[]) {
   int i;
 	unsigned int j;
-  bool bConf;
   char tstr[512]="\0";
   fstream fptr;
 
@@ -21,34 +20,16 @@ int main(int argc, char* argv[]) {
 	CMercury8 *mercury;
 	CModelLibrary *models;
 
-	cout << "Hardklor v2.15, July 25 2013" << endl;
+	cout << "Hardklor v2.16, November 6 2013" << endl;
 	cout << "Mike Hoopmann, Mike MacCoss\nCopyright 2007-2013\nUniversity of Washington" << endl;
-	if(argc==1){
+	if(argc!=2){
 		cout << "Usage:\t\thardklor <config file>\n";
 		cout << "See documentation for instructions to modify and use config files." << endl;
 		exit(1);
 	}
   
-  bConf = false;
-  for(i=0;i<argc;i++){
-    if(strcmp(argv[i],"-conf")==0) {
-      bConf = true;
-      break;
-    }
-  }
-  
-  
   CHardklorParser hp;
-  if(bConf) {
-    hp.parseConfig(argv[i+1]);
-  } else {
-    for(i=1;i<argc;i++){
-      strcat(tstr," ");
-      strcat(tstr,argv[i]);
-    }
-    hp.parse(tstr);
-  }
-  
+  hp.parseConfig(argv[1]);  
 
   //Create all the output files that will be used
   for(i=0;i<hp.size();i++){
