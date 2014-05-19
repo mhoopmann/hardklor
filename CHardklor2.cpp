@@ -13,7 +13,6 @@ CHardklor2::~CHardklor2(){
 	mercury=NULL;
 	models=NULL;
 	if(PT!=NULL) {
-		delete PT;
 		PT=NULL;
 	}
 }
@@ -50,7 +49,7 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 	//if(bEcho) cout << "\n\nHardklor, v2.06, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2012\nUniversity of Washington\n" << endl;
 
 	//Set the periodic table
-	if(PT==NULL) PT = new CPeriodicTable(cs.HardklorFile);
+	if(PT==NULL) averagine->getPT(PT);
 
 	//Ouput file info to user
 	if(bEcho){
@@ -76,6 +75,7 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 	  else r.readFile(&cs.inFile[0],curSpec);
 	} else {
 		if(cs.boxcarFilter==0){
+      if(!nr.DeNoiseD(curSpec)) curSpec.setScanNumber(0);
 			//if(!nr.DeNoise(curSpec)) curSpec.setScanNumber(0);
 			//do something about this...
 
@@ -163,6 +163,7 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 		} else {
 			if(cs.boxcarFilter==0){
 				//possible to not filter?
+        nr.DeNoiseD(curSpec);
 			} else {
 			//case 5: nr.DeNoise(curSpec); break; //this is for filtering without boxcar
 				nr.DeNoiseC(curSpec);
