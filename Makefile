@@ -13,15 +13,16 @@ INCLUDE = -I$(LIBPATH)/include -I$(LIBPATH)/mzParser
 
 #Do not touch these variables
 SUPPORT = S2N.o Smooth.o FFT.o
-HARDKLOR = CHardklor.o CAveragine.o CPeriodicTable.o CHardklorVariant.o CHardklorSetting.o CHardklorParser.o CNoiseReduction.o CSplitSpectrum.o CMercury8.o CSpecAnalyze.o CHardklorProtein.o SpecAnalyzeSupport.o FFT-HK.o CModelLibrary.o CHardklor2.o
+HARDKLOR = CHardklor.o CAveragine.o CPeriodicTable.o CHardklorVariant.o CHardklorSetting.o CHardklorParser.o CNoiseReduction.o CSplitSpectrum.o CMercury8.o CSpecAnalyze.o SpecAnalyzeSupport.o FFT-HK.o CModelLibrary.o CHardklor2.o
 
 
 #Make statements
 hardklor : HardklorApp.cpp $(HARDKLOR) $(SUPPORT)
 	$(CC) $(FLAGS) $(INCLUDE) $(SUPPORT) $(HARDKLOR) HardklorApp.cpp -L$(LIBPATH) $(LIBS) -o hardklor
+	ar rcs libhardklor.a $(HARDKLOR) $(SUPPORT)
 
 clean:
-	rm *.o hardklor
+	rm *.o hardklor libhardklor.a
 
 
 #Hardklor objects
@@ -63,9 +64,6 @@ CSpecAnalyze.o : CSpecAnalyze.cpp
 	$(CC) $(FLAGS) $(INCLUDE) CSplitSpectrum.cpp -c
 	$(CC) $(FLAGS) $(INCLUDE) SpecAnalyzeSupport.cpp -c
 	$(CC) $(FLAGS) $(INCLUDE) FFT-HK.cpp -c
-
-CHardklorProtein.o : CHardklorProtein.cpp
-	$(CC) $(FLAGS) $(INCLUDE) CHardklorProtein.cpp -c
 
 SpecAnalyzeSupport.o : SpecAnalyzeSupport.cpp
 	$(CC) $(FLAGS) $(INCLUDE) SpecAnalyzeSupport.cpp -c
