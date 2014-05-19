@@ -26,6 +26,7 @@ class CPeriodicTable {
  protected:
  private:
    //Methods:
+   void defaultValues();
    void loadTable(char*);
 
    //Data Members:

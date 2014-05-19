@@ -43,6 +43,7 @@ class CMercury8 {
   void CalcVariances(double*, double*, int);
   void CalcWeights(double&,double&,double&,int&,int&,int&,int&,int);
   void ConvertMass(complex*, int, int, double, double, int, int, int, double, double);
+  void DefaultValues();
   void GetPeaks(complex*, int, vector<Result>&, int, int);
   void InitializeData(char* fn="ISOTOPE.DAT");
   void MassToInt(complex*, int);

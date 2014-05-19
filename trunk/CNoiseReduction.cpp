@@ -1605,7 +1605,6 @@ bool CNoiseReduction::NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int wi
   //sort
   //cout << "Done " << sp.size() << endl;
   if(sp.size()>0) sp.sortMZ();
-
   sp.setScanNumber(specs[0].getScanNumber());
   sp.setScanNumber(specs[0].getScanNumber(true),true);
   sp.setRTime(specs[0].getRTime());

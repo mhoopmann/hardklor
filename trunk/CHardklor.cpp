@@ -126,7 +126,7 @@ void CHardklor::Analyze(Spectrum* s) {
   //Objects
   MSReader r;
   CNoiseReduction nr(&r,cs);
-	PT = new CPeriodicTable(cs.HardklorFile);
+  averagine->getPT(PT);
 
   //iterators
   unsigned int k;   //counters for loops
@@ -489,7 +489,7 @@ void CHardklor::Analyze(Spectrum* s) {
 		}
 	}
 
-	delete PT;
+	PT=NULL;
 
 }
 
