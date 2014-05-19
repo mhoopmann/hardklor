@@ -1,6 +1,9 @@
 #ifndef _CPERIODICTABLE_H
 #define _CPERIODICTABLE_H
 
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 #include <iostream>
 #include <vector>
 

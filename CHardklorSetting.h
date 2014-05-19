@@ -1,6 +1,8 @@
 #ifndef _CHARDKLORSETTING_H
 #define _CHARDKLORSETTING_H
 
+#include <cstdio>
+#include <cstring>
 #include <string>
 #include <vector>
 
