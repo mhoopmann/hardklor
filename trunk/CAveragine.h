@@ -4,6 +4,7 @@
 #include "CHardklorVariant.h"
 #include "CPeriodicTable.h"
 
+#include <cstdlib>
 #include <fstream>
 #include <vector>
 #include <cstring>
