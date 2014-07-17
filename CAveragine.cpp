@@ -253,8 +253,8 @@ double CAveragine::getMonoMass(){
 
 }
 
-void CAveragine::getPT(CPeriodicTable* pt){
-  pt=PT;
+CPeriodicTable* CAveragine::getPT(){
+  return PT;
 }
 
 void CAveragine::loadTable(char* c){
