@@ -126,7 +126,7 @@ void CHardklor::Analyze(Spectrum* s) {
   //Objects
   MSReader r;
   CNoiseReduction nr(&r,cs);
-  averagine->getPT(PT);
+  PT=averagine->getPT();
 
   //iterators
   unsigned int k;   //counters for loops

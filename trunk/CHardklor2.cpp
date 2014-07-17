@@ -49,7 +49,7 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 	//if(bEcho) cout << "\n\nHardklor, v2.06, Mike Hoopmann, Mike MacCoss\nCopyright 2007-2012\nUniversity of Washington\n" << endl;
 
 	//Set the periodic table
-	if(PT==NULL) averagine->getPT(PT);
+	if(PT==NULL) PT=averagine->getPT();
 
 	//Ouput file info to user
 	if(bEcho){

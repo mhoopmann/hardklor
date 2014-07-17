@@ -84,7 +84,7 @@ class CAveragine {
   void setAveragine(int,int,int,int,int);
   int getElement(int);
   double getMonoMass();
-  void getPT(CPeriodicTable* pt);
+  CPeriodicTable* getPT();
   void loadTable(char*);
 
  protected:
