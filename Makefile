@@ -22,7 +22,7 @@ hardklor : HardklorApp.cpp $(HARDKLOR) $(SUPPORT)
 	ar rcs libhardklor.a $(HARDKLOR) $(SUPPORT)
 
 clean:
-	rm *.o hardklor libhardklor.a
+	rm -f *.o hardklor libhardklor.a
 
 
 #Hardklor objects
@@ -61,8 +61,8 @@ CMercury8.o : CMercury8.cpp
 
 CSpecAnalyze.o : CSpecAnalyze.cpp
 	$(CC) $(FLAGS) $(INCLUDE) CSpecAnalyze.cpp -c
-	$(CC) $(FLAGS) $(INCLUDE) CSplitSpectrum.cpp -c
-	$(CC) $(FLAGS) $(INCLUDE) SpecAnalyzeSupport.cpp -c
+	
+FFT-HK.o : FFT-HK.cpp
 	$(CC) $(FLAGS) $(INCLUDE) FFT-HK.cpp -c
 
 SpecAnalyzeSupport.o : SpecAnalyzeSupport.cpp
