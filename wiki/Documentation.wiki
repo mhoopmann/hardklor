@@ -1,4 +1,4 @@
-#Command line and parameters for Hardklor
+#summary Command line and parameters for Hardklor
 
 = Command Line =
 
