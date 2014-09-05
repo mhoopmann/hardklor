@@ -4,7 +4,7 @@
 
 Hardklör is operated from the command line:
 
-*Usage:* hardklor _<config file>_
+=== *Usage:* hardklor _<config file>_ ===
 
 
 _<config file>_ is an ASCII text configuration file containing the parameters to use and the list of files to analyze. Detailed parameter descriptions are found below. An example configuration file can be found [SampleConfig here].
