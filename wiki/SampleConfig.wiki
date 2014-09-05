@@ -3,7 +3,7 @@
 {{{
 # Hardkor parameter file
 # See online documentation for detailed explanations: 
-# https://code.google.com/p/hardklor
+# http://code.google.com/p/hardklor
 
 # All parameters are separated from their values by an equals sign ('=')
 # Anything after a '#' will be ignored for the remainder of the line.
