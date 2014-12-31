@@ -1,13 +1,17 @@
 #summary Hardklor Downloads
 
-= Introduction =
+= Downloads =
 
-Add your content here.
+Hardklor is provided as a pre-compiled binary (or application). Please select the appropriate download from the links below that match your operating system. Hardklor is free.
 
 
-= Details =
+=== Windows 32-bit (works with 64-bit Windows) ===
+ * Version 2.17 (Dec 31 2014): [https://drive.google.com/uc?export=download&id=0ByyfOdPaY1xkSlk0b1FXbmY0MDg Latest Version - Download Now]
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+
+=== Linux 64-bit ===
+
+
+
+=== Additional Support Files ===
+ * Sample Hardklor Configuration File (version 2.17): [https://drive.google.com/uc?export=download&id=0ByyfOdPaY1xkckkwdUhSZ3NEbTQ Download Now]
