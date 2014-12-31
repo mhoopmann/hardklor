@@ -2,17 +2,13 @@
 
 {{{
 # Hardkor parameter file
-# See online documentation for detailed explanations: 
-# http://code.google.com/p/hardklor
+# Version 2.17, Release Date: Dec 31 2014
+# Please see online documentation for detailed explanations: 
+# https://code.google.com/p/hardklor/wiki/Documentation
 
 # All parameters are separated from their values by an equals sign ('=')
 # Anything after a '#' will be ignored for the remainder of the line.
 # All data files (including paths if necessary) to be analyzed are discussed below.
-
-# Hardklor uses two data files. If these are stored elsewhere, please alter the path
-# to the correct location.
-isotope_data	= C:\Hardklor\ISOTOPE.DAT
-hardklor_data	= C:\Hardklor\Hardklor.dat
 
 # Parameters used to described the data being input to Hardklor
 instrument	=	Orbitrap	#Values are: FTICR, Orbitrap, TOF, QIT
