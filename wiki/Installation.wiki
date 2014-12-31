@@ -1,10 +1,15 @@
 #summary Installation Notes
 
-= Introduction =
+= Installation of Pre-Compiled Applications (Binaries) =
 
-Hardklor uses the MSToolkit.
+Hardklor comes pre-compiled for Windows and Linux. Please select the appropriate operating system from the [Downloads downloads] page. Once the file has been downloaded, simply unzip it to the desired location on your hard drive. No further installation is necessary. The configuration file can be edited with any simple text editor. The Hardklor application is run from the command line.
+
+Additional details can be found in this [http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3891918/ tutorial].
 
 
-= Details =
 
-MSToolkit has its own page: http://code.google.com/p/mstoolkit/
+= Compiling Hardklor From Source =
+
+Hardklor requires the [http://code.google.com/p/mstoolkit/ MSToolkit]
+
+After downloading and compiling the MSToolkit, open the Hardklor Makefile and point the MSToolkit variable to the MSToolkit/include folder. Compile Hardklor by typing 'make' on the command line.
