@@ -10,7 +10,7 @@ Hardklor is provided as a pre-compiled binary (or application). Please select th
 
 
 === Linux 64-bit ===
- * Versopm 2.17 (Dec 31 2014): [https://drive.google.com/uc?export=download&id=0ByyfOdPaY1xkTlA1S3kycHhaYUE Latest Version - Download Now]
+ * Version 2.17 (Dec 31 2014): [https://drive.google.com/uc?export=download&id=0ByyfOdPaY1xkTlA1S3kycHhaYUE Latest Version - Download Now]
 
 
 === Additional Support Files ===
