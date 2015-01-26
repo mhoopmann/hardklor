@@ -71,7 +71,7 @@ class CHardklor{
  private:
   //Methods:
   void Analyze(Spectrum* s=NULL);
-	bool AnalyzePeaks(CSpecAnalyze& sa);
+  bool AnalyzePeaks(CSpecAnalyze& sa);
   int compareData(const void*, const void*);
   double LinReg(float *match, float *mismatch);
   void ResultToMem(SSObject& obj, CPeriodicTable* PT);
@@ -109,7 +109,7 @@ class CHardklor{
 	//Vector for holding peptide list of distribution
   vector<CHardklorVariant> pepVariants;
 
-  //Vecotr for holding results in memory should that be needed
+  //Vector for holding results in memory should that be needed
   vector<hkMem> vResults;
 
   //Temporary Data Members:

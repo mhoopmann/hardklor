@@ -5,6 +5,7 @@ CHardklor2::CHardklor2(CAveragine *a, CMercury8 *m, CModelLibrary *lib){
   mercury=m;
 	models=lib;
 	bEcho=true;
+  bMem=false;
 	PT=NULL;
 }
 
@@ -17,7 +18,11 @@ CHardklor2::~CHardklor2(){
 	}
 }
 
-int CHardklor2::GoHardklor(CHardklorSetting sett){
+hkMem& CHardklor2::operator[](const int& index){
+  return vResults[index];
+}
+
+int CHardklor2::GoHardklor(CHardklorSetting sett, Spectrum* s){
 	
 	//Member variables
 	MSReader r;
@@ -53,15 +58,15 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 
 	//Ouput file info to user
 	if(bEcho){
-		cout << "Reading from file: " << cs.inFile << endl;
-		cout << "Writing to file: " << cs.outFile << endl;
+		if(s==NULL) cout << "Reading from file: " << cs.inFile << endl;
+		if(!bMem) cout << "Writing to file: " << cs.outFile << endl;
 	}
   if(cs.fileFormat==dunno) {
     cout << "Unknown file format or bad extension." << endl;
     return -1;
   }
 
-	fout=fopen(cs.outFile,"wt");
+	if(!bMem) fout=fopen(cs.outFile,"wt");
 
 	//read a spectrum
 	getExactTime(startTime);
@@ -69,19 +74,23 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 	  //Read in the initial spectrum
   r.setFilter(cs.mzXMLFilter);
   r.setRawFilter(cs.rawFilter);
-	if(cs.boxcar==0){
-    if((cs.scan.iLower>0) && (cs.scan.iLower==cs.scan.iUpper)) r.readFile(&cs.inFile[0],curSpec,cs.scan.iLower);
-    else if(cs.scan.iLower>0) r.readFile(&cs.inFile[0],curSpec,cs.scan.iLower);
-	  else r.readFile(&cs.inFile[0],curSpec);
-	} else {
-		if(cs.boxcarFilter==0){
-      if(!nr.DeNoiseD(curSpec)) curSpec.setScanNumber(0);
-			//if(!nr.DeNoise(curSpec)) curSpec.setScanNumber(0);
-			//do something about this...
+  if(s!=NULL){
+    curSpec=*s;
+  } else {
+	  if(cs.boxcar==0){
+      if((cs.scan.iLower>0) && (cs.scan.iLower==cs.scan.iUpper)) r.readFile(&cs.inFile[0],curSpec,cs.scan.iLower);
+      else if(cs.scan.iLower>0) r.readFile(&cs.inFile[0],curSpec,cs.scan.iLower);
+	    else r.readFile(&cs.inFile[0],curSpec);
+	  } else {
+		  if(cs.boxcarFilter==0){
+        if(!nr.DeNoiseD(curSpec)) curSpec.setScanNumber(0);
+			  //if(!nr.DeNoise(curSpec)) curSpec.setScanNumber(0);
+			  //do something about this...
 
-		} else {
-      if(!nr.DeNoiseC(curSpec)) curSpec.setScanNumber(0);
-		}
+		  } else {
+        if(!nr.DeNoiseC(curSpec)) curSpec.setScanNumber(0);
+		  }
+    }
   }
 
 	getExactTime(stopTime);
@@ -91,15 +100,23 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 
 	//Check that file was read
   if(curSpec.getScanNumber()==0) {
+    if(s!=NULL) {
+      cout << "Spectrum is invalid." << endl;
+      return -2;
+    }
     if(cs.scan.iLower>0) cout << cs.inFile << " is invalid, or requested scan number is of incorrect format." << endl;
     else cout << cs.inFile << " is invalid, or contains no spectrum." << endl;
     return -2;
   }
 
 	//Write scan information to output file.
-	if(cs.reducedOutput) WriteScanLine(curSpec,fout,2);
-	else if(cs.xml) WriteScanLine(curSpec,fout,1);
-  else WriteScanLine(curSpec,fout,0);
+  if(!bMem){
+    if(cs.reducedOutput) WriteScanLine(curSpec,fout,2);
+    else if(cs.xml) WriteScanLine(curSpec,fout,1);
+    else WriteScanLine(curSpec,fout,0);
+  } else {
+    currentScanNumber = curSpec.getScanNumber();
+  }
 
 	//Output progress indicator
 	if(bEcho) cout << iPercent;
@@ -127,9 +144,13 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 
 		//export results
 		for(i=0;i<(int)vPeps.size();i++){
-			if(cs.reducedOutput) WritePepLine(vPeps[i],c,fout,2);
-			else if(cs.xml) WritePepLine(vPeps[i],c,fout,1);
-			else WritePepLine(vPeps[i],c,fout,0);
+      if(!bMem){
+			  if(cs.reducedOutput) WritePepLine(vPeps[i],c,fout,2);
+			  else if(cs.xml) WritePepLine(vPeps[i],c,fout,1);
+			  else WritePepLine(vPeps[i],c,fout,0);
+      } else {
+        ResultToMem(vPeps[i],c);
+      }
 		}
 
 		//Update progress
@@ -148,6 +169,8 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
     tmpTime1=toMicroSec(stopTime);
     tmpTime2=toMicroSec(startTime);
     analysisTime+=tmpTime1-tmpTime2;
+    
+    if(s!=NULL) break;
 
 		//Check if any user limits were made and met
 		if( (cs.scan.iUpper == cs.scan.iLower) && (cs.scan.iLower != 0) ){
@@ -190,7 +213,7 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 		}
 	}
 
-	fclose(fout);
+	if(!bMem) fclose(fout);
 
 	if(bEcho) {
 		cout << "\n" << endl;
@@ -220,7 +243,7 @@ int CHardklor2::GoHardklor(CHardklorSetting sett){
 		} else if(minutes<=40){
 			cout << "Oi! Too freakin' slow!!" << endl;
 		} else {
-			//cout << "Blame Klezmer!" << endl;
+			cout << "You might be able to eek out some better performance by adjusting your parameters." << endl;
 		}
 	}
 	return 1;
@@ -1283,6 +1306,48 @@ void CHardklor2::RefineHits(vector<pepHit>& vPeps, Spectrum& s){
 	vPeps.clear();
 	for(i=0;i<vTmpHit.size();i++)vPeps.push_back(vTmpHit[i]);
 
+}
+
+void CHardklor2::ResultToMem(pepHit& ph, Spectrum& s){
+  int i,j;
+  char mods[32];
+  char tmp[16];
+
+  hkm.monoMass = ph.monoMass;
+  hkm.charge = ph.charge;
+  if(cs.distArea) hkm.intensity = ph.area*ph.intensity;
+  else hkm.intensity = ph.intensity;
+  hkm.scan = currentScanNumber;
+  hkm.mz = s[ph.basePeakIndex].mz;
+  hkm.corr = ph.corr;
+
+  //Add mods
+  if(!cs.noBase) i=ph.variantIndex-1;
+	else i=ph.variantIndex;
+	strcpy(mods,"");
+  if(i<0) {
+	  strcat(mods,"_");
+	} else {
+    for(j=0;j<cs.variant->at(i).sizeAtom();j++){
+		  strcat(mods,PT->at(cs.variant->at(i).atAtom(j).iLower).symbol);
+		  sprintf(tmp,"%d",cs.variant->at(i).atAtom(j).iUpper);
+      strcat(mods,tmp);
+		}
+		strcat(mods,"_");
+		for(j=0;j<cs.variant->at(i).sizeEnrich();j++){
+		  sprintf(tmp,"%.2lf",cs.variant->at(i).atEnrich(j).ape);
+      strcat(mods,tmp);
+			strcat(mods,PT->at(cs.variant->at(i).atEnrich(j).atomNum).symbol);
+      sprintf(tmp,"%d_",cs.variant->at(i).atEnrich(j).isotope);
+      strcat(mods,tmp);
+		}
+	}
+  strcpy(hkm.mods,mods);
+  vResults.push_back(hkm);
+}
+
+void CHardklor2::SetResultsToMemory(bool b){
+  bMem=b;
 }
 
 void CHardklor2::WritePepLine(pepHit& ph, Spectrum& s, FILE* fptr, int format){
