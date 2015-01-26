@@ -22,6 +22,10 @@ hkMem& CHardklor2::operator[](const int& index){
   return vResults[index];
 }
 
+void CHardklor2::Echo(bool b){
+	bEcho=b;
+}
+
 int CHardklor2::GoHardklor(CHardklorSetting sett, Spectrum* s){
 	
 	//Member variables
