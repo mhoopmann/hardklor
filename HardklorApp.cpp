@@ -20,8 +20,8 @@ int main(int argc, char* argv[]) {
 	CMercury8 *mercury;
 	CModelLibrary *models;
 
-	cout << "Hardklor v2.17, December 31 2014" << endl;
-	cout << "Mike Hoopmann, Mike MacCoss\nCopyright 2007-2014\nUniversity of Washington" << endl;
+	cout << "Hardklor v2.18, January 26 2015" << endl;
+	cout << "Mike Hoopmann, Mike MacCoss\nCopyright 2007-2015\nUniversity of Washington" << endl;
 	if(argc!=2){
 		cout << "Usage:\t\thardklor <config file>\n";
 		cout << "See documentation for instructions to modify and use config files." << endl;

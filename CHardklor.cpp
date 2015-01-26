@@ -722,7 +722,8 @@ void CHardklor::SemiCompleteMethod(float *match, float *mismatch,SSObject *combo
   
   double RCorr;
   double bestRCorr = combo->corr;
-  int a,k,n;
+  int a,n;
+  unsigned int k;
 
 	float *sumMatch;
 	float *sumMismatch;
@@ -821,26 +822,27 @@ void CHardklor::SemiCompleteFastMethod(float *match, float *mismatch,SSObject *c
   
   double RCorr;
   double bestRCorr = combo->corr;
-  int a,b,k,n;
+  int a,b,n;
+  unsigned int k;
 
 	int numArrays=0;
 	for(k=start;k<sa.predPep->size();k++){
 		numArrays+=sa.predPep->at(k).VariantListSize();
-	};
+	}
 
 	float **sumMatch;
 	float **sumMismatch;
 
 	sumMatch = new float* [numArrays];
 	sumMismatch = new float* [numArrays];
-	for(k=0;k<numArrays;k++){
-		sumMatch[k] = new float[sa.peaks.size()];
+	for(n=0;n<numArrays;n++){
+		sumMatch[n] = new float[sa.peaks.size()];
 		if(sa.mismatchSize>0){
-			sumMismatch[k] = new float[sa.mismatchSize];
+			sumMismatch[n] = new float[sa.mismatchSize];
 		} else {
-			sumMismatch[k] = new float[1];
-		};
-	};
+			sumMismatch[n] = new float[1];
+		}
+	}
 	
 	b=0;
   //Iterate through all predicted peptides
@@ -853,12 +855,12 @@ void CHardklor::SemiCompleteFastMethod(float *match, float *mismatch,SSObject *c
 			//Do matches first
 			for(a=0;a<sa.peaks.size();a++){
 				sumMatch[b][a]=sa.predPep->at(k).GetVariant(n).GetMatch(a).intensity + match[a];
-			};
+			}
 
 			//Now add mismatches
 			for(a=0;a<sa.mismatchSize;a++){
 				sumMismatch[b][a]=sa.predPep->at(k).GetVariant(n).GetMismatch(a).intensity + mismatch[a];
-			};
+			}
       
       //Correlate this combined distribution with the mass spec data.
 			//SSIterations++;
@@ -873,21 +875,21 @@ void CHardklor::SemiCompleteFastMethod(float *match, float *mismatch,SSObject *c
 			if(recCombo.corr>bestCombo.corr) bestCombo = recCombo;
       
 			b++;
-    };
-  };
+    }
+  }
 
 	//If we reached threshold, stop here without recursion
 	if(bestCombo.corr>cs.corr) {
-		for(k=0;k<numArrays;k++) {
-			delete [] sumMatch[k];
-			delete [] sumMismatch[k];
+		for(n=0;n<numArrays;n++) {
+			delete [] sumMatch[n];
+			delete [] sumMismatch[n];
 		};
 		delete [] sumMatch;
 		delete [] sumMismatch;
 
 		*combo = bestCombo;
 		return;
-	};
+	}
 
 	if(depth<maxDepth){
 
@@ -909,19 +911,19 @@ void CHardklor::SemiCompleteFastMethod(float *match, float *mismatch,SSObject *c
 				if(recCombo.corr>bestCombo.corr) bestCombo = recCombo;
       
 				b++;
-			};
-    };
-  };
+			}
+    }
+  }
 
-	for(k=0;k<numArrays;k++) {
-		delete [] sumMatch[k];
-		delete [] sumMismatch[k];
-	};
+	for(n=0;n<numArrays;n++) {
+		delete [] sumMatch[n];
+		delete [] sumMismatch[n];
+	}
 	delete [] sumMatch;
 	delete [] sumMismatch;
 	*combo = bestCombo;
   
-};
+}
 
 
 void CHardklor::DynamicMethod(float *match, float *mismatch,SSObject *combo, 
@@ -932,7 +934,8 @@ void CHardklor::DynamicMethod(float *match, float *mismatch,SSObject *combo,
   
   double RCorr;
   double bestRCorr = combo->corr;
-  int a,k,n;
+  int a,n;
+  unsigned int k;
 
 	float *sumMatch;
 	float *sumMismatch;
@@ -998,7 +1001,8 @@ void CHardklor::DynamicSemiCompleteMethod(float *match, float *mismatch,SSObject
   
   double RCorr;
   double bestRCorr = combo->corr;
-  int a,b,k,n;
+  int a,b,n;
+  unsigned int k;
 
 	vector<double> vecCorr;
 
@@ -1010,7 +1014,7 @@ void CHardklor::DynamicSemiCompleteMethod(float *match, float *mismatch,SSObject
 		sumMismatch = new float[sa.mismatchSize];
 	} else {
 		sumMismatch = new float[1];
-	};
+	}
 	
   //Iterate through all predicted peptides
 	b=0;
@@ -1023,12 +1027,12 @@ void CHardklor::DynamicSemiCompleteMethod(float *match, float *mismatch,SSObject
 			//Do matches first
 			for(a=0;a<sa.peaks.size();a++){
 				sumMatch[a]=sa.predPep->at(k).GetVariant(n).GetMatch(a).intensity + match[a];
-			};
+			}
 
 			//Now add mismatches
 			for(a=0;a<sa.mismatchSize;a++){
 				sumMismatch[a]=sa.predPep->at(k).GetVariant(n).GetMismatch(a).intensity + mismatch[a];
-			};
+			}
       
       //Correlate this combined distribution with the mass spec data.
 			//SSIterations++;
@@ -1044,8 +1048,8 @@ void CHardklor::DynamicSemiCompleteMethod(float *match, float *mismatch,SSObject
 			//Check if it is the best, if so, mark it
 			if(recCombo.corr>bestCombo.corr) bestCombo = recCombo;
       
-    };
-  };
+    }
+  }
 
 	//If we reached threshold, stop here without recursion
 	if(bestCombo.corr>cs.corr) {
@@ -1053,7 +1057,7 @@ void CHardklor::DynamicSemiCompleteMethod(float *match, float *mismatch,SSObject
 		delete [] sumMismatch;
 		*combo = bestCombo;
 		return;
-	};
+	}
 
 
 	//Otherwise, if we're not at the maximum depth, iterate
@@ -1072,12 +1076,12 @@ void CHardklor::DynamicSemiCompleteMethod(float *match, float *mismatch,SSObject
 					//Do matches first
 					for(a=0;a<sa.peaks.size();a++){
 						sumMatch[a]=sa.predPep->at(k).GetVariant(n).GetMatch(a).intensity + match[a];
-					};
+					}
 
 					//Now add mismatches
 					for(a=0;a<sa.mismatchSize;a++){
 						sumMismatch[a]=sa.predPep->at(k).GetVariant(n).GetMismatch(a).intensity + mismatch[a];
-					};
+					}
       
 					recCombo = *combo;
 					recCombo.addVar(k,n);
@@ -1089,13 +1093,13 @@ void CHardklor::DynamicSemiCompleteMethod(float *match, float *mismatch,SSObject
 					//Check if it is the best, if so, mark it
 					if(recCombo.corr>bestCombo.corr) bestCombo = recCombo;
 
-				};
+				}
 				b++;
       
-			};
-		};
+			}
+		}
 
-	};
+	}
 
 	delete [] sumMatch;
 	delete [] sumMismatch;
@@ -1110,7 +1114,8 @@ void CHardklor::SemiSubtractiveMethod(SSObject *combo, int maxDepth){
 	SSObject depthCombo;
   
   double RCorr;
-  int a,k,n;
+  int a,n;
+  unsigned int k;
 	bool bSkip;
 
 	int depth=0;
@@ -1128,14 +1133,14 @@ void CHardklor::SemiSubtractiveMethod(SSObject *combo, int maxDepth){
 	} else {
 		sumMismatch = new float[1];
 		sumMismatchMem = new float[1];
-	};
+	}
 
 	for(a=0;a<sa.peaks.size();a++){
 		sumMatchMem[a]=0;
-	};
+	}
 	for(a=0;a<sa.mismatchSize;a++){
 		sumMismatchMem[a]=0;
-	};
+	}
 
 	while(depth < maxDepth) {
 
@@ -1148,12 +1153,12 @@ void CHardklor::SemiSubtractiveMethod(SSObject *combo, int maxDepth){
 
 			//Skip peptides we have already analyzed.
 			bSkip=false;
-			for(n=0;n<bestCombo.pepVar->size();n++){
+			for(n=0;n<(int)bestCombo.pepVar->size();n++){
 				if(bestCombo.pepVar->at(n).iLower==k) {
 					bSkip=true;
 					break;
-				};
-			};
+				}
+			}
 			if(bSkip) continue;
 
 			//check each variant
@@ -1163,12 +1168,12 @@ void CHardklor::SemiSubtractiveMethod(SSObject *combo, int maxDepth){
 				//Do matches first
 				for(a=0;a<sa.peaks.size();a++){
 					sumMatch[a]=sa.predPep->at(k).GetVariant(n).GetMatch(a).intensity + sumMatchMem[a];
-				};
+				}
 
 				//Now add mismatches
 				for(a=0;a<sa.mismatchSize;a++){
 					sumMismatch[a]=sa.predPep->at(k).GetVariant(n).GetMismatch(a).intensity + sumMismatchMem[a];
-				};
+				}
       
 				//Correlate this combined distribution with the mass spec data.
 				//SSIterations++;
@@ -1182,9 +1187,9 @@ void CHardklor::SemiSubtractiveMethod(SSObject *combo, int maxDepth){
 				//Check if it is the best, if so, mark it
 				if(recCombo.corr>bestCombo.corr) bestCombo = recCombo;
       
-			};
+			}
 
-		};
+		}
 
 		//If we reached threshold, stop here without recursion
 		if(bestCombo.corr>cs.corr) {
@@ -1194,7 +1199,7 @@ void CHardklor::SemiSubtractiveMethod(SSObject *combo, int maxDepth){
 			delete [] sumMismatchMem;
 			*combo = bestCombo;
 			return;
-		};
+		}
 
 		if(bestCombo.corr>0) {
 			//Copy the best correlated data for the next iteration
@@ -1204,17 +1209,17 @@ void CHardklor::SemiSubtractiveMethod(SSObject *combo, int maxDepth){
 			//Do matches first
 			for(a=0;a<sa.peaks.size();a++){
 				sumMatchMem[a]+=sa.predPep->at(k).GetVariant(n).GetMatch(a).intensity;
-			};
+			}
 
 			//Now add mismatches
 			for(a=0;a<sa.mismatchSize;a++){
 				sumMismatchMem[a]+=sa.predPep->at(k).GetVariant(n).GetMismatch(a).intensity;
-			};
-		};
+			}
+		}
 
 		depth++;
 
-	};
+	}
 
 	delete [] sumMatch;
 	delete [] sumMismatch;
@@ -1222,7 +1227,7 @@ void CHardklor::SemiSubtractiveMethod(SSObject *combo, int maxDepth){
 	delete [] sumMismatchMem;
 	*combo = bestCombo;
   
-};
+}
 
 
 void CHardklor::FewestPeptidesMethod(SSObject *combo, int maxDepth){
@@ -1265,7 +1270,7 @@ void CHardklor::FewestPeptidesMethod(SSObject *combo, int maxDepth){
 	};
 	*/
 
-	while(depth < maxDepth && depth < sa.predPep->size()) {
+	while(depth < maxDepth && depth < (int)sa.predPep->size()) {
 
 		countDown=comboListCounter;
 		comboListCounter=0;
@@ -1281,7 +1286,7 @@ void CHardklor::FewestPeptidesMethod(SSObject *combo, int maxDepth){
 			for(a=0;a<sa.mismatchSize;a++) priorMismatch[a]=0;
 
 			//recreate prior match and mismatch data
-			for(n=0;n<comboList.at(pos).pepVar->size();n++){
+			for(n=0;n<(int)comboList.at(pos).pepVar->size();n++){
 				pepID = comboList.at(pos).pepVar->at(n).iLower;
 				varID = comboList.at(pos).pepVar->at(n).iUpper;
 
@@ -1415,7 +1420,7 @@ void CHardklor::FewestPeptidesChoiceMethod(SSObject *combo, int maxDepth){
 	comboList.push_back(*combo);
 	comboListCounter++;
 
-	while(depth < maxDepth && depth < sa.predPep->size()) {
+	while(depth < maxDepth && depth < (int)sa.predPep->size()) {
 
 		countDown=comboListCounter;
 		comboListCounter=0;
@@ -1428,7 +1433,7 @@ void CHardklor::FewestPeptidesChoiceMethod(SSObject *combo, int maxDepth){
 			for(a=0;a<sa.mismatchSize;a++) priorMismatch[a]=0;
 
 			//recreate prior match and mismatch data
-			for(n=0;n<comboList.at(0).pepVar->size();n++){
+			for(n=0;n<(int)comboList.at(0).pepVar->size();n++){
 				pepID = comboList.at(0).pepVar->at(n).iLower;
 				varID = comboList.at(0).pepVar->at(n).iUpper;
 
@@ -2105,7 +2110,7 @@ void CHardklor::ResultToMem(SSObject& obj, CPeriodicTable* PT){
 
     hkm.monoMass = sa.predPep->at(pepID).GetVariant(varID).GetMonoMass();
     hkm.charge = sa.predPep->at(pepID).GetVariant(varID).GetCharge();
-    if(cs.distArea) hkm.intensity = sa.predPep->at(pepID).GetIntensity()*sa.predPep->at(pepID).GetVariant(varID).GetArea();
+    if(cs.distArea) hkm.intensity = sa.predPep->at(pepID).GetIntensity()*(float)sa.predPep->at(pepID).GetVariant(varID).GetArea();
     else hkm.intensity = sa.predPep->at(pepID).GetIntensity();
     hkm.scan = currentScanNumber;
     hkm.mz = sa.predPep->at(pepID).GetMZ();

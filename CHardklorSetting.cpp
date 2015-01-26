@@ -18,8 +18,8 @@ CHardklorSetting::CHardklorSetting(){
   window.dUpper=0;
   strcpy(inFile,"");
   strcpy(outFile,"");
-	strcpy(MercuryFile,"ISOTOPE.DAT");
-  strcpy(HardklorFile,"Hardklor.dat");
+	strcpy(MercuryFile,"");
+  strcpy(HardklorFile,"");
 	algorithm=FastFewestPeptides;
 	variant = new vector<CHardklorVariant>;
 
