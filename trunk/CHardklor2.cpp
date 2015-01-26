@@ -1350,6 +1350,10 @@ void CHardklor2::SetResultsToMemory(bool b){
   bMem=b;
 }
 
+int CHardklor2::Size(){
+  return vResults.size();
+}
+
 void CHardklor2::WritePepLine(pepHit& ph, Spectrum& s, FILE* fptr, int format){
   int i,j;
 

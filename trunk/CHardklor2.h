@@ -38,6 +38,7 @@ class CHardklor2{
   void  Echo(bool b);
   int   GoHardklor(CHardklorSetting sett, Spectrum* s=NULL);
   void  SetResultsToMemory(bool b);
+  int   Size();
 
  protected:
 
