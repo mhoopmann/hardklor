@@ -3,6 +3,7 @@
 CModelLibrary::CModelLibrary(CAveragine* avg, CMercury8* mer){
 	averagine=avg;
 	mercury=mer;
+  libModel=NULL;
 
 	chargeMin=0;
 	chargeCount=0;
