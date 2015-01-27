@@ -6,13 +6,15 @@ Hardklor is provided as a pre-compiled binary (or application). Please select th
 
 
 === Windows 32-bit (works with 64-bit Windows) ===
- * Version 2.17 (Dec 31 2014): [https://drive.google.com/uc?export=download&id=0ByyfOdPaY1xkSlk0b1FXbmY0MDg Latest Version - Download Now]
+ * Version 2.18 (Jan 26 2015): [https://drive.google.com/uc?export=download&id=0ByyfOdPaY1xkbmZtVWtJZk5PVG8 Latest Version - Download Now]
+ * Version 2.17 (Dec 31 2014): [https://drive.google.com/uc?export=download&id=0ByyfOdPaY1xkSlk0b1FXbmY0MDg Legacy Download]
 
 
 === Linux 64-bit ===
- * Version 2.17 (Dec 31 2014): [https://drive.google.com/uc?export=download&id=0ByyfOdPaY1xkTlA1S3kycHhaYUE Latest Version - Download Now]
+ * Version 2.18 (Jan 26 2015): [https://drive.google.com/uc?export=download&id=0ByyfOdPaY1xkX0h6RTBnQWNhb3c Latest Version - Download Now]
+ * Version 2.17 (Dec 31 2014): [https://drive.google.com/uc?export=download&id=0ByyfOdPaY1xkTlA1S3kycHhaYUE Legacy Download]
 
 
 === Additional Support Files ===
- * Sample Hardklor Configuration File (version 2.17): [https://drive.google.com/uc?export=download&id=0ByyfOdPaY1xkckkwdUhSZ3NEbTQ Download Now]
+ * Sample Hardklor Configuration File (version 2.18): [https://drive.google.com/uc?export=download&id=0ByyfOdPaY1xkLXo3Z2xoWUxBcmc Download Now]
  * Kronik version 2.11 (Oct 2012): [https://drive.google.com/uc?export=download&id=0ByyfOdPaY1xkSk1zdG1EUW9Zd00 Download Now]
