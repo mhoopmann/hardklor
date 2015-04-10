@@ -20,16 +20,24 @@ int main(int argc, char* argv[]) {
 	CMercury8 *mercury;
 	CModelLibrary *models;
 
-	cout << "Hardklor v2.18, January 26 2015" << endl;
+	cout << "Hardklor v2.19, April 10 2015" << endl;
 	cout << "Mike Hoopmann, Mike MacCoss\nCopyright 2007-2015\nUniversity of Washington" << endl;
-	if(argc!=2){
+	if(argc < 2 || strcmp(argv[1],"-cmd")!=0 ){
 		cout << "Usage:\t\thardklor <config file>\n";
+    cout << "\t\thardklor -cmd [options] <input file> <output file>\n" << endl;
 		cout << "See documentation for instructions to modify and use config files." << endl;
 		exit(1);
 	}
   
   CHardklorParser hp;
-  hp.parseConfig(argv[1]);  
+  if(strcmp(argv[1],"-cmd")==0){
+    if(!hp.parseCMD(argc, argv)){
+      exit(-3);
+    }
+  } else if(!hp.parseConfig(argv[1])){
+    cout << "\nThere was an error parsing your configuration file." << endl;  
+    exit(-2);
+  }
 
   //Create all the output files that will be used
   for(i=0;i<hp.size();i++){

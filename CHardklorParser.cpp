@@ -269,367 +269,45 @@ void CHardklorParser::parse(char* cmd) {
 		warn(param,1);
 	}
 
+}
 
-/*
-  //Analyze each token
-  for(i=0;i<vs.size();i++){
+bool CHardklorParser::parseCMD(int argc, char* argv[]){
 
-    //Grab first subtoken, which should be the parameter to change
-    tok = strtok(&vs.at(i)[0]," \t\n");
-    if(tok==NULL) continue;
+  int i=2;
+  char tstr[512];
 
-
-		//-ro : reduced output
-    } else if(strcmp(tok,"-ro")==0) {
-      tok = strtok(NULL," \t\n");
-      if(tok==NULL) {
-				if(isGlobal) global.reducedOutput=true;
-			  else hs.reducedOutput=true;
-        continue;
-      }
-			if(strcmp(tok,"true")==0){
-				if(isGlobal) global.reducedOutput=true;
-			  else hs.reducedOutput=true;
-			} else if(strcmp(tok,"false")==0 || atoi(tok)==0) {
-				if(isGlobal) global.reducedOutput=false;
-			  else hs.reducedOutput=false;
-			} else {
-				if(isGlobal) global.reducedOutput=true;
-			  else hs.reducedOutput=true;
-      }
-
-
-    //-m : Parse averagine molecule variants
-    } else if(strcmp(tok,"-m")==0) {
-			v.clear();
-			PT = new CPeriodicTable(global.HardklorFile);
-
-			while(true){
-				tok = strtok(NULL," \t\n");
-				if(tok==NULL) break;
-
-				badMod=false;
-				if(isdigit(tok[0]) || tok[0]=='.'){
-					//we have enrichment
-					percent="";
-					atom="";
-					isotope="";
-
-					//Get the APE
-					for(j=0;j<(int)strlen(tok);j++){
-						if(isdigit(tok[j]) || tok[j]=='.') {
-							if(percent.size()==15){
-								cout << "Malformed modification flag: too many digits." << endl;
-								badMod=true;
-								break;
-							}
-							percent+=tok[j];
-						} else {
-							break;
-						}
-					}
-					if(badMod) break;
-
-					//Get the atom
-					for(j=j;j<(int)strlen(tok);j++){
-						if(isalpha(tok[j])) {
-							if(atom.size()==2){
-								cout << "Malformed modification flag: invalid atom" << endl;
-								badMod=true;
-								break;
-							}
-							atom+=tok[j];
-						} else {
-							break;
-						}
-					}
-					if(badMod) break;
-
-					//Get the isotope
-					for(j=j;j<(int)strlen(tok);j++){
-						if(isotope.size()==2){
-							cout << "Malformed modification flag: bad isotope" << endl;
-							badMod=true;
-							break;
-						}
-						isotope+=tok[j];
-					}
-					if(badMod) break;
-
-					//format the atom properly
-					atom.at(0)=toupper(atom.at(0));
-				  if(atom.size()==2) atom.at(1)=tolower(atom.at(1));
-
-					//Get the array number for the atom
-					atomNum=-1;
-					for(j=0;j<PT->size();j++){
-						if(strcmp(PT->at(j).symbol,&atom[0])==0){
-							atomNum=j;
-							break;
-						}
-					}
-
-					if(atomNum==-1){
-						cout << "Malformed modification flag: Atom not in periodic table" << endl;
-						break;
-					}
-
-					v.addEnrich(atomNum,atoi(&isotope[0]),atof(&percent[0]));
-
-				} else {
-					//we have molecule
-					percent="";
-					atom="";
-					bNew=true;
-
-					//Get the atom
-					for(j=0;j<(int)strlen(tok);j++){
-      
-						//Check for an atom symbol
-						if(isalpha(tok[j])) {
-	
-							//Check if we were working on the count of the previous atom
-							if(!bNew) {
-								bNew=true;
-	  
-								//Make sure the atom has uppercase-lowercase letter format;
-								atom.at(0)=toupper(atom.at(0));
-								if(atom.size()==2) atom.at(1)=tolower(atom.at(1));
-
-								//Look up the new atom
-								for(k=0;k<PT->size();k++){
-									if(strcmp(PT->at(k).symbol,&atom[0])==0){
-										//Add the new atom to the variant
-										v.addAtom(k,atoi(&percent[0]));
-										break;
-									}
-								}
-	  
-								//Clear the fields
-								percent="";
-								atom="";
-							}
-	
-							//Add this letter to the atom symbol
-							if(atom.size()==2){
-								cout << "Malformed modification flag: invalid atom" << endl;
-								badMod=true;
-								break;
-							}
-							atom+=tok[j];
-
-							if(badMod) break;
-	
-						} else if(isdigit(tok[j])){
-	
-							//Whenever we find a digit, we have already found an atom symbol
-							bNew=false;
-	
-							//Add this letter to the atom count
-							if(percent.size()==12){
-								cout << "Malformed modification flag: unreasonable atom count" << endl;
-								badMod=true;
-								break;
-							}
-							percent+=tok[j];
-
-							if(badMod) break;
-	
-						}      
-					}
-
-					//process the last atom
-					//Make sure the atom has uppercase-lowercase letter format;
-					atom.at(0)=toupper(atom.at(0));
-					if(atom.size()==2) atom.at(1)=tolower(atom.at(1));
-
-			    //Look up the new atom
-					for(k=0;k<PT->size();k++){
-						if(strcmp(PT->at(k).symbol,&atom[0])==0){
-
-							//Add the new atom to the variant
-							v.addAtom(k,atoi(&percent[0]));
-							break;
-	
-						}
-					}
-				}
-
-			}
-
-			if(badMod) continue;
-			if(isGlobal) global.variant->push_back(v);
-			else hs.variant->push_back(v);
-
-			delete PT;
-
-    //-sl : sensitivity level
-    } else if(strcmp(tok,"-sl")==0) {
-      tok = strtok(NULL," \t\n");
-      if(tok==NULL) continue;
-      if(atof(tok)>=0) {
-				if(isGlobal) global.sl=atoi(tok);
-				else hs.sl=atoi(tok);
-      }
-
-    //-sna : Signal to Noise Algorithm
-    } else if(strcmp(tok,"-sna")==0) {
-      tok = strtok(NULL," \t\n");
-      if(tok==NULL) {
-        cout << "Unspecified signal to noise algorithm. Defaulting to STD method." << endl;
-        continue;
-      }
-      if(strcmp(tok,"STD")==0 || strcmp(tok,"std")==0) {
-				if(isGlobal) global.sna=0;
-				else hs.sna=0;
-			} else if (strcmp(tok,"ASN")==0 || strcmp(tok,"asn")==0) {
-				if(isGlobal) global.sna=1;
-				else hs.sna=1;
-      } else if (strcmp(tok,"AVG")==0 || strcmp(tok,"avg")==0) {
-				if(isGlobal) global.sna=2;
-				else hs.sna=2;
-      } else if (strcmp(tok,"MIX")==0 || strcmp(tok,"mix")==0) {
-				if(isGlobal) global.sna=3;
-				else hs.sna=3;
-			} else if (strcmp(tok,"V2")==0 || strcmp(tok,"v2")==0) {
-				if(isGlobal) global.sna=4;
-				else hs.sna=4;
-			} else if (strcmp(tok,"V2ASN")==0 || strcmp(tok,"v2asn")==0) {
-				if(isGlobal) global.sna=5;
-				else hs.sna=5;
-			} else if (strcmp(tok,"V2MIX")==0 || strcmp(tok,"v2mix")==0) {
-				if(isGlobal) global.sna=6;
-				else hs.sna=6;
-			} else {
-				cout << "Unkown signal to noise algorithm: " << tok << ". Defaulting to STD method." << endl;
-				if(isGlobal) global.sna=0;
-				else hs.sna=0;
-			}
-
-
-    //-p : Maximum number of peptide models
-    } else if(strcmp(tok,"-p")==0) {
-      tok = strtok(NULL," \t\n");
-      if(tok==NULL) continue;
-      if(atoi(tok)>0) {
-				if(isGlobal) global.peptide=atoi(tok);
-				else hs.peptide=atoi(tok);
-      }
-
-    //-mF : mzXML Filter
-    } else if(strcmp(tok,"-mF")==0) {
-      tok = strtok(NULL," \t\n");
-      if(tok==NULL) continue;
-      if(strcmp(tok,"MS1")==0) {
-				if(isGlobal) global.mzXMLFilter=MS1;
-				else hs.mzXMLFilter=MS1;
-      } else if(strcmp(tok,"MS2")==0){
-				if(isGlobal) global.mzXMLFilter=MS2;
-				else hs.mzXMLFilter=MS2;
-			} else if(strcmp(tok,"MS3")==0){
-				if(isGlobal) global.mzXMLFilter=MS3;
-				else hs.mzXMLFilter=MS3;
-			} else if(strcmp(tok,"ZS")==0){
-				if(isGlobal) global.mzXMLFilter=ZS;
-				else hs.mzXMLFilter=ZS;
-			} else if(strcmp(tok,"UZS")==0){
-				if(isGlobal) global.mzXMLFilter=UZS;
-				else hs.mzXMLFilter=UZS;
-      }
-      
-    //Reading file or invalid parameter
+  while(i<argc-2){
+    if(argv[i][0]=='-'){
+      strcpy(tstr,&argv[i][1]);
+      strcat(tstr," = ");
+      strcat(tstr,argv[i+1]);
+      parse(tstr);
     } else {
-      if(tok[0]=='-') {
-	      //we have invalid parameter
-        cout << "WARNING: Unknown parameter " << tok << endl;
-      } else {
-        isGlobal=false;
-				hs = global;
-        
-        //on systems that allow a space in the path, require quotes (") to capture
-        //complete file name
-        strcpy(tmpstr,tok);
-
-        //Check for quote
-        if(tok[0]=='\"'){
-
-          if(tok[strlen(tok)-1]=='\"') {
-            strcpy(tmpstr,tok);
-          } else {
-
-            //continue reading tokens until another quote is found
-            while(true){
-              tok=strtok(NULL," \t\n");
-              if(tok==NULL) {
-                cout << "Invalid input file." << endl;
-                exit(-1);
-              }
-              strcat(tmpstr," ");
-              strcat(tmpstr,tok);
-              if(tok[strlen(tok)-1]=='\"') break;
-            }
-          }
-          //For some reason, the null string terminator is not places, so place it manually
-          strncpy(hs.inFile,&tmpstr[1],strlen(tmpstr)-2);
-          hs.inFile[strlen(tmpstr)-2]='\0';
-
-        //If no quote, assume file name has no spaces
-        } else {
-					strcpy(hs.inFile,tok);
-        }
-
-				tok = strtok(NULL," \t\n");
-				if(tok==NULL) {
-					cout << "Invalid output file." << endl;
-					exit(-1);
-				}
-
-        //Repeat the entire process for output file
-        strcpy(tmpstr,tok);
-        if(tok[0]=='\"'){
-
-          if(tok[strlen(tok)-1]=='\"') {
-            strcpy(tmpstr,tok);
-          } else {
-
-            //continue reading tokens until another quote is found
-            while(true){
-              tok=strtok(NULL," \t\n");
-              if(tok==NULL) {
-                cout << "Invalid output file." << endl;
-                exit(-1);
-              }
-              strcat(tmpstr," ");
-              strcat(tmpstr,tok);
-              if(tok[strlen(tok)-1]=='\"') break;
-            }
-          }
-          //For some reason, the null string terminator is not places, so place it manually
-          strncpy(hs.outFile,&tmpstr[1],strlen(tmpstr)-2);
-          hs.outFile[strlen(tmpstr)-2]='\0';
-          
-        } else {
-					strcpy(hs.outFile,tok);
-        }
-
-				hs.fileFormat = getFileFormat(hs.inFile);
-      }
+      cout << "There was an error with your command line parameters." << endl;
+      return false;
     }
-    
+    i+=2;
   }
-	*/
+
+  strcpy(tstr,argv[argc-2]);
+  strcat(tstr," ");
+  strcat(tstr,argv[argc-1]);
+  parse(tstr);  
+
+  return true;
 
 }
 
+
 //Reads in a config file and passes it to the parser
-void CHardklorParser::parseConfig(char* c){
+bool CHardklorParser::parseConfig(char* c){
   fstream fptr;
   char tstr[512];
 
   fptr.open(c,ios::in);
   if(!fptr.good()){
     cout << "Cannot open config file!" << endl;
-    return;
+    return false;
   }
 
   while(!fptr.eof()) {
@@ -640,6 +318,7 @@ void CHardklorParser::parseConfig(char* c){
   }
 
   fptr.close();
+  return true;
 }
 
 CHardklorSetting& CHardklorParser::queue(int i){
