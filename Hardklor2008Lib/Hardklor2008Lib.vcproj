@@ -160,6 +160,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\CHardklor2.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\CHardklorParser.cpp"
 				>
 			</File>
@@ -173,6 +177,10 @@
 			</File>
 			<File
 				RelativePath="..\CMercury8.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\CModelLibrary.cpp"
 				>
 			</File>
 			<File

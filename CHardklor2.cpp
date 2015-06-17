@@ -51,6 +51,8 @@ int CHardklor2::GoHardklor(CHardklorSetting sett, Spectrum* s){
   iPercent=0;
 	getTimerFrequency(timerFrequency);
 
+  vResults.clear();
+
 	//For noise reduction
 	CNoiseReduction nr(&r,cs);
 
@@ -1210,6 +1212,8 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 	}
 
 	//Sort results by base peak
+  //This sort is expensive. Instead, try sorting before exporting to file. Make sure RefineHits below is not
+  //order dependent.
 	if(vPeps.size()>0) qsort(&vPeps[0],vPeps.size(),sizeof(pepHit),CompareBPI);
 
 	//Refine overfitting based on density
