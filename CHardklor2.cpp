@@ -1442,13 +1442,13 @@ void CHardklor2::WriteScanLine(Spectrum& s, FILE* fptr, int format){
 		//For Alex Panchaud, special ZS case
 		if(s.getFileType()==ZS || s.getFileType()==UZS){
 			if(s.sizeZ()>0){
-				for(int i=0;i<s.sizeZ();i++) fprintf(fptr,"\t%d,%.6lf",s.atZ(i).z,s.atZ(i).mz);
+				for(int i=0;i<s.sizeZ();i++) fprintf(fptr,"\t%d,%.6lf",s.atZ(i).z,s.atZ(i).mh);
 			}
 		} else {
 
 			//otherwise output precursor info if it exists
 			if(s.sizeZ()==1){
-				fprintf(fptr,"\t%.4lf\t%d\t%.4lf",s.atZ(0).mz-1.00727649,s.atZ(0).z,s.getMZ());
+				fprintf(fptr,"\t%.4lf\t%d\t%.4lf",s.atZ(0).mh-1.00727649,s.atZ(0).z,s.getMZ());
 			} else if(s.sizeZ()>1){
 				fprintf(fptr,"\t0.0\t0\t%.4lf",s.getMZ());
 			} else {
@@ -1464,11 +1464,11 @@ void CHardklor2::WriteScanLine(Spectrum& s, FILE* fptr, int format){
 		fprintf(fptr,"Filename=\"%s\"",cs.inFile);
 		if(s.getFileType()==ZS || s.getFileType()==UZS){
 			if(s.sizeZ()>0){
-				for(int i=0;i<s.sizeZ();i++) fprintf(fptr," PeptideSignal%d=\"%d,%.4lf\"",i,s.atZ(i).z,s.atZ(i).mz);
+				for(int i=0;i<s.sizeZ();i++) fprintf(fptr," PeptideSignal%d=\"%d,%.4lf\"",i,s.atZ(i).z,s.atZ(i).mh);
 			}
 		} else {
 			if(s.sizeZ()==1){
-				fprintf(fptr," AccMonoMass=\"%.4lf\" PrecursorCharge=\"%d\" PrecursorMZ=\"%.4lf\"",s.atZ(0).mz-1.00727649,s.atZ(0).z,s.getMZ());
+				fprintf(fptr," AccMonoMass=\"%.4lf\" PrecursorCharge=\"%d\" PrecursorMZ=\"%.4lf\"",s.atZ(0).mh-1.00727649,s.atZ(0).z,s.getMZ());
 			} else if(s.sizeZ()>1){
 				fprintf(fptr," AccMonoMass=\"0.0\" PrecursorCharge=\"0\" PrecursorMZ=\"%.4lf\"",s.getMZ());
 			} else {
