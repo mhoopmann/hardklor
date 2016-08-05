@@ -1,3 +1,19 @@
+/*
+Copyright 2007-2016, Michael R. Hoopmann, Institute for Systems Biology
+Michael J. MacCoss, University of Washington
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 /*
    Hardklör - Thanks to Aaron Klammer (Klezmer) and 
@@ -568,7 +584,7 @@ bool CHardklor::AnalyzePeaks(CSpecAnalyze& sa){
 		break;
 	case Basic:
 	default:
-		BasicMethod(match,mismatch,&bsso,1,cs.depth,sa.predPep->size()-1);
+		BasicMethod(match,mismatch,&bsso,1,cs.depth,(int)sa.predPep->size()-1);
 		break;
 	}
 
@@ -1303,7 +1319,7 @@ void CHardklor::FewestPeptidesMethod(SSObject *combo, int maxDepth){
 			if(comboList.at(pos).pepVar->size()>0){
 				b = comboList.at(pos).pepVar->at(comboList.at(pos).pepVar->size()-1).iLower - 1;
 			} else {
-				b = sa.predPep->size()-1;
+				b = (int)sa.predPep->size()-1;
 			};
 
 			//add every peptide & every variant
@@ -1448,7 +1464,7 @@ void CHardklor::FewestPeptidesChoiceMethod(SSObject *combo, int maxDepth){
 			};
 
 			if(comboList.at(0).pepVar->size()>0) start = comboList.at(0).pepVar->at(comboList.at(0).pepVar->size()-1).iLower-1;
-			else start = sa.predPep->size()-1;
+			else start = (int)sa.predPep->size()-1;
 
 			//add every peptide & every variant
 			for(j=start;j>-1;j--){
@@ -1648,7 +1664,7 @@ void CHardklor::FastFewestPeptidesMethod(SSObject *combo, int maxDepth){
 				}
 				if(lastCount==sizeB) break;
 				if(comboListB->at(lastCount).pepVar->size()==0) {
-					b=sa.predPep->size()-1;
+					b=(int)sa.predPep->size()-1;
 				} else {
 					b = comboListB->at(lastCount).pepVar->at(comboListB->at(lastCount).pepVar->size()-1).iLower-1;
 					//cout << "B: " << b << endl;
@@ -1661,7 +1677,7 @@ void CHardklor::FastFewestPeptidesMethod(SSObject *combo, int maxDepth){
 				}
 				if(lastCount==sizeA) break;
 				if(comboListA->at(lastCount).pepVar->size()==0) {
-					b=sa.predPep->size()-1;
+					b=(int)sa.predPep->size()-1;
 				}	else {
 					b = comboListA->at(lastCount).pepVar->at(comboListA->at(lastCount).pepVar->size()-1).iLower-1;
 					//cout << "B: " << b << endl;
@@ -1935,7 +1951,7 @@ void CHardklor::FastFewestPeptidesChoiceMethod(SSObject *combo, int maxDepth){
 			if(storeA){
 				if(lastCount==sizeB) break;
 				if(count==widthA) break;
-				if(comboListB->at(lastCount).pepVar->size()==0) b=sa.predPep->size()-1;
+				if(comboListB->at(lastCount).pepVar->size()==0) b=(int)sa.predPep->size()-1;
 				else b = comboListB->at(lastCount).pepVar->at(comboListB->at(lastCount).pepVar->size()-1).iLower-1;
 				//cout << "Checking ";
 				//for(a=0;a<comboListB->at(lastCount).pepVar->size();a++){
@@ -1945,7 +1961,7 @@ void CHardklor::FastFewestPeptidesChoiceMethod(SSObject *combo, int maxDepth){
 			} else {
 				if(lastCount==sizeA) break;
 				if(count==widthB) break;
-				if(comboListA->at(lastCount).pepVar->size()==0) b=sa.predPep->size()-1;
+				if(comboListA->at(lastCount).pepVar->size()==0) b=(int)sa.predPep->size()-1;
 				else b = comboListA->at(lastCount).pepVar->at(comboListA->at(lastCount).pepVar->size()-1).iLower-1;
 				//cout << "Checking ";
 				//for(a=0;a<comboListA->at(lastCount).pepVar->size();a++){
@@ -2267,7 +2283,7 @@ void CHardklor::WriteParams(fstream& fptr, int format){
 }
 
 int CHardklor::Size(){
-  return vResults.size();
+  return (int)vResults.size();
 }
 
 void CHardklor::SetResultsToMemory(bool b){

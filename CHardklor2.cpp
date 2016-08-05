@@ -1,3 +1,19 @@
+/*
+Copyright 2007-2016, Michael R. Hoopmann, Institute for Systems Biology
+Michael J. MacCoss, University of Washington
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 #include "CHardklor2.h"
 
 CHardklor2::CHardklor2(CAveragine *a, CMercury8 *m, CModelLibrary *lib){
@@ -465,8 +481,8 @@ double CHardklor2::LinReg(vector<float>& mer, vector<float>& obs){
 bool CHardklor2::MatchSubSpectrum(Spectrum& s, int peakIndex, pepHit& pep){
 
 	int i,k,n;
-	unsigned int varCount;
-	unsigned int v;
+	size_t varCount;
+	size_t v;
 	float max=s[peakIndex].intensity;
 	int maxMercuryIndex[3];
 	vector<int> charges;
@@ -511,7 +527,7 @@ bool CHardklor2::MatchSubSpectrum(Spectrum& s, int peakIndex, pepHit& pep){
 
 			//get model from library
 			dif=0;
-			model=models->getModel(charges[i],v,s[peakIndex].mz);
+			model=models->getModel(charges[i],(int)v,s[peakIndex].mz);
 			for(k=0; k<model->size; k++) {
 				if(model->peaks[k].intensity>dif){
 					dif = model->peaks[k].intensity;
@@ -543,7 +559,7 @@ bool CHardklor2::MatchSubSpectrum(Spectrum& s, int peakIndex, pepHit& pep){
 					r.data=model->peaks[k].intensity;
 					r.mass=model->peaks[k].mz+shft;
 					vMR.push_back(r);
-					if(model->peaks[k].intensity>99.999) thisMaxIndex=vMR.size()-1;
+					if(model->peaks[k].intensity>99.999) thisMaxIndex=(int)vMR.size()-1;
 					
 					if(r.mass<lower) lower=r.mass;
 					if(r.mass>upper) upper=r.mass;
@@ -566,7 +582,7 @@ bool CHardklor2::MatchSubSpectrum(Spectrum& s, int peakIndex, pepHit& pep){
 					bestMass=model->zeroMass+shft*charges[i];
 					bestCharge=charges[i];
 					bestDA=da;
-					bestVariant=v;
+					bestVariant=(int)v;
 				}
 
 				n++;
@@ -856,8 +872,8 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 
 	//iterators
 	int i,j,k,n,m,x;
-	unsigned int varCount;
-	unsigned int v;
+	size_t varCount;
+	size_t v;
 
 	//tracking spectrum peak intensities
 	float maxHeight=9999999999999.9f;
@@ -984,7 +1000,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 				dif=0;
         top3[0]=top3[1]=top3[2]=0;
         maxMercuryIndex[0]=maxMercuryIndex[1]=maxMercuryIndex[2]=-1;
-				model=models->getModel(charges[i],v,s[maxIndex].mz);
+				model=models->getModel(charges[i],(int)v,s[maxIndex].mz);
 				for(k=0; k<model->size; k++) {
           //cout << "i\t" << model->peaks[k].mz << "\t" << model->peaks[k].intensity << endl;
 					//if(model->peaks[k].intensity>dif){
@@ -1039,7 +1055,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 						r.data=model->peaks[k].intensity;
 						r.mass=model->peaks[k].mz+shft;
 						vMR.push_back(r);
-						if(model->peaks[k].intensity>99.999) thisMaxIndex=vMR.size()-1;
+						if(model->peaks[k].intensity>99.999) thisMaxIndex=(int)vMR.size()-1;
 					
 						if(r.mass<lower) lower=r.mass;
 						if(r.mass>upper) upper=r.mass;
@@ -1161,7 +1177,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 						bestOverlap=m;
 						bestLowIndex=lowIndex;
 						bestHighIndex=highIndex;
-						bestVariant=v;
+						bestVariant=(int)v;
 					}
 
 					n++;
@@ -1359,7 +1375,7 @@ void CHardklor2::SetResultsToMemory(bool b){
 }
 
 int CHardklor2::Size(){
-  return vResults.size();
+  return (int)vResults.size();
 }
 
 void CHardklor2::WritePepLine(pepHit& ph, Spectrum& s, FILE* fptr, int format){

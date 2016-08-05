@@ -1,3 +1,19 @@
+/*
+Copyright 2007-2016, Michael R. Hoopmann, Institute for Systems Biology
+Michael J. MacCoss, University of Washington
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 #include "FFT-HK.h"
 #include <iostream>
 
@@ -89,7 +105,7 @@ void Patterson(double *f, Spectrum& s, unsigned int start, unsigned int stop,
 		ch = (double)(i+2)/3 + shift;
 		ch = 1/ch;
 		ch /= 2;
-		for(j=start;j<=stop;j++){
+		for(j=(int)start;j<=(int)stop;j++){
 				mz1 = s.at(j).mz - ch;
 				mz2 = s.at(j).mz + ch;
 				f[i]+= (GetIntensity(s,start,stop,mz1) * GetIntensity(s,start,stop,mz2));
