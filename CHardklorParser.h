@@ -38,20 +38,20 @@ class CHardklorParser {
   void parse(char*);
   bool parseCMD(int argc, char* argv[]);
   bool parseConfig(char*);
-	MSFileFormat getFileFormat(char* c);
+  MSFileFormat getFileFormat(char* c);
   CHardklorSetting& queue(int);
   int size();
 
  protected:
 
  private:
-	 //Methods
+   //Methods
    bool makeVariant(char* c);
-	 void warn(char*, int);
+   void warn(const char*, int);
 	 
-	 //Data Members
-	 CHardklorSetting global;
-	 vector<CHardklorSetting> *vQueue;
+   //Data Members
+   CHardklorSetting global;
+   vector<CHardklorSetting> *vQueue;
 };
 
 

@@ -90,7 +90,7 @@ class CAveragine {
  public:
   //Constructors & Destructors
   //CAveragine();
-  CAveragine(char* fn="ISOTOPE.DAT", char* fn2="Hardklor.dat");
+  CAveragine(const char* fn="ISOTOPE.DAT", const char* fn2="Hardklor.dat");
   ~CAveragine();
 
   //Methods:
@@ -102,13 +102,12 @@ class CAveragine {
   int getElement(int);
   double getMonoMass();
   CPeriodicTable* getPT();
-  void loadTable(char*);
+  void loadTable(const char*);
 
  protected:
 
  private:
   //Data Members:
-  //double monoMass;
   int *atoms;
   CPeriodicTable *PT;
   vector<atomInfo> *enrich;

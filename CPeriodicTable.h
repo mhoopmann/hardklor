@@ -35,7 +35,7 @@ class CPeriodicTable {
  public:
    //Constructors & Destructors
    //CPeriodicTable();
-   CPeriodicTable(char* c="Hardklor.dat");
+   CPeriodicTable(const char* c="Hardklor.dat");
    ~CPeriodicTable();
 
    //Methods:
@@ -46,7 +46,7 @@ class CPeriodicTable {
  private:
    //Methods:
    void defaultValues();
-   void loadTable(char*);
+   void loadTable(const char*);
 
    //Data Members:
    vector<element> table;

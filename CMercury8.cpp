@@ -163,7 +163,7 @@ void CMercury8::Intro() {
 /***************************************************/
 //This function reads the ISOTOPE.DAT file that must be in the same
 //folder as the application.
-void CMercury8::InitializeData(char* fn) {
+void CMercury8::InitializeData(const char* fn) {
 
   FILE *ElementFile;
   int  i, Z;
@@ -182,7 +182,7 @@ void CMercury8::InitializeData(char* fn) {
   for (Z=0; Z<=MAXAtomNo; Z++) {
     Element[Z].Symbol[0]=Element[Z].Symbol[1]=Element[Z].Symbol[2]=0;
 
-    fscanf(ElementFile,"%2s %d\n", &Element[Z].Symbol,&Element[Z].NumIsotopes);
+    fscanf(ElementFile,"%2s %d\n", &Element[Z].Symbol[0],&Element[Z].NumIsotopes);
     strcpy(Orig[Z].Symbol,Element[Z].Symbol);
     Orig[Z].NumIsotopes = Element[Z].NumIsotopes;
 
@@ -495,7 +495,7 @@ void CMercury8::CalcFreq(complex* FreqData, int Ecount, int NumPoints, int MassR
 //	0: Success
 //	1: Invalid molecular formula
 //	2: Cannot write to file
-int CMercury8::GoMercury(char* MolForm, int Charge, char* filename) {
+int CMercury8::GoMercury(char* MolForm, int Charge, const char* filename) {
   
   unsigned int i;
   int	 NumElements=0;			/* Number of elements in molecular formula */
@@ -604,10 +604,10 @@ void CMercury8::AccurateMass(int NumElements, int Charge){
   if (showOutput){
     if (Charge != 0) {
       printf("Average Molecular Weight: %.3lf, at m/z: %.3f\n",MW,MW/fabs((double)Charge));
-      printf("Average Integer MW: %ld, at m/z: %.3f\n\n",intMW,(float)intMW/fabs((double)Charge));
+      printf("Average Integer MW: %d, at m/z: %.3f\n\n",intMW,(float)intMW/fabs((double)Charge));
     } else {
       printf("Average Molecular Weight: %.3lf\n",MW);
-      printf("Average Integer MW: %ld\n\n",intMW);
+      printf("Average Integer MW: %d\n\n",intMW);
     }
   }
 
@@ -901,10 +901,10 @@ void CMercury8::Mercury(int NumElements, int Charge) {
   if (showOutput){
     if (Charge != 0) {
       printf("Average Molecular Weight: %.3lf, at m/z: %.3f\n",MW,MW/fabs((double)Charge));
-      printf("Average Integer MW: %ld, at m/z: %.3f\n\n",intMW,(float)intMW/fabs((double)Charge));
+      printf("Average Integer MW: %d, at m/z: %.3f\n\n",intMW,(float)intMW/fabs((double)Charge));
     } else {
       printf("Average Molecular Weight: %.3lf\n",MW);
-      printf("Average Integer MW: %ld\n\n",intMW);
+      printf("Average Integer MW: %d\n\n",intMW);
     }
   }
  

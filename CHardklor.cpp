@@ -2052,36 +2052,36 @@ void CHardklor::FastFewestPeptidesChoiceMethod(SSObject *combo, int maxDepth){
 			delete comboListA;
 			delete comboListB;
 			*combo = bestCombo;
-			return;
-		};
+      return;
+    }
 
-		//otherwise, we iterate
-		if(storeA) storeA=false;
-		else storeA=true;
-		depth++;
+    //otherwise, we iterate
+    if(storeA) storeA=false;
+    else storeA=true;
+    depth++;
 
-	};//while depth
+  }//while depth
 
-	//return the best we got
-	for(a=0;a<widthA;a++){
-		delete [] sumMatchA[a];
-		delete [] sumMismatchA[a];
-	};
-	delete [] sumMatchA;
-	delete [] sumMismatchA;
-	for(a=0;a<widthB;a++){
-		delete [] sumMatchB[a];
-		delete [] sumMismatchB[a];
-	};
-	delete [] sumMatchB;
-	delete [] sumMismatchB;
-	delete comboListA;
-	delete comboListB;
-	*combo = bestCombo;
+  //return the best we got
+  for(a=0;a<widthA;a++){
+    delete [] sumMatchA[a];
+    delete [] sumMismatchA[a];
+  }
+  delete [] sumMatchA;
+  delete [] sumMismatchA;
+  for(a=0;a<widthB;a++){
+    delete [] sumMatchB[a];
+    delete [] sumMismatchB[a];
+  }
+  delete [] sumMatchB;
+  delete [] sumMismatchB;
+  delete comboListA;
+  delete comboListB;
+  *combo = bestCombo;
 	
-	//cout << "Done! " << bestCombo.corr << "   " << SSIterations << endl;
+  //cout << "Done! " << bestCombo.corr << "   " << SSIterations << endl;
   
-};
+}
 
 int CHardklor::calcDepth(int start, int max, int depth, int count) {
 	int i,j,n;
@@ -2269,13 +2269,13 @@ void CHardklor::WriteScanLine(Spectrum& s, fstream& fptr, int format){
 				fptr << " AccMonoMass=\"0.0\" PrecursorCharge=\"0\" PrecursorMZ=\"" << s.getMZ() << "\"";
 			} else {
 				fptr << " AccMonoMass=\"0.0\" PrecursorCharge=\"0\" PrecursorMZ=\"0.0\"";
-			}
-		}
+      }
+    }
     fptr << ">" << endl;
   } else if(format==2) {
-		fptr << "Scan = " << s.getScanNumber();
-		fptr << endl;
-	}
+    fptr << "Scan = " << s.getScanNumber();
+    fptr << endl;
+  }
 }
 
 void CHardklor::WriteParams(fstream& fptr, int format){

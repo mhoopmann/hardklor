@@ -25,7 +25,7 @@ CPeriodicTable::CPeriodicTable(){
 }
 */
 
-CPeriodicTable::CPeriodicTable(char* c){
+CPeriodicTable::CPeriodicTable(const char* c){
   loadTable(c);
 }
 
@@ -74,7 +74,7 @@ void CPeriodicTable::defaultValues(){
 
 }
 
-void CPeriodicTable::loadTable(char* c){
+void CPeriodicTable::loadTable(const char* c){
   FILE* fptr;
   element e;
 
@@ -95,10 +95,8 @@ void CPeriodicTable::loadTable(char* c){
      checks should be made to confirm the content of data
   */
   while(!feof(fptr)){
-
-		fscanf(fptr,"%d\t%s\t%lf\n",&e.atomicNum,e.symbol,&e.mass);   
-    table.push_back(e);
-    
+    fscanf(fptr,"%d\t%s\t%lf\n",&e.atomicNum,e.symbol,&e.mass);   
+    table.push_back(e);   
   }
 
   fclose(fptr);

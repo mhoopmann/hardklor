@@ -52,13 +52,13 @@ class CHardklorSetting {
   bool noBase;				//No base molecule - perform analysis with only averagine variant models
   bool noSplit;				//analyze entire spectrum at once
   //bool rawAvg;      //use averaged raw scans
-	bool reducedOutput;	//output m/z, intensity, and charge only (de-isotoped peaks)
+  bool reducedOutput;	//output m/z, intensity, and charge only (de-isotoped peaks)
   bool skipZero;			//ignore zero intensity data points
   bool staticSN;			//for sna=THRASH; assume one noise level for entire spectrum
   bool xml;						//output is in xml
   
-	int boxcar;				//number of scans to average together
-  int	boxcarFilter;	//value to meet or exceed to keep peak in boxcar averaged data
+  int boxcar;				//number of scans to average together
+  int boxcarFilter;	//value to meet or exceed to keep peak in boxcar averaged data
   int depth;        //maximum number of overlapping peptides
   int maxCharge;    //max charge state to search for
   int minCharge;    //min charge state to search for

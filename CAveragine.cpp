@@ -19,8 +19,8 @@ limitations under the License.
 #include "CAveragine.h"
 using namespace std;
 
-CAveragine::CAveragine(char* fn, char* fn2){
-	PT = new CPeriodicTable(fn2);
+CAveragine::CAveragine(const char* fn, const char* fn2){
+  PT = new CPeriodicTable(fn2);
   atoms = new int[PT->size()];
   for(int i=0;i<PT->size();i++) atoms[i]=0;
   enrich = new vector<atomInfo>;
@@ -28,6 +28,7 @@ CAveragine::CAveragine(char* fn, char* fn2){
 }
 
 CAveragine::~CAveragine(){
+  delete PT;
   delete [] atoms;
   delete enrich;
 }
@@ -273,12 +274,12 @@ CPeriodicTable* CAveragine::getPT(){
   return PT;
 }
 
-void CAveragine::loadTable(char* c){
+void CAveragine::loadTable(const char* c){
 
   FILE *f;
   int  j;
   atomInfo a;
-	double d1,d2;
+  double d1,d2;
 
   if(c==NULL || strlen(c)==0){
     defaultValues();
@@ -293,18 +294,18 @@ void CAveragine::loadTable(char* c){
 
   while(!feof(f)){
    
-		fscanf(f,"%2s\t%d\n",&a.symbol,&a.numIsotopes);
+    fscanf(f,"%2s\t%d\n",&a.symbol[0],&a.numIsotopes);
     a.mass->clear();
     a.abundance->clear();
 
     for(j=0;j<a.numIsotopes;j++){
       fscanf(f,"%lf\t%lf\n",&d1,&d2);
-			a.mass->push_back(d1);
-			a.abundance->push_back(d2);
+      a.mass->push_back(d1);
+      a.abundance->push_back(d2);
     }
 
     enrich->push_back(a);
-		fscanf(f," \n");
+    fscanf(f," \n");
 
   }
 

@@ -384,39 +384,39 @@ MSFileFormat CHardklorParser::getFileFormat(char* c){
 
 }
 
-void CHardklorParser::warn(char* c, int i){
-	switch(i){
-		case 0:
-			cout << "Parameter " << c << " has no value." << endl;
-			break;
-		case 1:
-			cout << "Unknown parameter: " << c << endl;
-			break;
-		case 2:
-		default:
-			cout << c << endl;
-			break;
-	}
+void CHardklorParser::warn(const char* c, int i){
+  switch(i){
+  case 0:
+    cout << "Parameter " << c << " has no value." << endl;
+    break;
+  case 1:
+    cout << "Unknown parameter: " << c << endl;
+    break;
+  case 2:
+  default:
+    cout << c << endl;
+    break;
+  }
 }
 
 bool CHardklorParser::makeVariant(char* c){
 
   //For modifications
-	CHardklorVariant v;
-	CPeriodicTable* PT;
-	int j,k;
-	string atom;
-	string isotope;
-	string percent;
-	int atomNum;
-	bool bNew;
+  CHardklorVariant v;
+  CPeriodicTable* PT;
+  int j,k;
+  string atom;
+  string isotope;
+  string percent;
+  int atomNum;
+  bool bNew;
   
   char str[256];
   char* tok;
   strcpy(str,c);
 
   v.clear();
-	PT = new CPeriodicTable(global.HardklorFile);  
+  PT = new CPeriodicTable(global.HardklorFile);  
 
   tok=strtok(str," \n");  
   while(tok!=NULL){
@@ -554,10 +554,10 @@ bool CHardklorParser::makeVariant(char* c){
       }
     }
     tok=strtok(NULL," \n"); 
-	}
+  }
 
-	global.variant->push_back(v);
-	delete PT;
+  global.variant->push_back(v);
+  delete PT;
   return true;
 
 }
