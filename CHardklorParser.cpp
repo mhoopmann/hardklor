@@ -63,7 +63,7 @@ void CHardklorParser::parse(char* cmd) {
 
 	//if we have only white space, exit here
 	strcpy(tmpstr,cmd);
-	tok=strtok(tmpstr," \t\n");
+	tok=strtok(tmpstr," \t\n\r");
 	if(tok==NULL) return;
 
 	//Check if we have a parameter (has '=' in it) or a file request.
@@ -96,7 +96,7 @@ void CHardklorParser::parse(char* cmd) {
 			strcpy(hs.inFile,&tmpstr[1]);
 			j++;
 		} else {
-			tok=strtok(tmpstr," \t\n");
+			tok=strtok(tmpstr," \t\n\r");
 			strcpy(hs.inFile,tmpstr);
 			j=(int)strlen(tmpstr);
 		}
@@ -129,7 +129,7 @@ void CHardklorParser::parse(char* cmd) {
 			strcpy(hs.outFile,&tmpstr[1]);
 			j++;
 		} else {
-			tok=strtok(tmpstr," \t\n");
+			tok=strtok(tmpstr," \t\n\r");
 			strcpy(hs.outFile,tmpstr);
 			j=(int)strlen(tmpstr);
 		}
@@ -142,10 +142,10 @@ void CHardklorParser::parse(char* cmd) {
 	}
 
 	//Read parameter
-	tok=strtok(cmd," \t=\n");
+	tok=strtok(cmd," \t=\n\r");
 	if(tok==NULL) return;
 	strcpy(param,tok);
-	tok=strtok(NULL," \t=\n");
+	tok=strtok(NULL," \t=\n\r");
 	if(tok==NULL) {
 		warn(param,0);
 		return;
@@ -167,11 +167,11 @@ void CHardklorParser::parse(char* cmd) {
     if(strlen(tok)==1 && tok[0]=='0') global.variant->clear();
     else {
       tstr=tok;
-      tok=strtok(NULL," \t\n");
+      tok=strtok(NULL," \t\n\r");
       while(tok!=NULL){
         tstr+=" ";
         tstr+=tok;
-        tok=strtok(NULL," \t\n");
+        tok=strtok(NULL," \t\n\r");
       }      
       if(!makeVariant(&tstr[0])) warn("Invalid averagine_mod value. Skipping averagine_mod.",2);
     }
@@ -361,10 +361,10 @@ MSFileFormat CHardklorParser::getFileFormat(char* c){
 	char *tok;
 
 	strcpy(file,c);
-	tok=strtok(file,".\n");
+	tok=strtok(file,".\n\r");
 	while(tok!=NULL){
 		strcpy(ext,tok);
-		tok=strtok(NULL,".\n");
+		tok=strtok(NULL,".\n\r");
 	}
 
 	if(strcmp(ext,"ms1")==0 || strcmp(ext,"MS1")==0) return ms1;
@@ -418,7 +418,7 @@ bool CHardklorParser::makeVariant(char* c){
   v.clear();
   PT = new CPeriodicTable(global.HardklorFile);  
 
-  tok=strtok(str," \n");  
+  tok=strtok(str," \n\r");  
   while(tok!=NULL){
     if(isdigit(tok[0]) || tok[0]=='.'){
       //we have enrichment
@@ -553,7 +553,7 @@ bool CHardklorParser::makeVariant(char* c){
         }
       }
     }
-    tok=strtok(NULL," \n"); 
+    tok=strtok(NULL," \n\r"); 
   }
 
   global.variant->push_back(v);

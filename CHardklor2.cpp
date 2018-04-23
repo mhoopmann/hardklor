@@ -442,7 +442,7 @@ bool CHardklor2::CheckForPeak(vector<Result>& vMR, Spectrum& s, int index){
 	}
 
 	if(dif<FWHM){
-		if(mask[mid].intensity>1.0) return false;
+		if(mask[mid].intensity>0.1) return false;
 		else return true;
 	}
 	return false;
@@ -684,10 +684,10 @@ double CHardklor2::PeakMatcher(vector<Result>& vMR, Spectrum& s, double lower, d
 		} else {
 			mer.push_back((float)vMR[k].data);
       //cout << "xM: " << vMR[k].mass << "\t" << s[matchIndex].mz << endl;
-			if(mask[matchIndex].intensity>1.0 && vMR[k].data>50) {
+			if(mask[matchIndex].intensity>0.1 && vMR[k].data>50) {
 				if(indexOverlap<0) indexOverlap=matchIndex;
 			}
-			if(s[matchIndex].intensity<1.0) {
+			if(s[matchIndex].intensity<0.1) {
 				obs.push_back(0.0f);
 			} else {
 				matchCount++;
@@ -778,7 +778,7 @@ double CHardklor2::PeakMatcherB(vector<Result>& vMR, Spectrum& s, double lower, 
 			break;
 		} else {
 			mer.push_back((float)vMR[k].data);
-			if(s[matchIndex].intensity<1.0) {
+			if(s[matchIndex].intensity<0.1) {
 				obs.push_back(0.0f);
 			} else {
 				matchCount++;
@@ -816,12 +816,13 @@ void CHardklor2::QuickCharge(Spectrum& s, int index, vector<int>& v){
 	double rawChR;
 	int ch;
 	int charge[1000];
+  float minIntensity=s[index].intensity/4;
 
 	for(i=cs.minCharge;i<=cs.maxCharge;i++) charge[i]=0;
 
 	//check forward
 	for(j=index+1;j<s.size();j++){
-		//if(s[j].intensity<1.0f) continue;
+		if(s[j].intensity<minIntensity) continue;
 			
 		dif = s[j].mz - s[index].mz;
 		if(dif > 1.1) break;
@@ -848,7 +849,7 @@ void CHardklor2::QuickCharge(Spectrum& s, int index, vector<int>& v){
 
 	//check backward
 	for(j=index-1;j>=0;j--){
-		//if(s[j].intensity<=0.0f) continue;
+    if (s[j].intensity<minIntensity) continue;
 			
 		dif = s[index].mz - s[j].mz;
 		if(dif > 1.1) break;
