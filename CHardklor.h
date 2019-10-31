@@ -39,14 +39,12 @@ limitations under the License.
 #include <sys/time.h>
 #endif
 
-using namespace std;
-
 #define PminusE 1.00672791
 
 class SSObject {
 public:
 	//Data members
-  vector<sInt> *pepVar;
+  std::vector<sInt> *pepVar;
   double corr;
 
 	//Constructors & Destructors
@@ -76,7 +74,7 @@ class CHardklor{
 
   //Methods:
 	void Echo(bool b);
-  int GoHardklor(CHardklorSetting sett, Spectrum* s=NULL);
+  int GoHardklor(CHardklorSetting sett, MSToolkit::Spectrum* s=NULL);
 	void SetAveragine(CAveragine *a);
 	void SetMercury(CMercury8 *m);
   void SetResultsToMemory(bool b);
@@ -86,14 +84,14 @@ class CHardklor{
 
  private:
   //Methods:
-  void Analyze(Spectrum* s=NULL);
+  void Analyze(MSToolkit::Spectrum* s=NULL);
   bool AnalyzePeaks(CSpecAnalyze& sa);
   int compareData(const void*, const void*);
   double LinReg(float *match, float *mismatch);
   void ResultToMem(SSObject& obj, CPeriodicTable* PT);
-  void WriteParams(fstream& fptr, int format=1); 
-  void WritePepLine(SSObject& obj, CPeriodicTable* PT, fstream& fptr, int format=0); 
-  void WriteScanLine(Spectrum& s, fstream& fptr, int format=0); 
+  void WriteParams(std::fstream& fptr, int format = 1);
+  void WritePepLine(SSObject& obj, CPeriodicTable* PT, std::fstream& fptr, int format = 0);
+  void WriteScanLine(MSToolkit::Spectrum& s, std::fstream& fptr, int format = 0);
 
 	//Finished analysis algorithms
 	void BasicMethod(float *match, float *mismatch,SSObject* combo, int depth, int maxDepth, int start);
@@ -120,13 +118,13 @@ class CHardklor{
 	bool bEcho;
   bool bMem;
   int currentScanNumber;
-	fstream fptr; //TODO: Get rid of this and use FILE* instead.
+  std::fstream fptr; //TODO: Get rid of this and use FILE* instead.
 
 	//Vector for holding peptide list of distribution
-  vector<CHardklorVariant> pepVariants;
+  std::vector<CHardklorVariant> pepVariants;
 
   //Vector for holding results in memory should that be needed
-  vector<hkMem> vResults;
+  std::vector<hkMem> vResults;
 
   //Temporary Data Members:
   char bestCh[200];

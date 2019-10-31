@@ -22,9 +22,6 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-using namespace std;
-using namespace MSToolkit;
-
 enum specType {
 	OrbiTrap,
 	TOF,
@@ -58,7 +55,7 @@ typedef struct {
 } sEnrich;
 
 typedef struct {
-  string molecule;
+  std::string molecule;
   int iLower;
   int iUpper;
 } sMolecule;
@@ -116,7 +113,7 @@ typedef struct {
   int O;
   int N;
   int S;
-  vector<sID> *enrich;
+  std::vector<sID> *enrich;
 } peps;
 
 typedef struct pepHit{
@@ -139,7 +136,7 @@ typedef struct mercuryModel{
 	float area;
 	int size;
 	double zeroMass;
-	Peak_T* peaks;
+	MSToolkit::Peak_T* peaks;
 } mercuryModel;
 
 //for storing results to memory for modular Hardklor runs

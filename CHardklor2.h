@@ -38,8 +38,6 @@ limitations under the License.
 #include <sys/time.h>
 #endif
 
-using namespace std;
-
 class CHardklor2{
 
  public:
@@ -52,8 +50,8 @@ class CHardklor2{
 
   //Methods:
   void  Echo(bool b);
-  int   GoHardklor(CHardklorSetting sett, Spectrum* s=NULL);
-  void    QuickCharge(Spectrum& s, int index, vector<int>& v);
+  int   GoHardklor(CHardklorSetting sett, MSToolkit::Spectrum* s=NULL);
+  void  QuickCharge(MSToolkit::Spectrum& s, int index, std::vector<int>& v);
   void  SetResultsToMemory(bool b);
   int   Size();
 
@@ -61,37 +59,37 @@ class CHardklor2{
 
  private:
   //Methods:
-  int     BinarySearch(Spectrum& s, double mz, bool floor);
+  int     BinarySearch(MSToolkit::Spectrum& s, double mz, bool floor);
   double  CalcFWHM(double mz,double res,int iType);
-  void    Centroid(Spectrum& s, Spectrum& out);
-  bool    CheckForPeak(vector<Result>& vMR, Spectrum& s, int index);
+  void    Centroid(MSToolkit::Spectrum& s, MSToolkit::Spectrum& out);
+  bool    CheckForPeak(std::vector<Result>& vMR, MSToolkit::Spectrum& s, int index);
   int     CompareData(const void*, const void*);
-  double  LinReg(vector<float>& mer, vector<float>& obs);
-  bool    MatchSubSpectrum(Spectrum& s, int peakIndex, pepHit& pep);
-  double  PeakMatcher(vector<Result>& vMR, Spectrum& s, double lower, double upper, double deltaM, int matchIndex, int& matchCount, int& indexOverlap, vector<int>& vMatchIndex, vector<float>& vMatchIntensity);
-  double  PeakMatcherB(vector<Result>& vMR, Spectrum& s, double lower, double upper, double deltaM, int matchIndex, int& matchCount, vector<int>& vMatchIndex, vector<float>& vMatchIntensity);
-  void    QuickHardklor(Spectrum& s, vector<pepHit>& vPeps);
-  void    RefineHits(vector<pepHit>& vPeps, Spectrum& s);
-  void    ResultToMem(pepHit& ph, Spectrum& s);
-  void    WritePepLine(pepHit& ph, Spectrum& s, FILE* fptr, int format=0); 
-  void    WriteScanLine(Spectrum& s, FILE* fptr, int format=0); 
+  double  LinReg(std::vector<float>& mer, std::vector<float>& obs);
+  bool    MatchSubSpectrum(MSToolkit::Spectrum& s, int peakIndex, pepHit& pep);
+  double  PeakMatcher(std::vector<Result>& vMR, MSToolkit::Spectrum& s, double lower, double upper, double deltaM, int matchIndex, int& matchCount, int& indexOverlap, std::vector<int>& vMatchIndex, std::vector<float>& vMatchIntensity);
+  double  PeakMatcherB(std::vector<Result>& vMR, MSToolkit::Spectrum& s, double lower, double upper, double deltaM, int matchIndex, int& matchCount, std::vector<int>& vMatchIndex, std::vector<float>& vMatchIntensity);
+  void    QuickHardklor(MSToolkit::Spectrum& s, std::vector<pepHit>& vPeps);
+  void    RefineHits(std::vector<pepHit>& vPeps, MSToolkit::Spectrum& s);
+  void    ResultToMem(pepHit& ph, MSToolkit::Spectrum& s);
+  void    WritePepLine(pepHit& ph, MSToolkit::Spectrum& s, FILE* fptr, int format=0); 
+  void    WriteScanLine(MSToolkit::Spectrum& s, FILE* fptr, int format=0); 
 
   static int CompareBPI(const void *p1, const void *p2);
 
   //Data Members:
-  CHardklorSetting  cs;
-  CAveragine*       averagine;
-  CMercury8*        mercury;
-  CModelLibrary*    models;
-  CPeriodicTable*   PT;
-  Spectrum          mask;
-  hkMem             hkm;
-  bool              bEcho;
-  bool              bMem;
-  int               currentScanNumber;
+  CHardklorSetting    cs;
+  CAveragine*         averagine;
+  CMercury8*          mercury;
+  CModelLibrary*      models;
+  CPeriodicTable*     PT;
+  MSToolkit::Spectrum mask;
+  hkMem               hkm;
+  bool                bEcho;
+  bool                bMem;
+  int                 currentScanNumber;
 
   //Vector for holding results in memory should that be needed
-  vector<hkMem> vResults;
+  std::vector<hkMem> vResults;
 
   //Temporary Data Members:
   char bestCh[200];

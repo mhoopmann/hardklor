@@ -14,7 +14,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 #include "CHardklor2.h"
+
+using namespace std;
+using namespace MSToolkit;
 
 CHardklor2::CHardklor2(CAveragine *a, CMercury8 *m, CModelLibrary *lib){
   averagine=a;

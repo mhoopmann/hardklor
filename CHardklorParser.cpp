@@ -17,6 +17,7 @@ limitations under the License.
 #include "CHardklorParser.h"
 
 using namespace std;
+using namespace MSToolkit;
 
 CHardklorParser::CHardklorParser(){
   vQueue = new vector<CHardklorSetting>;

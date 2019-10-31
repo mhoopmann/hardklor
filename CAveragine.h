@@ -21,12 +21,10 @@ limitations under the License.
 #include "CHardklorVariant.h"
 #include "CPeriodicTable.h"
 
-#include <cstdlib>
+//#include <cstdlib>
 #include <fstream>
 #include <vector>
-#include <cstring>
-
-using namespace std;
+#include <string>
 
 /*
 const double AVE_MASS = 111.1254;
@@ -47,22 +45,19 @@ const double AVE_S = 0.0390;
 typedef struct atomInfo {
   char symbol[3];
   int numIsotopes;
-  vector<double> *mass;
-  vector<double> *abundance;
+  std::vector<double> *mass;
+  std::vector<double> *abundance;
   atomInfo(){
     strcpy(symbol,"X");
     numIsotopes=0;
-    mass = new vector<double>;
-    abundance = new vector<double>;
+    mass = new std::vector<double>;
+    abundance = new std::vector<double>;
   }
   atomInfo(const atomInfo& a){
     strcpy(symbol,a.symbol);
     numIsotopes=a.numIsotopes;
-    mass = new vector<double>;
-    abundance = new vector<double>;
-    unsigned int i;
-    for(i=0;i<a.mass->size();i++) mass->push_back(a.mass->at(i));
-    for(i=0;i<a.abundance->size();i++) abundance->push_back(a.abundance->at(i));
+    mass = new std::vector<double>(*a.mass);
+    abundance = new std::vector<double>(*a.abundance);
   }
   ~atomInfo(){
     delete mass;
@@ -74,11 +69,8 @@ typedef struct atomInfo {
       numIsotopes=a.numIsotopes;
       delete mass;
       delete abundance;
-      mass = new vector<double>;
-      abundance = new vector<double>;
-      unsigned int i;
-      for(i=0;i<a.mass->size();i++) mass->push_back(a.mass->at(i));
-      for(i=0;i<a.abundance->size();i++) abundance->push_back(a.abundance->at(i));
+      mass = new std::vector<double>(*a.mass);
+      abundance = new std::vector<double>(*a.abundance);
     }
     return *this;
   }
@@ -110,7 +102,7 @@ class CAveragine {
   //Data Members:
   int *atoms;
   CPeriodicTable *PT;
-  vector<atomInfo> *enrich;
+  std::vector<atomInfo> *enrich;
 
 };
 

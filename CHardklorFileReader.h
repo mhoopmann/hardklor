@@ -48,12 +48,12 @@ private:
   int posNR;
   CHardklorSetting cs;
   CNoiseReduction nr;
-  MSReader r;
-  deque<Spectrum> sNative;
-  deque<Spectrum> sNR;
+  MSToolkit::MSReader r;
+  std::deque<MSToolkit::Spectrum> sNative;
+  std::deque<MSToolkit::Spectrum> sNR;
 
-  deque<cpar> dc;
+  std::deque<cpar> dc;
 
-  vector<int> vScans;
+  std::vector<int> vScans;
   
 };

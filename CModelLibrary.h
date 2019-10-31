@@ -23,8 +23,6 @@ limitations under the License.
 #include "CHardklorVariant.h"
 #include <vector>
 
-using namespace std;
-
 class CModelLibrary {
 public:
 
@@ -33,7 +31,7 @@ public:
 	~CModelLibrary();
 
 	//User functions
-	bool buildLibrary(int lowCharge, int highCharge, vector<CHardklorVariant>& pepVariants);
+  bool buildLibrary(int lowCharge, int highCharge, std::vector<CHardklorVariant>& pepVariants);
 	void eraseLibrary();
 	mercuryModel* getModel(int charge, int var, double mz);
 

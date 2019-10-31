@@ -18,14 +18,11 @@ limitations under the License.
 #define _CHARDKLORSETTING_H
 
 #include <cstdio>
-#include <cstring>
 #include <string>
 #include <vector>
 
 #include "HardklorTypes.h"
 #include "CHardklorVariant.h"
-
-using namespace std;
 
 /* 
    Defined as a class instead of a struct so
@@ -94,9 +91,9 @@ class CHardklorSetting {
 
   specType msType;                    //Type of mass spectrometer used to acquire data
   hkAlgorithm algorithm;              //Deconvolving algorithm to use
-  vector<CHardklorVariant> *variant;  //Variants to make to averagine
-  MSFileFormat fileFormat;            //File format
-  MSSpectrumType mzXMLFilter;         //Filter for mzXML files
+  std::vector<CHardklorVariant> *variant;  //Variants to make to averagine
+  MSToolkit::MSFileFormat fileFormat;            //File format
+  MSToolkit::MSSpectrumType mzXMLFilter;         //Filter for mzXML files
 
  protected:
  private:

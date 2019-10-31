@@ -19,15 +19,14 @@ Uses Mercury code, with permission, from Alan L. Rockwood and Steve van Orden
 #ifndef _CMercury8_H
 #define _CMercury8_H
 
-#include <cstdio>
-#include <cstdlib>
+//#include <cstdio>
+//#include <cstdlib>
 #include <cmath>
 #include <cstring>
 #include "ctype.h"
 #include <ctime>
 #include "mercury.h"
 #include "FFT.h"
-using namespace std;
 
 typedef struct
 {
@@ -49,7 +48,7 @@ class CMercury8 {
   bool showOutput;
   bool bAccMass;
   bool bRelAbun;
-  vector<int> EnrichAtoms;
+  std::vector<int> EnrichAtoms;
   double monoMass;
   double zeroMass;
 
@@ -62,17 +61,17 @@ class CMercury8 {
   void CalcWeights(double&,double&,double&,int&,int&,int&,int&,int);
   void ConvertMass(complex*, int, int, double, double, int, int, int, double, double);
   void DefaultValues();
-  void GetPeaks(complex*, int, vector<Result>&, int, int);
+  void GetPeaks(complex*, int, std::vector<Result>&, int, int);
   void InitializeData(const char* fn="ISOTOPE.DAT");
   void MassToInt(complex*, int);
   void Mercury(int,int);
   int ParseMF(char[], int*);
-  void RelativeAbundance(vector<Result>&);
+  void RelativeAbundance(std::vector<Result>&);
  
  public:
   //Data Members:
-  vector<Result> FixedData;
-  vector<Result> FracAbunData;
+  std::vector<Result> FixedData;
+  std::vector<Result> FracAbunData;
 
   //Constructors & Destructors:
   CMercury8();

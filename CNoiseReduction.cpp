@@ -16,6 +16,9 @@ limitations under the License.
 */
 #include "CNoiseReduction.h"
 
+using namespace std;
+using namespace MSToolkit;
+
 CNoiseReduction::CNoiseReduction(){
   pos=0;
   posA=0;

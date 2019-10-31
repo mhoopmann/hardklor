@@ -20,8 +20,6 @@ limitations under the License.
 #include "HardklorTypes.h"
 #include <iostream>
 
-using namespace std;
-
 class CHardklorOutput {
 public:
 

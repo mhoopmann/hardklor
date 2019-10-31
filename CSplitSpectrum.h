@@ -22,12 +22,10 @@ limitations under the License.
 #include "Spectrum.h"
 #include <vector>
 
-using namespace std;
-
 class CSplitSpectrum {
  public:
   //Constructors & Destructors
-  CSplitSpectrum(Spectrum *spec, CHardklorSetting& sett);
+  CSplitSpectrum(MSToolkit::Spectrum *spec, CHardklorSetting& sett);
 	~CSplitSpectrum();
   
   //Fuctions
@@ -43,28 +41,28 @@ class CSplitSpectrum {
 	void SetAveragine(CAveragine *a);
 	void SetMercury(CMercury8 *m);
 
-	void Centroid(Spectrum& s);
+	void Centroid(MSToolkit::Spectrum& s);
 
 	void NewSNPass(double gapSize);
 
 
  private:
   //Data members
-  Spectrum *wholeSpec;
+  MSToolkit::Spectrum *wholeSpec;
 	CHardklorSetting userParams;
 
 	CSpecAnalyze goodPeaks;
 	CAveragine *averagine;
 	CMercury8 *mercury;
 
-	vector<CSpecAnalyze> *setA;
-	vector<CSpecAnalyze> *setB;
-	vector<CSpecAnalyze> *finalAnalysis;
+  std::vector<CSpecAnalyze> *setA;
+  std::vector<CSpecAnalyze> *setB;
+  std::vector<CSpecAnalyze> *finalAnalysis;
 
-	vector<float> *s2n;
+  std::vector<float> *s2n;
 
-	vector<int> *aIndex;
-	vector<int> *bIndex;
+  std::vector<int> *aIndex;
+  std::vector<int> *bIndex;
 
 };
 

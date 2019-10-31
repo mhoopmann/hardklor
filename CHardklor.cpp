@@ -46,8 +46,9 @@ limitations under the License.
 #include "CSpecAnalyze.h"
 #include "Smooth.h"
 #include <iomanip>
-using namespace std;
 
+using namespace std;
+using namespace MSToolkit;
 
 SSObject::SSObject(){
 	pepVar = new vector<sInt>;

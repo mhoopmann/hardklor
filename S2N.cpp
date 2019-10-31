@@ -17,6 +17,9 @@ limitations under the License.
 #include "S2N.h"
 #include <iostream>
 
+using namespace std;
+using namespace MSToolkit;
+
 // Adapted from THRASH
 Spectrum signalToNoise(Spectrum& s, int start, int stop, float sig, float* cutoff, bool skipZero, bool subtract){
 

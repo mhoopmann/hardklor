@@ -16,6 +16,9 @@ limitations under the License.
 */
 #include "CModelLibrary.h"
 
+using namespace std;
+using namespace MSToolkit;
+
 CModelLibrary::CModelLibrary(CAveragine* avg, CMercury8* mer){
 	averagine=avg;
 	mercury=mer;

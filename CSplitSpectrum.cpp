@@ -16,7 +16,9 @@ limitations under the License.
 */
 #include "CSplitSpectrum.h"
 #include <iostream>
+
 using namespace std;
+using namespace MSToolkit;
 
 CSplitSpectrum::CSplitSpectrum(Spectrum* spec, CHardklorSetting& sett) {
   wholeSpec=spec;

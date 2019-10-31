@@ -18,6 +18,7 @@ limitations under the License.
 #include <iostream>
 
 using namespace std;
+using namespace MSToolkit;
 
 void FFTCharge(double *f, Spectrum& s, unsigned int start, unsigned int stop,
 							 unsigned int lowCharge, unsigned int highCharge, double interval, bool bSpline){

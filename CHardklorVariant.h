@@ -21,8 +21,6 @@ limitations under the License.
 
 #include "HardklorTypes.h"
 
-using namespace std;
-
 class CHardklorVariant {
  public:
   //Constructors & Destructors:
@@ -50,9 +48,9 @@ class CHardklorVariant {
  protected:
 
  private:
-  //Data Members:
-  vector<sInt> *atoms;
-  vector<sEnrichMercury> *enrich;
+   //Data Members:
+   std::vector<sInt> *atoms;
+   std::vector<sEnrichMercury> *enrich;
 
 };
 

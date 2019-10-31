@@ -16,6 +16,8 @@ limitations under the License.
 */
 #include "CHardklorOutput.h"
 
+using namespace std;
+
 bool CHardklorOutput::openFile(char* fileName, hkOutputFormat format){
 	
 	if(outFile!=NULL) closeFile();

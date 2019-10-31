@@ -17,6 +17,9 @@ limitations under the License.
 #include "Smooth.h"
 #include <iostream>
 
+using namespace std;
+using namespace MSToolkit;
+
 //Savitzky-Golay smoothing algorithm
 void SG_Smooth(Spectrum& sp, int m, int p){
 

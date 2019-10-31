@@ -17,7 +17,9 @@ limitations under the License.
 #include "CSpecAnalyze.h"
 #include <iostream>
 #include <algorithm>
+
 using namespace std;
+using namespace MSToolkit;
 
 //Default constructor
 CSpecAnalyze::CSpecAnalyze(){

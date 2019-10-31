@@ -27,7 +27,6 @@ limitations under the License.
 #include "FFT-HK.h"
 #include <vector>
 #include <cmath>
-using namespace std;
 
 //the following is 8*ln(2)
 #define GAUSSCONST 5.5451774444795623
@@ -48,27 +47,27 @@ class CSpecAnalyze {
   void clear();
 	//void FindCharge();
   int  FindPeaks();
-	int  FindPeaks(Spectrum& s, int start, int stop);
+	int  FindPeaks(MSToolkit::Spectrum& s, int start, int stop);
   //void FindPeptides();
-  void MakePredictions(vector<CHardklorVariant>& var);
+  void MakePredictions(std::vector<CHardklorVariant>& var);
   int  PredictPeptides();
   void removePeaksBelowSN();
-  void setSpectrum(Spectrum& s);
+  void setSpectrum(MSToolkit::Spectrum& s);
 	void setAveragine(CAveragine *a);
 	void setMercury(CMercury8 *m);
 	void setParams(const CHardklorSetting& sett);
 	void TraditionalCharges();
 
   //Data Members
-  float                      basePeak;     //most intense peak in peaks spectrum; used for SN cutoff
-  vector<int>                *charges;
-  bool                       manyPeps;
-  int                        mismatchSize;
-  Spectrum                   peaks;        //peaks found in the spectrum
-  Spectrum                   peptide;      //peaks that are potential peptides
-  vector<CPeakPrediction>    *predPeak;
-	vector<CPeptidePrediction> *predPep;
-  float                      S2NCutoff;	
+  float                           basePeak;     //most intense peak in peaks spectrum; used for SN cutoff
+  std::vector<int>                *charges;
+  bool                            manyPeps;
+  int                             mismatchSize;
+  MSToolkit::Spectrum             peaks;        //peaks found in the spectrum
+  MSToolkit::Spectrum             peptide;      //peaks that are potential peptides
+  std::vector<CPeakPrediction>    *predPeak;
+  std::vector<CPeptidePrediction> *predPep;
+  float                           S2NCutoff;	
 
  protected:
  private:
@@ -76,15 +75,15 @@ class CSpecAnalyze {
   //Functions
 	int    binarySearch(double mz);
 	double calcFWHM(double mz);
-  void   FirstDerivativePeaks(Spectrum&,int);
-	void   FirstDerivativePeaks(Spectrum&,int,int,int);
-	double InterpolateMZ(Peak_T& p1, Peak_T& p2, double halfMax);
+  void   FirstDerivativePeaks(MSToolkit::Spectrum&,int);
+	void   FirstDerivativePeaks(MSToolkit::Spectrum&,int,int,int);
+	double InterpolateMZ(MSToolkit::Peak_T& p1, MSToolkit::Peak_T& p2, double halfMax);
 
   //Data members
-  CAveragine       *averagine;
-	CMercury8        *mercury;
-  Spectrum         *spec;
-	CHardklorSetting userParams;
+  CAveragine          *averagine;
+	CMercury8           *mercury;
+  MSToolkit::Spectrum *spec;
+	CHardklorSetting    userParams;
 	
 };
 

@@ -32,27 +32,27 @@ public:
 
   //Constructors and Destructors
   CNoiseReduction();
-  CNoiseReduction(MSReader* msr, CHardklorSetting& hs);
+  CNoiseReduction(MSToolkit::MSReader* msr, CHardklorSetting& hs);
   ~CNoiseReduction();
 
   //Functions
-  double CParam(Spectrum& sp, int tot=1);
+  double CParam(MSToolkit::Spectrum& sp, int tot=1);
   double calcFWHM(double mz);
-  void FirstDerivativePeaks(Spectrum& sp, int winSize);
-  bool DeNoise(Spectrum& sp);
+  void FirstDerivativePeaks(MSToolkit::Spectrum& sp, int winSize);
+  bool DeNoise(MSToolkit::Spectrum& sp);
   //bool DeNoise(Spectrum& sp, vector<Spectrum>& vs, int pivot, bool findPeaks=false);
   //bool DeNoise(Spectrum& sp, deque<Spectrum>& vs, int pivot, bool findPeaks=false);
-  bool DeNoiseB(Spectrum& sp);
-  bool DeNoiseC(Spectrum& sp);
-  bool DeNoiseD(Spectrum& sp);
-  int NearestPeak(Spectrum& sp, double mz);
-  bool ScanAverage(Spectrum& sp, char* file, int width, float cutoff);
-  bool NewScanAverage(Spectrum& sp, char* file, int width, float cutoff, int scanNum=0);
+  bool DeNoiseB(MSToolkit::Spectrum& sp);
+  bool DeNoiseC(MSToolkit::Spectrum& sp);
+  bool DeNoiseD(MSToolkit::Spectrum& sp);
+  int NearestPeak(MSToolkit::Spectrum& sp, double mz);
+  bool ScanAverage(MSToolkit::Spectrum& sp, char* file, int width, float cutoff);
+  bool NewScanAverage(MSToolkit::Spectrum& sp, char* file, int width, float cutoff, int scanNum=0);
   //bool ScanAverage(Spectrum& sp, vector<Spectrum>& vs, int pivot, float cutoff, double cp=0.0);
   //bool ScanAverage(Spectrum& sp, deque<Spectrum>& vs, int pivot, float cutoff);
   //bool ScanAverageBuffered(Spectrum& sp, char* file, int width, float cutoff, int scanNum=0);
-  bool ScanAveragePlusDeNoise(Spectrum& sp, char* file, int width, float cutoff, int scanNum=0);
-  bool NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int width, float cutoff, int scanNum=0);
+  bool ScanAveragePlusDeNoise(MSToolkit::Spectrum& sp, char* file, int width, float cutoff, int scanNum=0);
+  bool NewScanAveragePlusDeNoise(MSToolkit::Spectrum& sp, char* file, int width, float cutoff, int scanNum=0);
 
   int pos;
 
@@ -65,9 +65,9 @@ private:
   int posA;
   char lastFile[256];
   CHardklorSetting cs;
-  MSReader* r;
-  deque<Spectrum> s;
-  deque<Spectrum> bs;
+  MSToolkit::MSReader* r;
+  std::deque<MSToolkit::Spectrum> s;
+  std::deque<MSToolkit::Spectrum> bs;
 
 	/*
 	  __int64 startTime;

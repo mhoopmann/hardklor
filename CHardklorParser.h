@@ -25,8 +25,6 @@ limitations under the License.
 #include "CPeriodicTable.h"
 #include "MSToolkitTypes.h"
 
-using namespace std;
-
 class CHardklorParser {
 
  public:
@@ -38,7 +36,7 @@ class CHardklorParser {
   void parse(char*);
   bool parseCMD(int argc, char* argv[]);
   bool parseConfig(char*);
-  MSFileFormat getFileFormat(char* c);
+  MSToolkit::MSFileFormat getFileFormat(char* c);
   CHardklorSetting& queue(int);
   int size();
 
@@ -51,7 +49,7 @@ class CHardklorParser {
 	 
    //Data Members
    CHardklorSetting global;
-   vector<CHardklorSetting> *vQueue;
+   std::vector<CHardklorSetting> *vQueue;
 };
 
 

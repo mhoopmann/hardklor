@@ -17,6 +17,7 @@ limitations under the License.
 #include "CHardklorSetting.h"
 
 using namespace std;
+using namespace MSToolkit;
 
 CHardklorSetting::CHardklorSetting(){
   noBase=false;

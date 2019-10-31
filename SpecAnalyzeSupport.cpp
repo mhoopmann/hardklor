@@ -16,6 +16,9 @@ limitations under the License.
 */
 #include "SpecAnalyzeSupport.h"
 
+using namespace std;
+using namespace MSToolkit;
+
 /* ******************************************************* */
 /*									CPeakPrediction												 */
 /* ******************************************************* */

@@ -22,7 +22,6 @@ limitations under the License.
 #include "CMercury8.h"
 #include "HardklorTypes.h"
 
-using namespace std;
 
 /* ******************************************************* */
 /*                   CPeakPrediction                       */
@@ -32,7 +31,7 @@ class CPeakPrediction{
   //Data Members
   double mz;                //Peak m/z in spectrum
   float intensity;          //Peak intensity in spectrum
-  vector<int> *charges;     //All charge state predictions for this peak
+  std::vector<int> *charges;     //All charge state predictions for this peak
  protected:
  public:
   //Constructors and Destructors
@@ -61,12 +60,12 @@ class CPeakPrediction{
 /* ******************************************************* */
 class CPeptideVariant {
  private:
-  Peak_T *match;            //Array of mz and intensities that match the peak list at index n
+  MSToolkit::Peak_T *match;            //Array of mz and intensities that match the peak list at index n
   int matchSize;
-  Peak_T *mismatch;         //Array of mz and intensities that do not match the peak list at index n
+  MSToolkit::Peak_T *mismatch;         //Array of mz and intensities that do not match the peak list at index n
   int mismatchSize;
 
-  vector<Peak_T> *extra;    //Temporary storage of mismatch data until mismatch array size is determined
+  std::vector<MSToolkit::Peak_T> *extra;    //Temporary storage of mismatch data until mismatch array size is determined
 
   int charge;               //Charge state of variant
   char formula[64];         //Molecular formula (averagine-based)
@@ -91,11 +90,11 @@ class CPeptideVariant {
   void DeleteExtra();
   double& GetArea();
   int& GetCharge();
-  Peak_T& GetExtra(int& index);
+  MSToolkit::Peak_T& GetExtra(int& index);
   char* GetFormula();
   CHardklorVariant& GetHKVariant();
-  Peak_T& GetMatch(int& index);
-  Peak_T& GetMismatch(int& index);
+  MSToolkit::Peak_T& GetMatch(int& index);
+  MSToolkit::Peak_T& GetMismatch(int& index);
   double& GetMonoMass();
   void SetArea(double& d);
   void SetCharge(int ch);
@@ -114,7 +113,7 @@ class CPeptideVariant {
 /* ******************************************************* */
 class CPeptidePrediction {
  private:
-  vector<CPeptideVariant> *variantList;   //vector of all variants for this peptide
+  std::vector<CPeptideVariant> *variantList;   //vector of all variants for this peptide
   double mz;                              //mz peak from which variants are derived
   float intensity;                        //intensity of mz peak
   int bestVar;                            //Index to variant with best match/mismatch score
