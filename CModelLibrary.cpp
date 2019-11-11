@@ -55,11 +55,11 @@ bool CModelLibrary::buildLibrary(int lowCharge, int highCharge, vector<CHardklor
 		return false;
 	}
 
-	//Fill in boundaries
+	//Fill in boundaries; Note Nov11_2019: This needs dynamic updating, perhaps drawn from a new parameter.
 	chargeMin=lowCharge;
 	chargeCount=highCharge+1;
 	varCount=(int)pepVariants.size();
-	merCount=1000;
+	if(merCount==0) merCount=1000;
 
 	libModel = new mercuryModel**[chargeCount];
 	for(i=chargeMin;i<chargeCount;i++){
@@ -127,12 +127,23 @@ void CModelLibrary::eraseLibrary(){
 	delete [] libModel;
 
 	libModel=NULL;
+  merCount=0;
 	
 }
 
 mercuryModel* CModelLibrary::getModel(int charge, int var, double mz){
 
 	int intMZ=(int)(mz/5);
+
+  //punting this for now. A better solution needs to be made, but will wait until necessary.
+  if(intMZ>=merCount) {
+    cout << "Spectrum feature beyond molecule_max_mz. Hard boundary encountered. Please increase molecule_max_mz." << endl;
+    exit(-47);
+  }
 	return &libModel[charge][var][intMZ];
 
+}
+
+void CModelLibrary::setSize(double mz){
+  merCount=(int)(mz/5)+1;
 }

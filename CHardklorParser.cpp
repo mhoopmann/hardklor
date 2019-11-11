@@ -242,6 +242,10 @@ void CHardklorParser::parse(char* cmd) {
     strcpy(global.MercuryFile,tok);
 
 	} else if(strcmp(param,"max_features")==0){
+
+  } else if(strcmp(param,"molecule_max_mz")==0){
+    global.maxMolMZ=atof(tok);
+
 	} else if(strcmp(param,"ms_level")==0){
     if(atoi(tok)==3){
       global.mzXMLFilter=MS3;

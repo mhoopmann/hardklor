@@ -73,6 +73,8 @@ CHardklorSetting::CHardklorSetting(){
   //rawAvgWidth=1;
   //rawAvgCutoff=1000;
 
+  maxMolMZ=5000;
+
   strcpy(rawFilter,"");
 }
 
@@ -134,6 +136,9 @@ CHardklorSetting::CHardklorSetting(const CHardklorSetting& c){
   //rawAvg=c.rawAvg;
   //rawAvgWidth=c.rawAvgWidth;
   //rawAvgCutoff=c.rawAvgCutoff;
+
+  maxMolMZ=c.maxMolMZ;
+
   strcpy(rawFilter,c.rawFilter);
 }
   
@@ -199,6 +204,7 @@ CHardklorSetting& CHardklorSetting::operator=(const CHardklorSetting& c){
     //rawAvg=c.rawAvg;
     //rawAvgWidth=c.rawAvgWidth;
     //rawAvgCutoff=c.rawAvgCutoff;
+    maxMolMZ = c.maxMolMZ;
 
     strcpy(rawFilter,c.rawFilter);
   }

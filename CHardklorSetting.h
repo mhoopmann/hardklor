@@ -71,6 +71,7 @@ class CHardklorSetting {
   int smooth;       //Savitsky-Golay smoothing window size
   //int sna;          //Signal-to-noise algorithm; 0=THRASH, 1=Persistent peaks (PP)
 
+  double maxMolMZ;  //Largest m/z to detect in the data
   double corr;      //correlation threshold
   double ppm;       //ppm tolerance of m/z values to match across scans
   double res400;    //resolution at m/z 400

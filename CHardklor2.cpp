@@ -336,6 +336,13 @@ void CHardklor2::Centroid(Spectrum& s, Spectrum& out){
 
 	out.clear();
 
+  //Get boundaries of the spectrum. centroids must be within boundaries.
+  double minMZ, maxMZ;
+  if(s.size()>0){
+    minMZ = s[0].mz;
+    maxMZ = s[s.size()-1].mz;
+  }
+
   bLastPos=false;
 	for(i=0;i<s.size()-1;i++){
 
@@ -385,9 +392,9 @@ void CHardklor2::Centroid(Spectrum& s, Spectrum& out){
 					centroid.intensity=s[bestPeak].intensity;
 				}
 				
-				//Hack until I put in mass ranges
-				if(centroid.mz<0 || centroid.mz>2000) {
-					//do nothing if invalid mz
+				//Centroided peaks must fall within spectrum mass range
+				if(centroid.mz<minMZ || centroid.mz>maxMZ) {
+					//do nothing if invalid mz, but perhaps find a better way to handle this one day.
 				} else {
 					out.add(centroid);
 				}

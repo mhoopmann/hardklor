@@ -34,6 +34,7 @@ public:
   bool buildLibrary(int lowCharge, int highCharge, std::vector<CHardklorVariant>& pepVariants);
 	void eraseLibrary();
 	mercuryModel* getModel(int charge, int var, double mz);
+  void setSize(double mz);
 
 protected:
 
