@@ -18,6 +18,7 @@ limitations under the License.
 #define _CHARDKLORSETTING_H
 
 #include <cstdio>
+#include <cstring>
 #include <string>
 #include <vector>
 

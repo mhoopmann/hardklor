@@ -217,5 +217,5 @@ void CHardklorSetting::clearVariant(){
 }
 
 void CHardklorSetting::out(char *s){
-  sprintf(s,"minCh:%d maxCh:%d d:%d p:%d s:%d corr:%lf sn:%lf res:%d,%lf win:%lf sl:%d v:%d\n",minCharge,maxCharge,depth,peptide,smooth,corr,sn,msType,res400,winSize,sl,variant->size());
+  sprintf(s,"minCh:%d maxCh:%d d:%d p:%d s:%d corr:%lf sn:%lf res:%d,%lf win:%lf sl:%d v:%zu\n",minCharge,maxCharge,depth,peptide,smooth,corr,sn,msType,res400,winSize,sl,variant->size());
 }

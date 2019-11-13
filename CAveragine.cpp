@@ -277,7 +277,7 @@ CPeriodicTable* CAveragine::getPT(){
 void CAveragine::loadTable(const char* c){
 
   FILE *f;
-  int  j;
+  int  j,ret;
   atomInfo a;
   double d1,d2;
 
@@ -294,18 +294,18 @@ void CAveragine::loadTable(const char* c){
 
   while(!feof(f)){
    
-    fscanf(f,"%2s\t%d\n",&a.symbol[0],&a.numIsotopes);
+    ret=fscanf(f,"%2s\t%d\n",&a.symbol[0],&a.numIsotopes);
     a.mass->clear();
     a.abundance->clear();
 
     for(j=0;j<a.numIsotopes;j++){
-      fscanf(f,"%lf\t%lf\n",&d1,&d2);
+      ret=fscanf(f,"%lf\t%lf\n",&d1,&d2);
       a.mass->push_back(d1);
       a.abundance->push_back(d2);
     }
 
     enrich->push_back(a);
-    fscanf(f," \n");
+    ret=fscanf(f," \n");
 
   }
 
