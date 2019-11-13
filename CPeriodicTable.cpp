@@ -94,8 +94,9 @@ void CPeriodicTable::loadTable(const char* c){
      It has basic error detection (missing data), but additional
      checks should be made to confirm the content of data
   */
+  int ret;
   while(!feof(fptr)){
-    fscanf(fptr,"%d\t%s\t%lf\n",&e.atomicNum,e.symbol,&e.mass);   
+    ret=fscanf(fptr,"%d\t%s\t%lf\n",&e.atomicNum,e.symbol,&e.mass);   
     table.push_back(e);   
   }
 
