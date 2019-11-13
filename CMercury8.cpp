@@ -166,7 +166,7 @@ void CMercury8::Intro() {
 void CMercury8::InitializeData(const char* fn) {
 
   FILE *ElementFile;
-  int  i, Z;
+  int  i, Z,ret;
 
   //Use default values if an isotope file is not provided
   if(fn==NULL || strlen(fn)==0){
@@ -182,7 +182,7 @@ void CMercury8::InitializeData(const char* fn) {
   for (Z=0; Z<=MAXAtomNo; Z++) {
     Element[Z].Symbol[0]=Element[Z].Symbol[1]=Element[Z].Symbol[2]=0;
 
-    fscanf(ElementFile,"%2s %d\n", &Element[Z].Symbol[0],&Element[Z].NumIsotopes);
+    ret=fscanf(ElementFile,"%2s %d\n", &Element[Z].Symbol[0],&Element[Z].NumIsotopes);
     strcpy(Orig[Z].Symbol,Element[Z].Symbol);
     Orig[Z].NumIsotopes = Element[Z].NumIsotopes;
 
@@ -197,8 +197,8 @@ void CMercury8::InitializeData(const char* fn) {
     //Orig[Z].WrapMass = NULL;
     
     for (i=0; i<Element[Z].NumIsotopes; i++) {
-      fscanf(ElementFile, "%f \n", &Element[Z].IsoMass[i]);
-      fscanf(ElementFile, "%f \n", &Element[Z].IsoProb[i]);
+      ret=fscanf(ElementFile, "%f \n", &Element[Z].IsoMass[i]);
+      ret=fscanf(ElementFile, "%f \n", &Element[Z].IsoProb[i]);
       Element[Z].IntMass[i] = (int)(Element[Z].IsoMass[i]+0.5);
       Orig[Z].IsoMass[i]=Element[Z].IsoMass[i];
       Orig[Z].IsoProb[i]=Element[Z].IsoProb[i];
@@ -212,7 +212,7 @@ void CMercury8::InitializeData(const char* fn) {
     Orig[Z].IsoMass[Orig[Z].NumIsotopes] = 0;
     Orig[Z].IsoProb[Orig[Z].NumIsotopes] = 0;
 
-    fscanf(ElementFile, " \n");
+    ret=fscanf(ElementFile, " \n");
   }
 
   fclose(ElementFile);
