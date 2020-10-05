@@ -52,7 +52,7 @@ int CHardklor2::GoHardklor(CHardklorSetting sett, Spectrum* s){
 	MSReader r;
 	Spectrum curSpec,c;
 	vector<int> v;
-	FILE* fout;
+	FILE* fout=NULL;
 	int TotalScans;
 	int manyPep, zeroPep, lowSigPep;
 	int iPercent;
@@ -92,7 +92,7 @@ int CHardklor2::GoHardklor(CHardklorSetting sett, Spectrum* s){
     return -1;
   }
 
-	if(!bMem) fout=fopen(cs.outFile,"wt");
+  if (!bMem) fout = fopen(cs.outFile, "wt");
 
 	//read a spectrum
 	getExactTime(startTime);
@@ -137,9 +137,9 @@ int CHardklor2::GoHardklor(CHardklorSetting sett, Spectrum* s){
 
 	//Write scan information to output file.
   if(!bMem){
-    if(cs.reducedOutput) WriteScanLine(curSpec,fout,2);
-    else if(cs.xml) WriteScanLine(curSpec,fout,1);
-    else WriteScanLine(curSpec,fout,0);
+    if (cs.reducedOutput) WriteScanLine(curSpec, fout, 2);
+    else if (cs.xml) WriteScanLine(curSpec, fout, 1);
+    else WriteScanLine(curSpec, fout, 0);
   } else {
     currentScanNumber = curSpec.getScanNumber();
   }

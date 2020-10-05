@@ -547,9 +547,10 @@ bool CNoiseReduction::NewScanAverage(Spectrum& sp, char* file, int width, float 
   int widthCount=0;
   int numScans=1;
   double dif;
-  double prec;
+  double prec=0;
   double dt;
-  double c;
+  double c=0;
+  double ppm;
 
   bool bLeft=true;
   int posLeft;
@@ -577,7 +578,7 @@ bool CNoiseReduction::NewScanAverage(Spectrum& sp, char* file, int width, float 
     }
     bs.push_back(ts);
     specs[0]=bs[0];
-    c=CParam(specs[0],3);
+    if (!cs.centroid) c = CParam(specs[0], 3);
     posA=0;
   } else {
     posA++;
@@ -586,7 +587,7 @@ bool CNoiseReduction::NewScanAverage(Spectrum& sp, char* file, int width, float 
       return false; 
     }
     specs[0]=bs[posA];
-    c=CParam(specs[0],3);
+    if (!cs.centroid) c = CParam(specs[0], 3);
   }
 
   specs[0].getRawFilter(cFilter1,256);
@@ -703,7 +704,7 @@ bool CNoiseReduction::NewScanAverage(Spectrum& sp, char* file, int width, float 
       if(specs[m].at(i).intensity<0.1) continue;
       tmz=specs[m].at(i).mz;
       mzcount=1;
-      prec = c * tmz * tmz / 2;
+      if (!cs.centroid) prec = c * tmz * tmz / 2;
       
       for(k=m+1;k<numScans;k++){ //iterate all neighbors
         dif=100000.0;
@@ -713,7 +714,18 @@ bool CNoiseReduction::NewScanAverage(Spectrum& sp, char* file, int width, float 
           dt=fabs(tmz-specs[k].at(j).mz);
 
           if(dt<=dif) {
-            if(dt<prec) {
+
+            if (cs.centroid){
+              ppm = dt / specs[k].at(j).mz*1e6;
+              if (ppm<cs.ppm){
+                specs[m].at(i).intensity += specs[k].at(j).intensity;
+                specs[m].at(i).mz += specs[k].at(j).mz;
+                vPos[k] = j + 1;
+                specs[k].at(j).intensity = -1.0;
+                mzcount++;
+                break;
+              }
+            } else if(dt<prec) {
               //linear interpolate
               //if(specs[k].at(j).mz<tmz && j<specs[k].size()-1){
               //  slope=(specs[k].at(j+1).intensity-specs[k].at(j).intensity)/(specs[k].at(j+1).mz-specs[k].at(j).mz);
@@ -1353,7 +1365,7 @@ bool CNoiseReduction::DeNoiseB(Spectrum& sp){
   }
 
   if(sp.getScanNumber()==0) return false;
-  FirstDerivativePeaks(sp,1);
+  if (!cs.centroid) FirstDerivativePeaks(sp, 1);
   return true;
 
 }
@@ -1377,7 +1389,7 @@ bool CNoiseReduction::DeNoiseC(Spectrum& sp){
   }
 
   if(sp.getScanNumber()==0) return false;
-  FirstDerivativePeaks(sp,1);
+  if(!cs.centroid) FirstDerivativePeaks(sp,1);
   return true;
 
 }
@@ -1401,7 +1413,7 @@ bool CNoiseReduction::DeNoiseD(Spectrum& sp){
   }
 
   if(sp.getScanNumber()==0) return false;
-  FirstDerivativePeaks(sp,1);
+  if (!cs.centroid) FirstDerivativePeaks(sp, 1);
   return true;
 
 }
@@ -1443,9 +1455,10 @@ bool CNoiseReduction::NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int wi
   int numScans=1;
   int match;
   double dif;
-  double prec;
+  double prec=0;
   double dt;
-  double c;
+  double c=0;
+  double ppm;
 
   bool bLeft=true;
   int posLeft;
@@ -1471,7 +1484,7 @@ bool CNoiseReduction::NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int wi
     }
     bs.push_back(ts);
     specs[0]=bs[0];
-    c=CParam(specs[0],3);
+    if (!cs.centroid) c = CParam(specs[0], 3);
     posA=0;
   } else {
     posA++;
@@ -1480,7 +1493,7 @@ bool CNoiseReduction::NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int wi
       return false; 
     }
     specs[0]=bs[posA];
-    c=CParam(specs[0],3);
+    if (!cs.centroid) c = CParam(specs[0], 3);
   }
 
   //set our pivot spectrum
@@ -1577,7 +1590,7 @@ bool CNoiseReduction::NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int wi
 
     for(i=0;i<specs[m].size();i++){ //iterate all points
       if(specs[m].at(i).intensity<0.1) continue;
-      prec = c * specs[m].at(i).mz * specs[m].at(i).mz / 2;
+      if (!cs.centroid) prec = c * specs[m].at(i).mz * specs[m].at(i).mz / 2;
       match=1;
 
       for(k=m+1;k<numScans;k++){ //iterate all neighbors
@@ -1587,10 +1600,20 @@ bool CNoiseReduction::NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int wi
           //cout << "Checking " << j << " of " << specs[k].size() << endl;
           if(specs[k].at(j).intensity<0.1) continue; //skip meaningless datapoints to speed along
           dt=fabs(specs[m].at(i).mz-specs[k].at(j).mz);
+          //cout << dt << "\t" << c << "\t" << prec << endl;
           //dt=specs[m].at(i).mz-specs[k].at(j).mz;
           //if(dt<0.0)dt=-dt;
           if(dt<=dif) {
-            if(dt<prec) {
+            if(cs.centroid){
+              ppm = dt / specs[k].at(j).mz*1e6;
+              if(ppm<cs.ppm){
+                specs[m].at(i).intensity += specs[k].at(j).intensity;
+                vPos[k] = j + 1;
+                specs[k].at(j).intensity = -1.0;
+                match++;
+                break;
+              }
+            } else if(dt<prec) {
               specs[m].at(i).intensity+=specs[k].at(j).intensity;
               vPos[k]=j+1;
               specs[k].at(j).intensity=-1.0;
