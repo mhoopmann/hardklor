@@ -881,7 +881,6 @@ void CHardklor2::QuickCharge(Spectrum& s, int index, vector<int>& v){
 }
 
 void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
-
 	//iterators
 	int i,j,k,n,m,x;
 	size_t varCount;
@@ -960,6 +959,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 	//find lowest intensity;
 	for(i=0;i<s.size();i++){
     //printf("%.6lf\t%.1f\n",s[i].mz, s[i].intensity);
+		if(s[i].intensity<1) continue; //zero is not allowed as a low point
 		if(s[i].intensity<lowPoint) lowPoint=s[i].intensity;
 	}
 
