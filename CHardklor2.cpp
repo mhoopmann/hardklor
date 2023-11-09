@@ -104,9 +104,19 @@ int CHardklor2::GoHardklor(CHardklorSetting sett, Spectrum* s){
     curSpec=*s;
   } else {
 	  if(cs.boxcar==0){
-      if((cs.scan.iLower>0) && (cs.scan.iLower==cs.scan.iUpper)) r.readFile(&cs.inFile[0],curSpec,cs.scan.iLower);
-      else if(cs.scan.iLower>0) r.readFile(&cs.inFile[0],curSpec,cs.scan.iLower);
-	    else r.readFile(&cs.inFile[0],curSpec);
+			if (cs.scan.iLower > 0) {
+				int scn = cs.scan.iLower;
+				r.readFile(&cs.inFile[0], curSpec, scn);
+				while (curSpec.getScanNumber() == 0) {
+					scn++;
+					if (cs.scan.iUpper > 0) {
+						if (scn > cs.scan.iUpper) break;
+					} else {
+						if (scn > r.getLastScan()) break;
+					}
+					r.readFile(NULL, curSpec, scn);
+				}
+			} else r.readFile(&cs.inFile[0], curSpec);
 	  } else {
 		  if(cs.boxcarFilter==0){
         if(!nr.DeNoiseD(curSpec)) curSpec.setScanNumber(0);
@@ -272,6 +282,7 @@ int CHardklor2::GoHardklor(CHardklorSetting sett, Spectrum* s){
 			cout << "You might be able to eek out some better performance by adjusting your parameters." << endl;
 		}
 	}
+
 	return 1;
 
 }

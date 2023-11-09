@@ -570,8 +570,19 @@ bool CNoiseReduction::NewScanAverage(Spectrum& sp, char* file, int width, float 
   if(file!=NULL){
     strcpy(lastFile,file);
     bs.clear();
-    if(scanNum>0) r->readFile(file,ts,scanNum);
-    else r->readFile(file,ts);
+    if (scanNum > 0) {
+      int scn = scanNum;
+      r->readFile(file, ts, scn);
+      while (ts.getScanNumber() == 0) {
+        scn++;
+        if (cs.scan.iUpper > 0) {
+          if (scn > cs.scan.iUpper) break;
+        } else {
+          if (scn > r->getLastScan()) break;
+        }
+        r->readFile(NULL, ts, scn);
+      }
+    } else r->readFile(file, ts);
     if(ts.getScanNumber()==0) {
       delete [] specs;
       return false;
@@ -610,7 +621,7 @@ bool CNoiseReduction::NewScanAverage(Spectrum& sp, char* file, int width, float 
           while(true){
             i--;
             if(i==0) break;
-            r->readFile(lastFile,ts,i);
+            r->readFile(NULL,ts,i);
             if(ts.getScanNumber()==0) continue;
             else break;
           }
@@ -640,7 +651,7 @@ bool CNoiseReduction::NewScanAverage(Spectrum& sp, char* file, int width, float 
       while(true){
         posRight++;
         if(posRight>=(int)bs.size()) { //buffer is too short on right, add spectra
-          r->readFile(lastFile,ts,bs[bs.size()-1].getScanNumber());
+          r->readFile(NULL,ts,bs[bs.size()-1].getScanNumber());
           r->readFile(NULL,ts);
           if(ts.getScanNumber()==0) {
             posRight--;
@@ -1476,8 +1487,19 @@ bool CNoiseReduction::NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int wi
   if(file!=NULL){
     strcpy(lastFile,file);
     bs.clear();
-    if(scanNum>0) r->readFile(file,ts,scanNum);
-    else r->readFile(file,ts);
+    if(scanNum>0) {
+      int scn=scanNum;
+      r->readFile(file,ts,scn);
+      while(ts.getScanNumber()==0){
+        scn++;
+        if (cs.scan.iUpper > 0) {
+          if (scn > cs.scan.iUpper) break;
+        } else {
+          if (scn > r->getLastScan()) break;
+        }
+        r->readFile(NULL,ts,scn);
+      }
+    } else r->readFile(file,ts);
     if(ts.getScanNumber()==0) {
       delete [] specs;
       return false;
@@ -1498,7 +1520,6 @@ bool CNoiseReduction::NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int wi
 
   //set our pivot spectrum
   specs[0].getRawFilter(cFilter1,256);
-
   posLeft=posA;
   posRight=posA;
   while(widthCount<(width*2)){
@@ -1517,7 +1538,7 @@ bool CNoiseReduction::NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int wi
           while(true){
             i--;
             if(i==0) break;
-            r->readFile(lastFile,ts,i);
+            r->readFile(NULL,ts,i);
             if(ts.getScanNumber()==0) continue;
             else break;
           }
@@ -1539,7 +1560,6 @@ bool CNoiseReduction::NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int wi
           }
         }
       }
-
     } else {
       bLeft=true;
       widthCount++;
@@ -1547,7 +1567,7 @@ bool CNoiseReduction::NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int wi
       while(true){
         posRight++;
         if(posRight>=(int)bs.size()) { //buffer is too short on right, add spectra
-          r->readFile(lastFile,ts,bs[bs.size()-1].getScanNumber());
+          r->readFile(NULL,ts,bs[bs.size()-1].getScanNumber());
           r->readFile(NULL,ts);
           if(ts.getScanNumber()==0) {
             posRight--;
