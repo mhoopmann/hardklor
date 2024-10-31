@@ -76,6 +76,8 @@ CHardklorSetting::CHardklorSetting(){
   maxMolMZ=5000;
 
   strcpy(rawFilter,"");
+
+  exportMzML.clear();
 }
 
 CHardklorSetting::CHardklorSetting(const CHardklorSetting& c){
@@ -140,6 +142,8 @@ CHardklorSetting::CHardklorSetting(const CHardklorSetting& c){
   maxMolMZ=c.maxMolMZ;
 
   strcpy(rawFilter,c.rawFilter);
+
+  exportMzML=c.exportMzML;
 }
   
 CHardklorSetting::~CHardklorSetting(){
@@ -207,6 +211,8 @@ CHardklorSetting& CHardklorSetting::operator=(const CHardklorSetting& c){
     maxMolMZ = c.maxMolMZ;
 
     strcpy(rawFilter,c.rawFilter);
+
+    exportMzML = c.exportMzML;
   }
   return *this;
 }

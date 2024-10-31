@@ -227,6 +227,9 @@ void CHardklorParser::parse(char* cmd) {
 		if(atoi(tok)!=0) global.distArea=true;
 		else global.distArea=false;
 
+  } else if (strcmp(param, "export_mzml") == 0) {
+    global.exportMzML=tok;
+
 	} else if(strcmp(param,"hardklor_data")==0){
 		strcpy(global.HardklorFile,tok);
 

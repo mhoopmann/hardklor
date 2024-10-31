@@ -530,6 +530,7 @@ bool CNoiseReduction::ScanAverage(Spectrum& sp, char* file, int width, float cut
   sp.setScanNumber(ps.getScanNumber());
   sp.setScanNumber(ps.getScanNumber(true),true);
   sp.setRTime(ps.getRTime());
+  sp.setMsLevel(ps.getMsLevel());
 
   return true;
 }
@@ -776,6 +777,7 @@ bool CNoiseReduction::NewScanAverage(Spectrum& sp, char* file, int width, float 
   sp.setScanNumber(specs[0].getScanNumber(true),true);
   sp.setRTime(specs[0].getRTime());
   sp.setRawFilter(cFilter1);
+  sp.setMsLevel(specs[0].getMsLevel());
 
   if(posLeft>0){
     while(posLeft>0){
@@ -1342,6 +1344,7 @@ bool CNoiseReduction::ScanAveragePlusDeNoise(Spectrum& sp, char* file, int width
   sp.setScanNumber(ps.getScanNumber(true),true);
   sp.setRTime(ps.getRTime());
   sp.setRawFilter(cFilter1);
+  sp.setMsLevel(ps.getMsLevel());
 
   //clear unused buffer
   if(posLeft>0){
@@ -1671,6 +1674,7 @@ bool CNoiseReduction::NewScanAveragePlusDeNoise(Spectrum& sp, char* file, int wi
   sp.setScanNumber(specs[0].getScanNumber(true),true);
   sp.setRTime(specs[0].getRTime());
   sp.setRawFilter(cFilter1);
+  sp.setMsLevel(specs[0].getMsLevel());
 
   //clear unused buffer
   if(posLeft>0){

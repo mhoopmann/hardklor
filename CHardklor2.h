@@ -23,6 +23,8 @@ limitations under the License.
 #include <list>
 #include <cmath>
 
+#include "NeoMzMLParser.h"
+
 #include "MSObject.h"
 #include "MSReader.h"
 #include "Spectrum.h"
@@ -64,10 +66,12 @@ class CHardklor2{
   void    Centroid(MSToolkit::Spectrum& s, MSToolkit::Spectrum& out);
   bool    CheckForPeak(std::vector<Result>& vMR, MSToolkit::Spectrum& s, int index);
   int     CompareData(const void*, const void*);
+  std::string encodeBinary(void* arr, bool bFloat, bool bZlib);
   double  LinReg(std::vector<float>& mer, std::vector<float>& obs);
   bool    MatchSubSpectrum(MSToolkit::Spectrum& s, int peakIndex, pepHit& pep);
   double  PeakMatcher(std::vector<Result>& vMR, MSToolkit::Spectrum& s, double lower, double upper, double deltaM, int matchIndex, int& matchCount, int& indexOverlap, std::vector<int>& vMatchIndex, std::vector<float>& vMatchIntensity);
   double  PeakMatcherB(std::vector<Result>& vMR, MSToolkit::Spectrum& s, double lower, double upper, double deltaM, int matchIndex, int& matchCount, std::vector<int>& vMatchIndex, std::vector<float>& vMatchIntensity);
+  double  PeakMatcher2024_01(std::vector<Result>& vMR, double areaMR, MSToolkit::Spectrum& s, double lower, double upper, double deltaM, int matchIndex, int& matchCount, int& indexOverlap, std::vector<int>& vMatchIndex, std::vector<float>& vMatchIntensity, int& cMatchCount, double& areaP, hkDComparison* hkd=NULL);
   void    QuickHardklor(MSToolkit::Spectrum& s, std::vector<pepHit>& vPeps);
   void    RefineHits(std::vector<pepHit>& vPeps, MSToolkit::Spectrum& s);
   void    ResultToMem(pepHit& ph, MSToolkit::Spectrum& s);
@@ -87,6 +91,8 @@ class CHardklor2{
   bool                bEcho;
   bool                bMem;
   int                 currentScanNumber;
+
+  NeoMzMLParser*      mzml;
 
   //Vector for holding results in memory should that be needed
   std::vector<hkMem> vResults;

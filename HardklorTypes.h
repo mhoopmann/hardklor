@@ -116,12 +116,35 @@ typedef struct {
   std::vector<sID> *enrich;
 } peps;
 
+
+
+//for Hardklor diagnostics
+typedef struct hkDPeakMatch {
+  double modelPeak = 0;
+  double obsPeak = 0;
+  double ppm = -100; //not necessary to store this, but feeling lazy
+} hkDPeakMatch;
+typedef struct hkDComparison {
+  int count = 0;  //number of peaks in use
+  int match = 0;  //matches in the final result
+  int maxMatch = 0;
+  double firstCorr = 0;
+  double lastCorr = 0;
+  hkDPeakMatch peaks[30];  //should be more than necessary. ever.
+} hkDComparison;
+
+
+
+
 typedef struct pepHit{
 	int basePeakIndex;
 	int charge;
 	int lowIndex;
 	int highIndex;
 	int variantIndex;
+  int matchCount;          //new
+  int consMatchCount;      //new
+  int modelSize;           //new
 	float intensity;
 	float area;
 	double massShift;
@@ -129,7 +152,9 @@ typedef struct pepHit{
 	double highMZ;
 	double monoMass;
 	double corr;
+  double modelArea;        //new
 	char averagine[32];
+  hkDComparison diagnostic; //new
 } pepHit;
 
 typedef struct mercuryModel{

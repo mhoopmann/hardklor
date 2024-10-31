@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 	CMercury8 *mercury;
 	CModelLibrary *models;
 
-	cout << "Hardklor v2.3.6, November 8 2023" << endl;
+	cout << "Hardklor v2.4.1dev, January 2 2024" << endl;
 	cout << "Mike Hoopmann, Mike MacCoss\nCopyright 2007-2023\nUniversity of Washington" << endl;
 	if(argc < 2 || (argc>2 && strcmp(argv[1],"-cmd")!=0) ){
 		cout << "Usage:\t\thardklor <config file>\n";

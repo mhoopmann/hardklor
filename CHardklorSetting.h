@@ -97,6 +97,8 @@ class CHardklorSetting {
   MSToolkit::MSFileFormat fileFormat;            //File format
   MSToolkit::MSSpectrumType mzXMLFilter;         //Filter for mzXML files
 
+  std::string exportMzML;
+
  protected:
  private:
 
