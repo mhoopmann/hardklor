@@ -822,7 +822,7 @@ bool CHardklor2::MatchSubSpectrum(Spectrum& s, int peakIndex, pepHit& pep){
 }
 
 double CHardklor2::PeakMatcher(vector<Result>& vMR, Spectrum& s, double lower, double upper, double deltaM, int matchIndex, int& matchCount, int& indexOverlap, vector<int>& vMatchIndex, vector<float>& vMatchIntensity){
-	cout << "PeakMatcher " << lower << "-" << upper << endl;
+	//cout << "PeakMatcher " << lower << "-" << upper << endl;
 	vMatchIndex.clear();
 	vMatchIntensity.clear();
 
@@ -874,7 +874,7 @@ double CHardklor2::PeakMatcher(vector<Result>& vMR, Spectrum& s, double lower, d
 		if(!match) {
       //if expected peak is significant (above 50 rel abun) and has no match, match it to 0.
       if(vMR[k].data>50.0) {
-        cout << " xM: " << vMR[k].mass << "\t0" << endl;
+        //cout << " xM: " << vMR[k].mass << "\t0" << endl;
         mer.push_back((float)vMR[k].data);
         obs.push_back(0.0f);
         if(bMax) break;
@@ -882,13 +882,13 @@ double CHardklor2::PeakMatcher(vector<Result>& vMR, Spectrum& s, double lower, d
       
 		} else {
 			mer.push_back((float)vMR[k].data);
-      cout << " xM: " << vMR[k].mass << "\t" << s[matchIndex].mz << "," << s[matchIndex].intensity << "\t" << (vMR[k].mass- s[matchIndex].mz)/ s[matchIndex].mz*1e6; 
-			if((vMR[k].mass - s[matchIndex].mz) / s[matchIndex].mz * 1e6 >10) cout << "!!!";
-			cout << endl;
+      //cout << " xM: " << vMR[k].mass << "\t" << s[matchIndex].mz << "," << s[matchIndex].intensity << "\t" << (vMR[k].mass- s[matchIndex].mz)/ s[matchIndex].mz*1e6; 
+			//if((vMR[k].mass - s[matchIndex].mz) / s[matchIndex].mz * 1e6 >10) cout << "!!!";
+			//cout << endl;
 			if(mask[matchIndex].intensity>0.1 && vMR[k].data>50) {
 				if(indexOverlap<0) {
 					indexOverlap=matchIndex;
-					cout << " indexOverlap=" << matchIndex<<endl;
+					//cout << " indexOverlap=" << matchIndex<<endl;
 				}
 			}
 			if(s[matchIndex].intensity<0.1) {
@@ -905,10 +905,10 @@ double CHardklor2::PeakMatcher(vector<Result>& vMR, Spectrum& s, double lower, d
 	if(matchCount<2) corr=0.0;
 	else corr=LinReg(mer,obs);
 
-	for(j=0;j<mer.size();j++){
-    cout << " M:" << mer[j] << "\t" << "O:" << obs[j] << endl;
-	}
-	cout << " Corr: " << corr << "(" << matchCount << ")" << endl;
+	//for(j=0;j<mer.size();j++){
+  //  cout << " M:" << mer[j] << "\t" << "O:" << obs[j] << endl;
+	//}
+	//cout << " Corr: " << corr << "(" << matchCount << ")" << endl;
 
   //remove last matched peaks (possibly overlap with other peaks) but only if they are of low abundance.
 	int tmpCount=matchCount;
@@ -917,14 +917,14 @@ double CHardklor2::PeakMatcher(vector<Result>& vMR, Spectrum& s, double lower, d
 		obs.pop_back();
 		matchCount--;
 		double corr2=LinReg(mer,obs);
-		cout << " Old corr: " << corr << "(" << matchCount+1 << ")" << " New corr: " << corr2 << endl;
+		//cout << " Old corr: " << corr << "(" << matchCount+1 << ")" << " New corr: " << corr2 << endl;
 		if(corr2>corr) {
 			corr=corr2;
 			tmpCount=matchCount;
 		}
 	}
 	matchCount=tmpCount;
-	cout << "Done PeakMatcher" << endl;
+	//cout << "Done PeakMatcher" << endl;
 	return corr;
 }
 
@@ -1013,7 +1013,7 @@ double CHardklor2::PeakMatcherB(vector<Result>& vMR, Spectrum& s, double lower, 
 }
 
 double CHardklor2::PeakMatcher2024_01(vector<Result>& vMR, double areaMR, Spectrum& s, double lower, double upper, double deltaM, int matchIndex, int& matchCount, int& indexOverlap, vector<int>& vMatchIndex, vector<float>& vMatchIntensity, int& cMatchCount, double& areaP, hkDComparison* hkd) {
-	cout << "PeakMatcher 2024.01: " << lower << "-" << upper << endl;
+	//cout << "PeakMatcher 2024.01: " << lower << "-" << upper << endl;
 	vMatchIndex.clear();
 	vMatchIntensity.clear();
 
@@ -1034,7 +1034,7 @@ double CHardklor2::PeakMatcher2024_01(vector<Result>& vMR, double areaMR, Spectr
 	int conMax=0;   //max consecutive matches
 	int j, k;
 	for (k = 0; k < (int)vMR.size(); k++) {
-		cout << "\tVMR:" << vMR.size() << "\t" << vMR[k].mass << "\t" << vMR[k].data << endl;
+		//cout << "\tVMR:" << vMR.size() << "\t" << vMR[k].mass << "\t" << vMR[k].data << endl;
 		if (vMR[k].data > 99.9) bMax = true;
 		if(hkd) hkd->peaks[hkd->count].modelPeak=vMR[k].mass;
 
@@ -1053,7 +1053,7 @@ double CHardklor2::PeakMatcher2024_01(vector<Result>& vMR, double areaMR, Spectr
 			}
 			j--;
 		}
-		cout << "Left: " << match << "\t" << matchIndex << "\t" << s[matchIndex].mz << "\t" << dif <<endl;
+		//cout << "Left: " << match << "\t" << matchIndex << "\t" << s[matchIndex].mz << "\t" << dif <<endl;
 
 		//look right
 		j = matchIndex + 1;
@@ -1067,7 +1067,7 @@ double CHardklor2::PeakMatcher2024_01(vector<Result>& vMR, double areaMR, Spectr
 			}
 			j++;
 		}
-		cout << "Right: " << match << "\t" << matchIndex << "\t" << s[matchIndex].mz << "\t" << dif << endl;
+		//cout << "Right: " << match << "\t" << matchIndex << "\t" << s[matchIndex].mz << "\t" << dif << endl;
 
 		if (!match) {
 			//if expected peak is significant (above 50 rel abun) and has no match, match it to 0.
@@ -1076,7 +1076,7 @@ double CHardklor2::PeakMatcher2024_01(vector<Result>& vMR, double areaMR, Spectr
 					hkd->peaks[hkd->count].obsPeak=0; 
 					hkd->peaks[hkd->count].ppm=-100;
 				}
-				cout << " xM: " << vMR[k].mass << "\t0" << endl;
+				//cout << " xM: " << vMR[k].mass << "\t0" << endl;
 				mer.push_back((float)vMR[k].data);
 				obs.push_back(0.0f);
 				if (bMax) break;  //if this was the model's base isotope peak, quit now. it MUST match.
@@ -1085,13 +1085,13 @@ double CHardklor2::PeakMatcher2024_01(vector<Result>& vMR, double areaMR, Spectr
 
 		} else {
 			mer.push_back((float)vMR[k].data);
-			cout << " xM: " << vMR[k].mass << "\t" << s[matchIndex].mz << "," << s[matchIndex].intensity << "\t" << (vMR[k].mass - s[matchIndex].mz) / s[matchIndex].mz * 1e6;
-			if ((vMR[k].mass - s[matchIndex].mz) / s[matchIndex].mz * 1e6 > 10) cout << "!!!";
-			cout << endl;
+			//cout << " xM: " << vMR[k].mass << "\t" << s[matchIndex].mz << "," << s[matchIndex].intensity << "\t" << (vMR[k].mass - s[matchIndex].mz) / s[matchIndex].mz * 1e6;
+			//if ((vMR[k].mass - s[matchIndex].mz) / s[matchIndex].mz * 1e6 > 10) cout << "!!!";
+			//cout << endl;
 			if (mask[matchIndex].intensity > 0.1 && vMR[k].data > 50) {
 				if (indexOverlap < 0) {
 					indexOverlap = matchIndex;
-					cout << " indexOverlap=" << matchIndex << endl;
+					//cout << " indexOverlap=" << matchIndex << endl;
 				}
 			}
 			if (s[matchIndex].intensity < 0.1) {
@@ -1124,10 +1124,10 @@ double CHardklor2::PeakMatcher2024_01(vector<Result>& vMR, double areaMR, Spectr
 		hkd->firstCorr=hkd->lastCorr=corr;
 	}
 
-	for (j = 0; j < mer.size(); j++) {
-		cout << " M:" << mer[j] << "\t" << "O:" << obs[j] << endl;
-	}
-	cout << " Corr: " << corr << " Matches: " << matchCount << " Consecutive: " << conMax << endl;
+	//for (j = 0; j < mer.size(); j++) {
+	//	cout << " M:" << mer[j] << "\t" << "O:" << obs[j] << endl;
+	//}
+	//cout << " Corr: " << corr << " Matches: " << matchCount << " Consecutive: " << conMax << endl;
 
 	//remove last matched peaks (possibly overlap with other peaks) but only if they are of low abundance.
 	//this bit of refinement is questionable, but exists because dealing with low model peaks and noise is tricky.
@@ -1149,9 +1149,9 @@ double CHardklor2::PeakMatcher2024_01(vector<Result>& vMR, double areaMR, Spectr
 	cMatchCount=conMax;
 	float tot=0;
 	for(size_t a=0;a<mer.size();a++) if(obs[a]>0) tot+=mer[a]; //tally matched peaks
-	cout << tot << " vs. " << areaMR << " = " << tot/areaMR << endl;
+	//cout << tot << " vs. " << areaMR << " = " << tot/areaMR << endl;
 	areaP=tot/areaMR;
-	cout << "Done PeakMatcher" << endl;
+	//cout << "Done PeakMatcher" << endl;
 	return corr;
 }
 
@@ -1297,7 +1297,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 	hkDComparison bestComparison;
 
 
-	cout << "Next spectrum: " << s.getScanNumber() << endl;
+	//cout << "Next spectrum: " << s.getScanNumber() << endl;
 
 	//create mask
 	mask.clear();
@@ -1348,21 +1348,21 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 		bestMatchCount=0;
 		for(i=0;i<(int)charges.size();i++){
 
-			cout << "Next Peak: " << s[maxIndex].mz << " " << s[maxIndex].intensity << "\t" << charges[i] << endl;
+			//cout << "Next Peak: " << s[maxIndex].mz << " " << s[maxIndex].intensity << "\t" << charges[i] << endl;
 
 			//check all variants
 			for(v=0;v<varCount;v++){
 
-        cout << "Variant: " << v << endl;
+        //cout << "Variant: " << v << endl;
 
 				//use model library, align to top 3 peaks
 				dif=0;
         top3[0]=top3[1]=top3[2]=0;
         maxMercuryIndex[0]=maxMercuryIndex[1]=maxMercuryIndex[2]=-1;
 				model=models->getModel(charges[i],(int)v,s[maxIndex].mz);
-				cout << "Model: " << model->area << endl;
+				//cout << "Model: " << model->area << endl;
 				for(k=0; k<model->size; k++) {
-          cout << "i\t" << model->peaks[k].mz << "\t" << model->peaks[k].intensity << endl;
+          //cout << "i\t" << model->peaks[k].mz << "\t" << model->peaks[k].intensity << endl;
 					//if(model->peaks[k].intensity>dif){
           if(model->peaks[k].intensity>top3[0]){
 						//dif = model->peaks[k].intensity;
@@ -1440,7 +1440,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 					int cMatchCount=0;
 					double areaP=0;
 					corr=PeakMatcher2024_01(vMR,da,s,lower,upper,deltaM/2,maxIndex,matchCount,indexOverlap,vMatchIndex,vMatchPeak,cMatchCount,areaP,&comparison);
-					cout << "Top corr: " << corr << endl;
+					//cout << "Top corr: " << corr << endl;
 					//cout << "ii.i\t" << s[maxIndex].mz << " " << s[maxIndex].intensity << "\t" << charges[i] << "\t" << matchCount << "\t" << corr << "\t" << indexOverlap << "\t" << maxIndex << "\tn" << n << endl;
 
 					//check any overlap with observed peptides. Overlap indicates deconvolution may be necessary.
@@ -1508,7 +1508,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 								vMatchIndex=vMatchIndex2;
 								vMatchPeak=vMatchPeak2;
 								matchCount=matchCount2;
-								cout << "Refinement happened somewhere: " << corr3 << endl;
+								//cout << "Refinement happened somewhere: " << corr3 << endl;
 
 								//refine the overlapping one.
 								keepPH=true;
@@ -1531,7 +1531,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
           double tCorr;
           if(bestMatchCount==0) tCorr=0;
           else tCorr=0.025*(matchCount-bestMatchCount)/bestMatchCount;
-					cout << "Old best corr: " << bestCorr << "(" << bestMatchCount << ") This corr: " << corr << "," << corr+tCorr << "(" << matchCount << ")" << endl;
+					//cout << "Old best corr: " << bestCorr << "(" << bestMatchCount << ") This corr: " << corr << "," << corr+tCorr << "(" << matchCount << ")" << endl;
 					if(/*corr>bestCorr ||*/ (corr>cs.corr && corr+tCorr>bestCorr) ){
 						bestMatchIndex=vMatchIndex;
 						bestMatchPeak=vMatchPeak;
@@ -1582,7 +1582,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 			ph.modelSize=bestModelSize;
 			ph.diagnostic=bestComparison;
 			if(bestKeepPH){
-				cout << "Changed " << bestOverlap << " which was " << vPeps[bestOverlap].monoMass << "\t" << vPeps[bestOverlap].charge << "\t" << vPeps[bestOverlap].corr << "\t" << vPeps[bestOverlap].variantIndex << endl;
+				//cout << "Changed " << bestOverlap << " which was " << vPeps[bestOverlap].monoMass << "\t" << vPeps[bestOverlap].charge << "\t" << vPeps[bestOverlap].corr << "\t" << vPeps[bestOverlap].variantIndex << endl;
 				vPeps[bestOverlap].area=bestPH.area;
 				vPeps[bestOverlap].intensity=bestPH.intensity;
 				vPeps[bestOverlap].corr=bestPH.corr;
@@ -1591,7 +1591,7 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
 				vPeps[bestOverlap].variantIndex=bestPH.variantIndex;
 			}
 			vPeps.push_back(ph);
-			cout << vPeps.size()-1 << " New top dog: " << ph.monoMass << "\t" << s[ph.basePeakIndex].mz << "\t" << ph.charge << "\t" << ph.corr << "\t" << ph.variantIndex << "\t" << ph.matchCount << "\t" << ph.consMatchCount << "\t" << ph.modelArea << "\t" << ph.modelSize << endl;
+			//cout << vPeps.size()-1 << " New top dog: " << ph.monoMass << "\t" << s[ph.basePeakIndex].mz << "\t" << ph.charge << "\t" << ph.corr << "\t" << ph.variantIndex << "\t" << ph.matchCount << "\t" << ph.consMatchCount << "\t" << ph.modelArea << "\t" << ph.modelSize << endl;
 			mask[maxIndex].intensity=100.0f;
 
 			for(k=0;k<(int)bestMatchIndex.size();k++){
@@ -1614,10 +1614,10 @@ void CHardklor2::QuickHardklor(Spectrum& s, vector<pepHit>& vPeps) {
   //order dependent.
 	if(vPeps.size()>0) qsort(&vPeps[0],vPeps.size(),sizeof(pepHit),CompareBPI);
 
-	cout << "Before RefineHits:" << endl;
-	for(size_t a=0;a<vPeps.size();a++){
-		cout << vPeps[a].monoMass << "\t" << vPeps[a].charge << "\t" << s[vPeps[a].basePeakIndex].mz << "\t" << vPeps[a].corr << "\t" << vPeps[a].variantIndex << endl;
-	}
+	//cout << "Before RefineHits:" << endl;
+	//for(size_t a=0;a<vPeps.size();a++){
+	//	cout << vPeps[a].monoMass << "\t" << vPeps[a].charge << "\t" << s[vPeps[a].basePeakIndex].mz << "\t" << vPeps[a].corr << "\t" << vPeps[a].variantIndex << endl;
+	//}
 
 	//Refine overfitting based on density
 	RefineHits(vPeps,origSpec);
